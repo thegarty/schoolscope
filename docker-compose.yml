@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: schoolscope-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: schoolscope
+      POSTGRES_USER: schoolscope_user
+      POSTGRES_PASSWORD: schoolscope_password
+    ports:
+      - "55442:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U schoolscope_user -d schoolscope"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data: 

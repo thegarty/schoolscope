@@ -1,0 +1,9 @@
+# Database - Docker PostgreSQL on port 55442
+DATABASE_URL="postgresql://schoolscope_user:schoolscope_password@localhost:55442/schoolscope?schema=public"
+
+# Auth - Generate a secure random secret for production
+NEXTAUTH_SECRET="schoolscope-dev-secret-change-in-production-2024"
+NEXTAUTH_URL="http://localhost:3000"
+
+# App
+NEXT_PUBLIC_APP_URL="http://localhost:3000" 
