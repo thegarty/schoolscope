@@ -38,6 +38,14 @@ export default function EventConfirmation({
         const data = await response.json()
         setIsConfirmed(!isConfirmed)
         setCount(data.confirmationCount)
+        
+        // If the event status changed (confirmed/unconfirmed), refresh the page
+        if (data.eventConfirmed !== undefined) {
+          // Small delay to show the updated count first
+          setTimeout(() => {
+            window.location.reload()
+          }, 500)
+        }
       } else {
         console.error('Failed to update confirmation')
       }

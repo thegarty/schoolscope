@@ -50,9 +50,19 @@ export async function POST(
       where: { eventId }
     })
 
+    // Auto-confirm event if it reaches the threshold (3 confirmations)
+    const CONFIRMATION_THRESHOLD = 3
+    if (confirmationCount >= CONFIRMATION_THRESHOLD && !event.confirmed) {
+      await db.event.update({
+        where: { id: eventId },
+        data: { confirmed: true }
+      })
+    }
+
     return NextResponse.json({ 
       success: true, 
-      confirmationCount 
+      confirmationCount,
+      eventConfirmed: confirmationCount >= CONFIRMATION_THRESHOLD
     })
   } catch (error) {
     console.error('Error confirming event:', error)
@@ -72,6 +82,15 @@ export async function DELETE(
 
     const eventId = params.id
 
+    // Check if event exists
+    const event = await db.event.findUnique({
+      where: { id: eventId }
+    })
+
+    if (!event) {
+      return NextResponse.json({ error: 'Event not found' }, { status: 404 })
+    }
+
     // Remove confirmation
     await db.eventConfirmation.deleteMany({
       where: {
@@ -85,9 +104,19 @@ export async function DELETE(
       where: { eventId }
     })
 
+    // Un-confirm event if it falls below the threshold (3 confirmations)
+    const CONFIRMATION_THRESHOLD = 3
+    if (confirmationCount < CONFIRMATION_THRESHOLD && event.confirmed) {
+      await db.event.update({
+        where: { id: eventId },
+        data: { confirmed: false }
+      })
+    }
+
     return NextResponse.json({ 
       success: true, 
-      confirmationCount 
+      confirmationCount,
+      eventConfirmed: confirmationCount >= CONFIRMATION_THRESHOLD
     })
   } catch (error) {
     console.error('Error removing event confirmation:', error)
