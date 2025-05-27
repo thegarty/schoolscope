@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { School, Calendar, Users, Plus, Home, Menu, X } from 'lucide-react'
 import NotificationBell from './NotificationBell'
 import { useState } from 'react'
+import { logout } from '@/lib/actions'
 
 interface User {
   id: string
@@ -158,7 +159,7 @@ export default function AppHeader({ user, showNotifications = true }: AppHeaderP
                   <span className="text-sm text-gray-700">
                     Welcome, {user.name || user.email.split('@')[0]}
                   </span>
-                  <form action="/api/auth/logout" method="POST">
+                  <form action={logout}>
                     <Button variant="outline" type="submit" size="sm">
                       Logout
                     </Button>
@@ -167,7 +168,7 @@ export default function AppHeader({ user, showNotifications = true }: AppHeaderP
 
                 {/* Mobile User Menu */}
                 <div className="sm:hidden">
-                  <form action="/api/auth/logout" method="POST">
+                  <form action={logout}>
                     <Button variant="outline" type="submit" size="sm">
                       Logout
                     </Button>

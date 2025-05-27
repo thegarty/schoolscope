@@ -1,5 +1,6 @@
 import { db } from '@/lib/db'
 import { validateRequest } from '@/auth/lucia'
+import { logout } from '@/lib/actions'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { SuburbSearch } from '@/components/ui/suburb-search'
@@ -74,7 +75,7 @@ export default async function BrowseSchoolsPage({ searchParams }: { searchParams
                     <Link href="/dashboard">Dashboard</Link>
                   </Button>
                   <span className="text-sm text-gray-700">Welcome, {user.name || user.email}</span>
-                  <form action="/api/auth/logout" method="POST">
+                  <form action={logout}>
                     <Button variant="outline" type="submit">
                       Logout
                     </Button>

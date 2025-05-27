@@ -44,6 +44,8 @@ export const validateRequest = cache(async () => {
   return result;
 });
 
+
+
 declare module "lucia" {
   interface Register {
     Lucia: typeof lucia;
