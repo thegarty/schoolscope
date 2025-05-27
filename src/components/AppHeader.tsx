@@ -1,7 +1,10 @@
+'use client'
+
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { School, Calendar, Users, Plus, Home } from 'lucide-react'
+import { School, Calendar, Users, Plus, Home, Menu, X } from 'lucide-react'
 import NotificationBell from './NotificationBell'
+import { useState } from 'react'
 
 interface User {
   id: string
@@ -15,6 +18,8 @@ interface AppHeaderProps {
 }
 
 export default function AppHeader({ user, showNotifications = true }: AppHeaderProps) {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+
   return (
     <header className="bg-white shadow">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -72,10 +77,77 @@ export default function AppHeader({ user, showNotifications = true }: AppHeaderP
             {user ? (
               <>
                 {/* Mobile Navigation Menu */}
-                <div className="md:hidden">
-                  <Button asChild variant="outline" size="sm">
-                    <Link href="/dashboard">Menu</Link>
+                <div className="md:hidden relative">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                    className="relative"
+                  >
+                    {isMobileMenuOpen ? (
+                      <X className="h-4 w-4" />
+                    ) : (
+                      <Menu className="h-4 w-4" />
+                    )}
                   </Button>
+
+                  {isMobileMenuOpen && (
+                    <div className="absolute right-0 top-full mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                      <div className="p-2">
+                        <div className="space-y-1">
+                          <Link
+                            href="/dashboard"
+                            className="flex items-center w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                          >
+                            <Calendar className="h-4 w-4 mr-3" />
+                            My Calendar
+                          </Link>
+                          <Link
+                            href="/events"
+                            className="flex items-center w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                          >
+                            <Home className="h-4 w-4 mr-3" />
+                            All Events
+                          </Link>
+                          <Link
+                            href="/children"
+                            className="flex items-center w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                          >
+                            <Users className="h-4 w-4 mr-3" />
+                            Children
+                          </Link>
+                          <Link
+                            href="/schools"
+                            className="flex items-center w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                          >
+                            <School className="h-4 w-4 mr-3" />
+                            Schools
+                          </Link>
+                          <div className="border-t border-gray-200 my-2"></div>
+                          <Link
+                            href="/events/create"
+                            className="flex items-center w-full px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-md font-medium"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                          >
+                            <Plus className="h-4 w-4 mr-3" />
+                            Add Event
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Overlay to close dropdown when clicking outside */}
+                  {isMobileMenuOpen && (
+                    <div
+                      className="fixed inset-0 z-40"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    />
+                  )}
                 </div>
 
                 {/* Notifications */}

@@ -54,19 +54,29 @@ export default function NotificationBell() {
         const data = await response.json()
         setNotifications(data.notifications)
         setCounts(data.counts)
+      } else if (response.status === 401) {
+        // User not authenticated, don't show error
+        setNotifications([])
+        setCounts({ total: 0, eventsNeedingConfirmation: 0, schoolEditsNeedingVotes: 0, upcomingEvents: 0 })
       }
     } catch (error) {
       console.error('Error fetching notifications:', error)
+      // Set empty state on error
+      setNotifications([])
+      setCounts({ total: 0, eventsNeedingConfirmation: 0, schoolEditsNeedingVotes: 0, upcomingEvents: 0 })
     } finally {
       setIsLoading(false)
     }
   }
 
   useEffect(() => {
-    fetchNotifications()
-    // Refresh notifications every 5 minutes
-    const interval = setInterval(fetchNotifications, 5 * 60 * 1000)
-    return () => clearInterval(interval)
+    // Only fetch notifications in the browser
+    if (typeof window !== 'undefined') {
+      fetchNotifications()
+      // Refresh notifications every 5 minutes
+      const interval = setInterval(fetchNotifications, 5 * 60 * 1000)
+      return () => clearInterval(interval)
+    }
   }, [])
 
   const handleConfirmEvent = async (eventId: string) => {

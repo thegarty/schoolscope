@@ -5,33 +5,17 @@ import { Button } from '@/components/ui/button'
 import { Calendar, School, MapPin, Clock, Users, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { Metadata } from 'next'
-import { createSchoolSlug } from '../page'
+import { createSchoolSlug, findSchoolBySlug } from '@/lib/school-utils'
 
 interface SchoolEventsPageProps {
   params: { slug: string }
   searchParams?: { category?: string; confirmed?: string; page?: string }
 }
 
-// Helper function to find school by slug
-async function findSchoolBySlug(slug: string) {
-  const schools = await db.school.findMany({
-    select: {
-      id: true,
-      name: true,
-      suburb: true,
-      state: true
-    }
-  })
 
-  const school = schools.find(s => 
-    createSchoolSlug(s.name, s.suburb, s.state) === slug
-  )
-
-  return school?.id || null
-}
 
 export async function generateMetadata({ params }: SchoolEventsPageProps): Promise<Metadata> {
-  const schoolId = await findSchoolBySlug(params.slug)
+  const schoolId = await findSchoolBySlug(params.slug, db)
   
   if (!schoolId) {
     return {
@@ -62,7 +46,7 @@ export async function generateMetadata({ params }: SchoolEventsPageProps): Promi
 }
 
 export default async function SchoolEventsPage({ params, searchParams }: SchoolEventsPageProps) {
-  const schoolId = await findSchoolBySlug(params.slug)
+  const schoolId = await findSchoolBySlug(params.slug, db)
   
   if (!schoolId) {
     notFound()
@@ -299,6 +283,89 @@ export default async function SchoolEventsPage({ params, searchParams }: SchoolE
           )}
         </div>
       </main>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white py-12">
+        <div className="container px-4 md:px-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            {/* Brand */}
+            <div className="md:col-span-1">
+              <div className="flex items-center mb-4">
+                <School className="h-6 w-6 mr-2" />
+                <span className="font-bold text-xl">SchoolScope</span>
+              </div>
+              <p className="text-gray-400 text-sm">
+                Connecting Australian school communities through events, calendars, and information sharing.
+              </p>
+            </div>
+
+            {/* Schools by State */}
+            <div>
+              <h3 className="font-semibold mb-4">Schools by State</h3>
+              <div className="space-y-2">
+                <Link href="/schools/state/nsw" className="block text-sm text-gray-400 hover:text-white transition-colors">
+                  New South Wales Schools
+                </Link>
+                <Link href="/schools/state/vic" className="block text-sm text-gray-400 hover:text-white transition-colors">
+                  Victoria Schools
+                </Link>
+                <Link href="/schools/state/qld" className="block text-sm text-gray-400 hover:text-white transition-colors">
+                  Queensland Schools
+                </Link>
+                <Link href="/schools/state/wa" className="block text-sm text-gray-400 hover:text-white transition-colors">
+                  Western Australia Schools
+                </Link>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="font-semibold mb-4">More States</h3>
+              <div className="space-y-2">
+                <Link href="/schools/state/sa" className="block text-sm text-gray-400 hover:text-white transition-colors">
+                  South Australia Schools
+                </Link>
+                <Link href="/schools/state/tas" className="block text-sm text-gray-400 hover:text-white transition-colors">
+                  Tasmania Schools
+                </Link>
+                <Link href="/schools/state/nt" className="block text-sm text-gray-400 hover:text-white transition-colors">
+                  Northern Territory Schools
+                </Link>
+                <Link href="/schools/state/act" className="block text-sm text-gray-400 hover:text-white transition-colors">
+                  ACT Schools
+                </Link>
+              </div>
+            </div>
+
+            {/* Quick Links */}
+            <div>
+              <h3 className="font-semibold mb-4">Quick Links</h3>
+              <div className="space-y-2">
+                <Link href="/schools" className="block text-sm text-gray-400 hover:text-white transition-colors">
+                  Browse All Schools
+                </Link>
+                <Link href="/register" className="block text-sm text-gray-400 hover:text-white transition-colors">
+                  Join SchoolScope
+                </Link>
+                <Link href="/privacy" className="block text-sm text-gray-400 hover:text-white transition-colors">
+                  Privacy Policy
+                </Link>
+                <Link href="/terms" className="block text-sm text-gray-400 hover:text-white transition-colors">
+                  Terms of Service
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center">
+            <p className="text-xs text-gray-400">
+              © 2024 SchoolScope. All rights reserved.
+            </p>
+            <p className="text-xs text-gray-400 mt-2 sm:mt-0">
+              Connecting 10,000+ Australian schools nationwide
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 } 

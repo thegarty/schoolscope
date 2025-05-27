@@ -2,27 +2,19 @@ import { db } from '@/lib/db'
 import { validateRequest } from '@/auth/lucia'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { SuburbSearch } from '@/components/ui/suburb-search'
 import { School, Search, MapPin } from 'lucide-react'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-
-// Helper function to create a slug from school name and suburb
-function createSchoolSlug(name: string, suburb: string, state: string): string {
-  const combined = `${name} ${suburb} ${state}`
-  return combined
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
-    .replace(/\s+/g, '-') // Replace spaces with hyphens
-    .replace(/-+/g, '-') // Replace multiple hyphens with single
-    .trim()
-}
+import { createSchoolSlug } from '@/lib/school-utils'
 
 export const dynamic = 'force-dynamic'
 
 export default async function BrowseSchoolsPage({ searchParams }: { searchParams?: Record<string, string> }) {
   const { user } = await validateRequest()
   // Filters
-  const q = searchParams?.q?.trim() || ''
+  const name = searchParams?.name?.trim() || ''
+  const suburb = searchParams?.suburb?.trim() || ''
   const state = searchParams?.state || ''
   const type = searchParams?.type || ''
   const sector = searchParams?.sector || ''
@@ -30,27 +22,25 @@ export default async function BrowseSchoolsPage({ searchParams }: { searchParams
   const pageSize = 20
 
   // Get distinct values for filters
-  const [states, types, sectors] = await Promise.all([
+  const [states, types, sectors, suburbs] = await Promise.all([
     db.school.findMany({ distinct: ['state'], select: { state: true }, orderBy: { state: 'asc' } }),
     db.school.findMany({ distinct: ['type'], select: { type: true }, orderBy: { type: 'asc' } }),
-    db.school.findMany({ distinct: ['sector'], select: { sector: true }, orderBy: { sector: 'asc' } })
+    db.school.findMany({ distinct: ['sector'], select: { sector: true }, orderBy: { sector: 'asc' } }),
+    db.school.findMany({ distinct: ['suburb'], select: { suburb: true }, orderBy: { suburb: 'asc' } })
   ])
 
   // Build query dynamically
   const where: any = {}
-  if (q) {
-    where.OR = [
-      { name: { contains: q, mode: 'insensitive' } },
-      { suburb: { contains: q, mode: 'insensitive' } },
-      { postcode: { contains: q, mode: 'insensitive' } }
-    ]
+  if (name) {
+    where.name = { contains: name, mode: 'insensitive' }
   }
+  if (suburb) where.suburb = suburb
   if (state) where.state = state
   if (type) where.type = type
   if (sector) where.sector = sector
 
   // Only show results if at least one filter or search is set
-  const hasQuery = !!q || !!state || !!type || !!sector
+  const hasQuery = !!name || !!suburb || !!state || !!type || !!sector
   let schools: any[] = []
   let total = 0
   let totalPages = 0
@@ -126,25 +116,32 @@ export default async function BrowseSchoolsPage({ searchParams }: { searchParams
         <div className="mb-8">
           <h2 className="text-2xl font-semibold text-gray-900 mb-4">Find Your School</h2>
           <p className="text-gray-600">
-            Search by school name, suburb, or postcode to find schools and view their events and information.
+            Search by school name, suburb, state, type, and sector to find schools and view their events and information.
           </p>
         </div>
+        
         {/* Search Form */}
         <Card className="mb-8">
           <CardHeader>
             <CardTitle className="flex items-center">
               <Search className="h-5 w-5 mr-2" />
-              Search Schools
+              Search Australian Schools
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <form className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <form className="grid grid-cols-1 md:grid-cols-5 gap-4">
               <input
                 type="text"
-                name="q"
-                placeholder="Search by name, suburb, postcode..."
-                defaultValue={q}
+                name="name"
+                placeholder="School name..."
+                defaultValue={name}
                 className="border rounded-md px-3 py-2 w-full"
+              />
+              <SuburbSearch 
+                suburbs={suburbs.map(s => s.suburb)}
+                defaultValue={suburb}
+                name="suburb"
+                placeholder="Search suburbs..."
               />
               <select name="state" defaultValue={state} className="border rounded-md px-3 py-2 w-full">
                 <option value="">All States</option>
@@ -164,7 +161,7 @@ export default async function BrowseSchoolsPage({ searchParams }: { searchParams
                   <option key={s.sector} value={s.sector}>{s.sector}</option>
                 ))}
               </select>
-              <Button type="submit" className="md:col-span-4 w-full mt-2">
+              <Button type="submit" className="md:col-span-5 w-full">
                 <Search className="h-4 w-4 mr-2" />
                 Search Schools
               </Button>
@@ -222,42 +219,54 @@ export default async function BrowseSchoolsPage({ searchParams }: { searchParams
         {hasQuery && schools.length > 0 && (
           <>
             {/* Results Summary */}
-            <div className="mb-6 flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900">
-                  {total} school{total !== 1 ? 's' : ''} found
-                </h3>
-                <p className="text-sm text-gray-600">
-                  Showing {((page - 1) * pageSize) + 1}-{Math.min(page * pageSize, total)} of {total} results
-                </p>
-              </div>
-              {user && (
-                <div className="text-sm text-gray-600">
-                  Click "View School" to see events and calendar
+            <div className="mb-6">
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                Search Results
+                <span className="text-gray-500 text-lg ml-2">({total.toLocaleString()} schools)</span>
+              </h3>
+              {(name || suburb || state || type || sector) && (
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {name && <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">Name: {name}</span>}
+                  {suburb && <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded text-sm">Suburb: {suburb}</span>}
+                  {state && <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">State: {state}</span>}
+                  {type && <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded text-sm">Type: {type}</span>}
+                  {sector && <span className="bg-red-100 text-red-800 px-2 py-1 rounded text-sm">Sector: {sector}</span>}
+                  <Link href="/schools" className="bg-gray-100 text-gray-800 px-2 py-1 rounded text-sm hover:bg-gray-200">
+                    Clear all filters
+                  </Link>
                 </div>
               )}
+              <p className="text-sm text-gray-600">
+                Showing {((page - 1) * pageSize) + 1}-{Math.min(page * pageSize, total)} of {total} results
+              </p>
             </div>
             
-            <div className="grid gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {schools.map((school) => (
-                <Card key={school.id}>
+                <Card key={school.id} className="hover:shadow-lg transition-shadow">
                   <CardHeader>
-                    <CardTitle>{school.name}</CardTitle>
+                    <CardTitle className="text-lg">{school.name}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                      <div>
-                        <div className="text-sm text-gray-700">{school.suburb}, {school.state} {school.postcode}</div>
-                        <div className="text-xs text-gray-500">{school.type} | {school.sector}</div>
+                    <div className="space-y-3">
+                      <div className="flex items-center text-sm text-gray-600">
+                        <MapPin className="h-4 w-4 mr-2" />
+                        {school.suburb}, {school.state} {school.postcode}
                       </div>
-                      <div className="flex flex-col sm:flex-row gap-2 mt-2 md:mt-0">
-                        <Button asChild variant="outline" size="sm">
-                          <Link href={`/schools/${createSchoolSlug(school.name, school.suburb, school.state)}`}>View School</Link>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="bg-gray-100 px-2 py-1 rounded">{school.type}</span>
+                        <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">{school.sector}</span>
+                      </div>
+                      <div className="flex flex-col sm:flex-row gap-2 pt-2">
+                        <Button asChild variant="outline" size="sm" className="flex-1">
+                          <Link href={`/schools/${createSchoolSlug(school.name, school.suburb, school.state)}`}>
+                            View School
+                          </Link>
                         </Button>
                         {user && (
-                          <form action={`/children/add`} method="GET">
+                          <form action={`/children/add`} method="GET" className="flex-1">
                             <input type="hidden" name="schoolId" value={school.id} />
-                            <Button type="submit" size="sm">Add to My Children</Button>
+                            <Button type="submit" size="sm" className="w-full">Add Child</Button>
                           </form>
                         )}
                       </div>
@@ -271,7 +280,7 @@ export default async function BrowseSchoolsPage({ searchParams }: { searchParams
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                 <Link
                   key={p}
-                  href={`?q=${encodeURIComponent(q)}&state=${encodeURIComponent(state)}&type=${encodeURIComponent(type)}&sector=${encodeURIComponent(sector)}&page=${p}`}
+                  href={`?name=${encodeURIComponent(name)}&suburb=${encodeURIComponent(suburb)}&state=${encodeURIComponent(state)}&type=${encodeURIComponent(type)}&sector=${encodeURIComponent(sector)}&page=${p}`}
                   className={`px-3 py-1 rounded-md border ${p === page ? 'bg-blue-600 text-white' : 'bg-white text-blue-600'}`}
                 >
                   {p}
@@ -281,6 +290,89 @@ export default async function BrowseSchoolsPage({ searchParams }: { searchParams
           </>
         )}
       </main>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white py-12">
+        <div className="container px-4 md:px-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            {/* Brand */}
+            <div className="md:col-span-1">
+              <div className="flex items-center mb-4">
+                <School className="h-6 w-6 mr-2" />
+                <span className="font-bold text-xl">SchoolScope</span>
+              </div>
+              <p className="text-gray-400 text-sm">
+                Connecting Australian school communities through events, calendars, and information sharing.
+              </p>
+            </div>
+
+            {/* Schools by State */}
+            <div>
+              <h3 className="font-semibold mb-4">Schools by State</h3>
+              <div className="space-y-2">
+                <Link href="/schools/state/nsw" className="block text-sm text-gray-400 hover:text-white transition-colors">
+                  New South Wales Schools
+                </Link>
+                <Link href="/schools/state/vic" className="block text-sm text-gray-400 hover:text-white transition-colors">
+                  Victoria Schools
+                </Link>
+                <Link href="/schools/state/qld" className="block text-sm text-gray-400 hover:text-white transition-colors">
+                  Queensland Schools
+                </Link>
+                <Link href="/schools/state/wa" className="block text-sm text-gray-400 hover:text-white transition-colors">
+                  Western Australia Schools
+                </Link>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="font-semibold mb-4">More States</h3>
+              <div className="space-y-2">
+                <Link href="/schools/state/sa" className="block text-sm text-gray-400 hover:text-white transition-colors">
+                  South Australia Schools
+                </Link>
+                <Link href="/schools/state/tas" className="block text-sm text-gray-400 hover:text-white transition-colors">
+                  Tasmania Schools
+                </Link>
+                <Link href="/schools/state/nt" className="block text-sm text-gray-400 hover:text-white transition-colors">
+                  Northern Territory Schools
+                </Link>
+                <Link href="/schools/state/act" className="block text-sm text-gray-400 hover:text-white transition-colors">
+                  ACT Schools
+                </Link>
+              </div>
+            </div>
+
+            {/* Quick Links */}
+            <div>
+              <h3 className="font-semibold mb-4">Quick Links</h3>
+              <div className="space-y-2">
+                <Link href="/schools" className="block text-sm text-gray-400 hover:text-white transition-colors">
+                  Browse All Schools
+                </Link>
+                <Link href="/register" className="block text-sm text-gray-400 hover:text-white transition-colors">
+                  Join SchoolScope
+                </Link>
+                <Link href="/privacy" className="block text-sm text-gray-400 hover:text-white transition-colors">
+                  Privacy Policy
+                </Link>
+                <Link href="/terms" className="block text-sm text-gray-400 hover:text-white transition-colors">
+                  Terms of Service
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center">
+            <p className="text-xs text-gray-400">
+              © 2024 SchoolScope. All rights reserved.
+            </p>
+            <p className="text-xs text-gray-400 mt-2 sm:mt-0">
+              Connecting 10,000+ Australian schools nationwide
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 } 

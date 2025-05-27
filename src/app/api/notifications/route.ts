@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { validateRequest } from '@/auth/lucia'
 import { db } from '@/lib/db'
 
+// Force this route to be dynamic
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
   try {
     const { user } = await validateRequest()

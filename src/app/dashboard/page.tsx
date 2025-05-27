@@ -170,6 +170,28 @@ export default async function DashboardPage({ searchParams }: { searchParams?: {
             </p>
           </div>
 
+          {/* Personal Calendar - Main Focus */}
+          <div className="mb-8">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Calendar className="h-6 w-6 mr-2" />
+                  Your Personal Calendar
+                </CardTitle>
+                <CardDescription>
+                  All events for your children across all their schools
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <PersonalCalendar 
+                  events={calendarEvents}
+                  currentMonth={month}
+                  currentYear={year}
+                />
+              </CardContent>
+            </Card>
+          </div>
+
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
             <Card>
@@ -227,28 +249,6 @@ export default async function DashboardPage({ searchParams }: { searchParams?: {
               />
             </div>
           )}
-
-          {/* Personal Calendar - Main Focus */}
-          <div className="mb-8">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Calendar className="h-6 w-6 mr-2" />
-                  Your Personal Calendar
-                </CardTitle>
-                <CardDescription>
-                  All events for your children across all their schools
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <PersonalCalendar 
-                  events={calendarEvents}
-                  currentMonth={month}
-                  currentYear={year}
-                />
-              </CardContent>
-            </Card>
-          </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Children Section */}
