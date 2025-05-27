@@ -5,7 +5,11 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL?.startsWith('http') 
+      ? process.env.NEXT_PUBLIC_APP_URL 
+      : `https://${process.env.NEXT_PUBLIC_APP_URL || 'localhost:3000'}`
+  ),
   title: 'SchoolScope - Australian School Events & Information',
   description: 'A crowdsourced calendar and wiki-style app for Australian schools. View school profiles, events, and stay connected with your school community.',
   openGraph: {
