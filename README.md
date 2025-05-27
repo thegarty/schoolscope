@@ -1,212 +1,227 @@
-# 🏫 SchoolScope: Local Development Setup Guide
+# 🏫 SchoolScope
 
-A crowdsourced calendar + wiki-style app for Australian schools using:
-- Next.js 14 App Router
-- Tailwind + ShadCN
-- Prisma + PostgreSQL (local)
-- Lucia Auth
+**Community-driven school calendar and profile management system for Australian schools**
 
----
+[![Next.js](https://img.shields.io/badge/Next.js-14.0.4-black?logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![Prisma](https://img.shields.io/badge/Prisma-5.7.1-2D3748?logo=prisma)](https://www.prisma.io/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-336791?logo=postgresql)](https://www.postgresql.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.3-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
 
-## 💡 What SchoolScope Does
+## ✨ Features
 
-**SchoolScope** is a platform for Australian parents, students, and teachers to:
+### 🏫 **Comprehensive School Database**
+- **10,868+ Australian schools** pre-loaded with official data
+- Complete school profiles with location, type, and sector information
+- Community-driven school information updates with democratic voting system
 
-- 📚 View and edit **school profiles** (type, location, year levels, contacts)
-- 🗓️ Explore a **calendar of school events** (excursions, parent nights, holidays, etc.)
-- 🏷️ Filter events by **year level**, category, and confirmed/unconfirmed status
-- 👨‍👩‍👧‍👦 Create a **personal profile** linked to children (with year + school info)
-- 📌 Select your **child's school and year** to instantly see what's coming up
-- ✏️ **Edit and confirm** events submitted by others (Wiki-style validation)
-- 🔔 Receive **alerts** and updates for schools or years you follow
+### 👥 **User & Family Management**
+- Secure authentication with Lucia Auth
+- Multi-child family support
+- Easy child profile management (add, edit, delete)
+- Year level tracking and school associations
 
-🎯 **Main Flow:**
-- On login, user adds children to their profile, selecting school and year level
-- App shows a personalized view: "What's on for your kids this week"
-- Easily browse holidays, excursions, and school-specific events by year
+### 📅 **Dual Event System**
+- **Public Events**: Community-wide school events visible to all parents
+- **Private Events**: Personal family reminders and appointments
+- Event categories: Academic, Sports, Arts, Health, and more
+- Location support with address details
 
-SchoolScope solves the frustrating information gap most schools leave: chaotic communication, last-minute announcements, and no centralized, reliable event calendar.
+### ✅ **Community Validation**
+- **Event Confirmations**: Community members can verify public events
+- Real-time confirmation counts and status updates
+- Prevents misinformation through crowd-sourced validation
+- Event owners cannot confirm their own events (prevents bias)
 
-By enabling parent-driven updates and confirmations, the app becomes a living source of truth, powered by the school community.
+### 🗳️ **Democratic School Editing**
+- Any community member can suggest school information updates
+- Voting system with 3-vote threshold for approval/rejection
+- Change history tracking and transparency
+- Prevents vandalism through community oversight
 
----
+### 📱 **Calendar Integration**
+- Export events to Google Calendar, Outlook, Apple Calendar
+- .ics file generation for universal calendar support
+- Location data included in calendar exports
+- Automatic timezone handling
+
+### 🎨 **Modern User Experience**
+- Responsive design for desktop and mobile
+- Clean, intuitive interface with Tailwind CSS
+- Real-time updates and interactions
+- Accessible components with Radix UI
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-
 - Node.js 18+ 
-- PostgreSQL database
-- npm or yarn
+- Docker (for PostgreSQL)
+- Git
 
-### 1. Install Dependencies
-
+### 1. Clone & Install
 ```bash
+git clone https://github.com/thegarty/schoolscope.git
+cd schoolscope
 npm install
 ```
 
 ### 2. Environment Setup
+```bash
+# Copy environment template
+cp env-template.txt .env.local
 
-Create a `.env.local` file in the root directory:
-
-```env
-# Database
-DATABASE_URL="postgresql://username:password@localhost:5432/schoolscope?schema=public"
-
-# Auth
-NEXTAUTH_SECRET="your-secret-key-here"
-NEXTAUTH_URL="http://localhost:3000"
-
-# App
-NEXT_PUBLIC_APP_URL="http://localhost:3000"
+# Edit .env.local with your settings
+# DATABASE_URL is pre-configured for Docker PostgreSQL
 ```
 
 ### 3. Database Setup
-
 ```bash
-# Quick automated setup (recommended)
-npm run setup
+# Start PostgreSQL with Docker
+npm run docker:up
 
-# OR manual setup:
-# Generate Prisma client
-npm run db:generate
-
-# Run database migrations
+# Apply database schema
 npm run db:migrate
 
-# Seed with 10,868 real Australian schools
+# Seed with Australian schools + test data
 npm run db:seed
 ```
 
-### 4. Start Development Server
-
+### 4. Start Development
 ```bash
 npm run dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000) to see the app!
+Visit [http://localhost:3000](http://localhost:3000) to see your application!
 
----
+## 🧪 Test Accounts
 
-## 🗃️ Database Schema
+The seed script creates 4 test parent accounts for testing confirmations:
 
-The Prisma schema includes:
+| Email | Password | Parent Name | Children |
+|-------|----------|-------------|----------|
+| `parent1@schoolscope.com` | `password123` | Sarah Johnson | Emma (Year 5), Jack (Year 8) |
+| `parent2@schoolscope.com` | `password123` | Michael Chen | Lily (Year 6) |
+| `parent3@schoolscope.com` | `password123` | Emma Williams | Oliver (Year 4), Sophie (Year 7) |
+| `parent4@schoolscope.com` | `password123` | David Martinez | Carlos (Year 9) |
 
-- **Schools**: 10,868 real Australian schools with ACARA IDs, coordinates, and comprehensive data
-- **Users**: Authentication and profile management
-- **Children**: User's children linked to schools and year levels
-- **Events**: School events with year level filtering and confirmation status
-- **Sessions**: Lucia auth session management
+## 📊 Database Schema
 
----
+### Core Models
+- **Schools**: 10,868+ Australian schools with comprehensive data
+- **Users**: Parent accounts with secure authentication
+- **Children**: Student profiles linked to users and schools
+- **Events**: Public and private events with confirmation system
+- **EventConfirmations**: Community validation tracking
+- **SchoolEdits**: Democratic school information updates
+- **SchoolEditVotes**: Voting system for school changes
 
-## 📂 Project Structure
+## 🛠️ Tech Stack
+
+### Frontend
+- **Next.js 14** - React framework with App Router
+- **TypeScript** - Type-safe development
+- **Tailwind CSS** - Utility-first styling
+- **Radix UI** - Accessible component primitives
+- **Lucide React** - Beautiful icons
+
+### Backend
+- **Next.js API Routes** - Serverless API endpoints
+- **Prisma** - Type-safe database ORM
+- **PostgreSQL** - Robust relational database
+- **Lucia Auth** - Secure session-based authentication
+
+### Development
+- **Docker** - Containerized PostgreSQL
+- **ESLint** - Code linting
+- **Prettier** - Code formatting
+
+## 📝 Available Scripts
+
+```bash
+# Development
+npm run dev              # Start development server
+npm run build           # Build for production
+npm run start           # Start production server
+npm run lint            # Run ESLint
+
+# Database
+npm run db:migrate      # Apply database migrations
+npm run db:seed         # Seed database with test data
+npm run db:studio       # Open Prisma Studio (database GUI)
+npm run db:reset        # Reset database (development only)
+npm run db:generate     # Generate Prisma client
+
+# Docker
+npm run docker:up       # Start PostgreSQL container
+npm run docker:down     # Stop PostgreSQL container
+npm run docker:logs     # View PostgreSQL logs
+```
+
+## 🏗️ Project Structure
 
 ```
 schoolscope/
-├── prisma/
-│   ├── schema.prisma          # Database schema
-│   └── seed.ts               # Sample data seeding
 ├── src/
-│   ├── app/                  # Next.js App Router pages
-│   │   ├── globals.css       # Global styles
-│   │   ├── layout.tsx        # Root layout
-│   │   └── page.tsx          # Home page
-│   ├── components/           # React components
-│   │   └── ui/              # ShadCN UI components
-│   ├── lib/                 # Utilities and helpers
-│   │   ├── db.ts            # Prisma client
-│   │   └── utils.ts         # Utility functions
-│   └── auth/                # Authentication
-│       └── lucia.ts         # Lucia auth setup
-├── package.json
-├── tailwind.config.ts       # Tailwind configuration
-├── tsconfig.json           # TypeScript configuration
-└── next.config.js          # Next.js configuration
+│   ├── app/                 # Next.js App Router pages
+│   │   ├── api/            # API endpoints
+│   │   ├── auth/           # Authentication pages
+│   │   ├── children/       # Child management
+│   │   ├── events/         # Event management
+│   │   ├── schools/        # School pages
+│   │   └── dashboard/      # Main dashboard
+│   ├── components/         # Reusable React components
+│   │   └── ui/            # UI component library
+│   ├── lib/               # Utility functions
+│   └── auth/              # Authentication logic
+├── prisma/
+│   ├── schema.prisma      # Database schema
+│   ├── seed.js           # Database seeding
+│   └── migrations/       # Database migrations
+├── public/               # Static assets
+└── docs/                # Documentation
 ```
 
----
+## 🔒 Security Features
 
-## 🛠️ Available Scripts
+- **Session-based authentication** with secure cookies
+- **CSRF protection** built into Next.js
+- **SQL injection prevention** with Prisma ORM
+- **Input validation** and sanitization
+- **User isolation** - users can only access their own data
+- **Democratic oversight** prevents malicious school edits
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
-- `npm run db:generate` - Generate Prisma client
-- `npm run db:migrate` - Run database migrations
-- `npm run db:seed` - Seed database with sample data
-- `npm run db:studio` - Open Prisma Studio
+## 🌟 Key Innovations
 
----
+### Community-Driven Validation
+Unlike traditional school apps, SchoolScope uses community validation to ensure event accuracy. Parents can confirm events they didn't create, building trust through crowd-sourcing.
 
-## ✅ MVP Goals
+### Democratic School Management
+School information updates require community approval, preventing vandalism while allowing necessary corrections and updates.
 
-- [x] Project setup with Next.js 14, Tailwind, ShadCN
-- [x] Database schema with Prisma
-- [x] Basic UI components and landing page
-- [ ] User authentication with Lucia
-- [ ] User registration and login
-- [ ] Add children to user profile
-- [ ] School browsing and search
-- [ ] Event calendar and filtering
-- [ ] Event creation and editing
-- [ ] Wiki-style event confirmation
+### Dual Event System
+Separates public school events from private family reminders, with appropriate privacy controls and auto-confirmation for personal events.
 
----
-
-## 🎨 UI Components
-
-Built with ShadCN UI components:
-- Button, Card, Input, Select
-- Calendar, Dialog, Dropdown Menu
-- Form components with validation
-- Toast notifications
-
----
-
-## 🔐 Authentication
-
-Using Lucia Auth for:
-- Session-based authentication
-- Secure password handling
-- User session management
-- Integration with Prisma
-
----
-
-## 📱 Features to Implement
-
-### Phase 1 (MVP)
-- User registration/login
-- Profile management with children
-- School search and selection
-- Basic event calendar
-
-### Phase 2
-- Event creation and editing
-- Year level filtering
-- Event confirmation system
-- School profile editing
-
-### Phase 3
-- Advanced filtering and search
-- Notifications and alerts
-- Mobile responsiveness
-- Performance optimizations
-
----
+### Comprehensive Australian Coverage
+Pre-loaded with official data for 10,868+ Australian schools, eliminating setup friction for parents.
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
----
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## 📄 License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Australian school data sourced from official education departments
+- Built with modern web technologies and best practices
+- Inspired by the need for better school community communication
+
+---
+
+**Made with ❤️ for Australian school communities**
