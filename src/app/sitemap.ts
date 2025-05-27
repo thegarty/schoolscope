@@ -64,25 +64,33 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }))
 
-  // Get all schools for individual school pages
-  const schools = await db.school.findMany({
-    select: {
-      name: true,
-      suburb: true,
-      state: true,
-      updatedAt: true,
-    },
-    orderBy: {
-      updatedAt: 'desc'
-    }
-  })
+  let schoolPages: any[] = []
+  
+  try {
+    // Get all schools for individual school pages
+    const schools = await db.school.findMany({
+      select: {
+        name: true,
+        suburb: true,
+        state: true,
+        updatedAt: true,
+      },
+      orderBy: {
+        updatedAt: 'desc'
+      }
+    })
 
-  const schoolPages = schools.map(school => ({
-    url: `${baseUrl}/schools/${createSchoolSlug(school.name, school.suburb, school.state)}`,
-    lastModified: school.updatedAt,
-    changeFrequency: 'weekly' as const,
-    priority: 0.6,
-  }))
+    schoolPages = schools.map(school => ({
+      url: `${baseUrl}/schools/${createSchoolSlug(school.name, school.suburb, school.state)}`,
+      lastModified: school.updatedAt,
+      changeFrequency: 'weekly' as const,
+      priority: 0.6,
+    }))
+  } catch (error) {
+    console.error('Error fetching schools for sitemap:', error)
+    // During build time or when database is unavailable, just return static pages
+    schoolPages = []
+  }
 
   // Combine all pages
   return [

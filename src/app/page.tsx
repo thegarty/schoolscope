@@ -98,18 +98,26 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="w-full py-12 md:py-24 lg:py-32">
-        <div className="container px-4 md:px-6">
+      <section 
+        className="relative w-full py-12 md:py-24 lg:py-32 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: "url('/schoolscope-header-bg.png')"
+        }}
+      >
+        {/* Overlay for better text readability */}
+        <div className="absolute inset-0 bg-black/50"></div>
+        
+        <div className="relative container px-4 md:px-6">
           <div className="flex flex-col items-center space-y-4 text-center">
             <div className="space-y-2">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-white drop-shadow-lg">
                 Ready to get started?
               </h2>
-              <p className="mx-auto max-w-[600px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400">
+              <p className="mx-auto max-w-[600px] text-gray-100 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed drop-shadow-md">
                 Join thousands of Australian families staying connected with their school communities.
               </p>
             </div>
-            <Button size="lg" asChild>
+            <Button size="lg" asChild className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg">
               <Link href="/register">Create Your Account</Link>
             </Button>
           </div>
