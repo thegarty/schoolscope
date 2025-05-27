@@ -7,6 +7,7 @@ import { Calendar, School, MapPin, Clock, Users, Lock, Globe, Eye, EyeOff } from
 import Link from 'next/link'
 import EventConfirmation from '@/components/EventConfirmation'
 import CalendarExport from '@/components/CalendarExport'
+import AppHeader from '@/components/AppHeader'
 
 export default async function EventsPage({ searchParams }: { searchParams?: Record<string, string> }) {
   const { user } = await validateRequest()
@@ -169,28 +170,7 @@ export default async function EventsPage({ searchParams }: { searchParams?: Reco
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center">
-              <School className="h-8 w-8 text-blue-600 mr-3" />
-              <h1 className="text-2xl font-bold text-gray-900">SchoolScope</h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Button asChild variant="outline">
-                <Link href="/dashboard">Dashboard</Link>
-              </Button>
-              <span className="text-sm text-gray-700">Welcome, {user.name || user.email}</span>
-              <form action="/api/auth/logout" method="POST">
-                <Button variant="outline" type="submit">
-                  Logout
-                </Button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </header>
+      <AppHeader user={user} />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">

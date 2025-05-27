@@ -5,13 +5,21 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { School, Users, Calendar, MapPin, Lock, Globe, Edit } from 'lucide-react'
 import Link from 'next/link'
+import AppHeader from '@/components/AppHeader'
+import DashboardVoting from '@/components/DashboardVoting'
+import PersonalCalendar from '@/components/PersonalCalendar'
 
-export default async function DashboardPage() {
+export default async function DashboardPage({ searchParams }: { searchParams?: { month?: string; year?: string } }) {
   const { user } = await validateRequest()
   
   if (!user) {
     redirect('/login')
   }
+
+  // Get current month/year for calendar
+  const currentDate = new Date()
+  const month = searchParams?.month ? parseInt(searchParams.month) : currentDate.getMonth() + 1
+  const year = searchParams?.year ? parseInt(searchParams.year) : currentDate.getFullYear()
 
   // Get user's children and their schools
   const children = await db.child.findMany({
@@ -21,8 +29,43 @@ export default async function DashboardPage() {
     }
   })
 
-  // Get upcoming events - both public events from children's schools and user's private events
+  // Get events for calendar and upcoming events
   const schoolIds = children.map(child => child.schoolId)
+  
+  // Get events for the calendar month
+  const startOfMonth = new Date(year, month - 1, 1)
+  const endOfMonth = new Date(year, month, 0)
+  
+  const calendarEvents = await db.event.findMany({
+    where: {
+      OR: [
+        // Public events from schools where user has children
+        {
+          schoolId: { in: schoolIds },
+          isPrivate: false,
+          startDate: {
+            gte: startOfMonth,
+            lte: endOfMonth
+          }
+        },
+        // User's own private events
+        {
+          userId: user.id,
+          isPrivate: true,
+          startDate: {
+            gte: startOfMonth,
+            lte: endOfMonth
+          }
+        }
+      ]
+    },
+    include: {
+      school: true,
+      child: true,
+      user: true
+    },
+    orderBy: { startDate: 'asc' }
+  })
   
   const upcomingEvents = await db.event.findMany({
     where: {
@@ -46,7 +89,7 @@ export default async function DashboardPage() {
       child: true // Include child info for private events
     },
     orderBy: { startDate: 'asc' },
-    take: 8 // Increased to show more events since we now have two types
+    take: 6 // Reduced since calendar is now the main focus
   })
 
   // Get some statistics for the user
@@ -66,27 +109,53 @@ export default async function DashboardPage() {
     }
   })
 
+  // Get pending school edits that need user's vote
+  const pendingSchoolEdits = schoolIds.length > 0 ? await db.schoolEdit.findMany({
+    where: {
+      schoolId: { in: schoolIds },
+      status: 'PENDING',
+      userId: { not: user.id }, // Can't vote on own edits
+      votes: {
+        none: {
+          userId: user.id // User hasn't voted on this edit yet
+        }
+      }
+    },
+    include: {
+      school: {
+        select: {
+          id: true,
+          name: true,
+          suburb: true,
+          state: true
+        }
+      },
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true
+        }
+      },
+      votes: {
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true
+            }
+          }
+        }
+      }
+    },
+    orderBy: { createdAt: 'desc' },
+    take: 5
+  }) : []
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center">
-              <School className="h-8 w-8 text-blue-600 mr-3" />
-              <h1 className="text-2xl font-bold text-gray-900">SchoolScope</h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-700">Welcome, {user.name || user.email}</span>
-              <form action="/api/auth/logout" method="POST">
-                <Button variant="outline" type="submit">
-                  Logout
-                </Button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </header>
+      <AppHeader user={user} />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
@@ -97,7 +166,7 @@ export default async function DashboardPage() {
               Welcome back, {user.name || 'Parent'}!
             </h2>
             <p className="text-gray-600">
-              Here's what's happening with your children's schools and your personal events.
+              Your personalized calendar shows all events for your children across all their schools.
             </p>
           </div>
 
@@ -145,6 +214,38 @@ export default async function DashboardPage() {
                     <p className="text-2xl font-bold text-gray-900">{new Set(children.map(c => c.schoolId)).size}</p>
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Voting Section */}
+          {pendingSchoolEdits.length > 0 && (
+            <div className="mb-8">
+              <DashboardVoting 
+                schoolEdits={pendingSchoolEdits} 
+                currentUserId={user.id}
+              />
+            </div>
+          )}
+
+          {/* Personal Calendar - Main Focus */}
+          <div className="mb-8">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Calendar className="h-6 w-6 mr-2" />
+                  Your Personal Calendar
+                </CardTitle>
+                <CardDescription>
+                  All events for your children across all their schools
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <PersonalCalendar 
+                  events={calendarEvents}
+                  currentMonth={month}
+                  currentYear={year}
+                />
               </CardContent>
             </Card>
           </div>

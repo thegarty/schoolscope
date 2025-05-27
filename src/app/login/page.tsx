@@ -65,24 +65,6 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* Test Credentials Info */}
-        <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <AlertCircle className="h-5 w-5 text-blue-400" />
-            </div>
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-blue-800">
-                Test Account
-              </h3>
-              <div className="mt-2 text-sm text-blue-700">
-                <p>Email: test@schoolscope.com</p>
-                <p>Password: password123</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Login Form */}
         <Card>
           <CardHeader>
