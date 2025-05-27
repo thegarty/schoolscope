@@ -177,8 +177,10 @@ schoolscope/
 │   ├── schema.prisma      # Database schema
 │   ├── seed.js           # Database seeding
 │   └── migrations/       # Database migrations
-├── public/               # Static assets
-└── docs/                # Documentation
+├── data/
+│   ├── SchoolData.xlsx    # Australian schools dataset
+│   └── README.md         # Data documentation
+└── public/               # Static assets
 ```
 
 ## 🔒 Security Features

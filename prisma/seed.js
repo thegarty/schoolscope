@@ -8,7 +8,7 @@ async function main() {
   console.log('Reading school data from Excel file...')
   
   // Read the Excel file
-  const workbook = XLSX.readFile(path.join(__dirname, '../SchoolData.xlsx'))
+  const workbook = XLSX.readFile(path.join(__dirname, '../data/SchoolData.xlsx'))
   const sheetName = workbook.SheetNames[0]
   const worksheet = workbook.Sheets[sheetName]
   const data = XLSX.utils.sheet_to_json(worksheet)
