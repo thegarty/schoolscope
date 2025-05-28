@@ -3,6 +3,8 @@ import { requireAdmin } from '@/lib/admin';
 import { sendEmail, sendWelcomeEmail, sendEventNotification } from '@/lib/email';
 import { isUserSubscribed } from '@/lib/email-utils';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   try {
     // Check admin access

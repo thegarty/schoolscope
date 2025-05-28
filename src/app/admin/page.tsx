@@ -2,47 +2,66 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import AppHeader from '@/components/AppHeader';
+import Link from 'next/link';
+import AdminLayout from '@/components/admin/AdminLayout';
+import { 
+  Users, 
+  School, 
+  Calendar, 
+  Mail, 
+  Shield, 
+  TrendingUp, 
+  AlertTriangle, 
+  CheckCircle, 
+  UserCheck, 
+  UserX,
+  Plus,
+  Settings,
+  BarChart3,
+  Activity,
+  MapPin,
+  Send,
+  FileText,
+  Database
+} from 'lucide-react';
 
-interface EmailStats {
-  stats: {
-    totalUsers: number;
-    subscribedUsers: number;
-    unsubscribedUsers: number;
-    totalEmailEvents: number;
-    recentBouncesCount: number;
-    recentComplaintsCount: number;
+interface DashboardStats {
+  users: {
+    total: number;
+    admins: number;
+    subscribed: number;
+    unsubscribed: number;
+    recentSignups: number;
   };
-  deliveryStats: Record<string, number>;
-  recentEvents: Array<{
-    id: string;
-    email: string;
-    eventType: string;
-    timestamp: string;
-    reason?: string;
-    bounceType?: string;
-  }>;
+  schools: {
+    total: number;
+    byState: Record<string, number>;
+    recentlyAdded: number;
+  };
+  events: {
+    total: number;
+    pending: number;
+    thisMonth: number;
+  };
+  email: {
+    totalEvents: number;
+    deliveries: number;
+    bounces: number;
+    complaints: number;
+    recentActivity: Array<{
+      id: string;
+      email: string;
+      eventType: string;
+      timestamp: string;
+    }>;
+  };
 }
 
 export default function AdminDashboard() {
-  const [emailStats, setEmailStats] = useState<EmailStats | null>(null);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [testEmailLoading, setTestEmailLoading] = useState(false);
-  const [message, setMessage] = useState('');
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const router = useRouter();
-
-  // Test email form state
-  const [testEmail, setTestEmail] = useState({
-    type: 'custom',
-    email: '',
-    subject: 'Test Email from SchoolScope',
-    html: '',
-    name: 'Test User',
-    eventTitle: 'Test School Event',
-    schoolName: 'Test School',
-  });
 
   useEffect(() => {
     checkAdminAccess();
@@ -50,7 +69,6 @@ export default function AdminDashboard() {
 
   const checkAdminAccess = async () => {
     try {
-      // First check if user is logged in and get user info
       const userResponse = await fetch('/api/auth/me');
       if (!userResponse.ok) {
         router.push('/login');
@@ -58,300 +76,482 @@ export default function AdminDashboard() {
       }
       const userData = await userResponse.json();
       setCurrentUser(userData.user);
-
-      // Then check admin access
-      const response = await fetch('/api/admin/email-stats');
-      if (response.status === 403) {
-        // Not admin, redirect to home
-        router.push('/');
-        return;
-      }
-      if (response.ok) {
-        setIsAdmin(true);
-        const data = await response.json();
-        setEmailStats(data);
-      } else {
-        setMessage('Failed to load email statistics');
-        setIsAdmin(false);
-      }
+      
+      // Load dashboard stats
+      await loadDashboardStats();
     } catch (error) {
       console.error('Error checking admin access:', error);
-      setMessage('Failed to verify admin access');
-      setIsAdmin(false);
+      router.push('/login');
     } finally {
       setLoading(false);
     }
   };
 
-  const loadEmailStats = async () => {
+  const loadDashboardStats = async () => {
     try {
-      const response = await fetch('/api/admin/email-stats');
-      if (response.ok) {
-        const data = await response.json();
-        setEmailStats(data);
-      } else {
-        setMessage('Failed to load email statistics');
-      }
-    } catch (error) {
-      console.error('Error loading email stats:', error);
-      setMessage('Failed to load email statistics');
-    } finally {
-      setLoading(false);
-    }
-  };
+      // Load all stats in parallel
+      const [usersResponse, emailResponse, schoolsResponse] = await Promise.all([
+        fetch('/api/admin/users?limit=1000'),
+        fetch('/api/admin/email-stats'),
+        fetch('/api/schools/search?limit=1000')
+      ]);
 
-  const sendTestEmail = async () => {
-    setTestEmailLoading(true);
-    setMessage('');
-    try {
-      const response = await fetch('/api/admin/test-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(testEmail),
+      const usersData = usersResponse.ok ? await usersResponse.json() : null;
+      const emailData = emailResponse.ok ? await emailResponse.json() : null;
+      const schoolsData = schoolsResponse.ok ? await schoolsResponse.json() : null;
+
+      // Process user stats
+      const users = usersData?.users || [];
+      const userStats = {
+        total: users.length,
+        admins: users.filter((u: any) => u.isAdmin).length,
+        subscribed: users.filter((u: any) => u.emailSubscribed).length,
+        unsubscribed: users.filter((u: any) => !u.emailSubscribed).length,
+        recentSignups: users.filter((u: any) => {
+          const createdAt = new Date(u.createdAt);
+          const weekAgo = new Date();
+          weekAgo.setDate(weekAgo.getDate() - 7);
+          return createdAt > weekAgo;
+        }).length,
+      };
+
+      // Process school stats
+      const schools = schoolsData?.schools || [];
+      const schoolsByState: Record<string, number> = {};
+      schools.forEach((school: any) => {
+        if (school.state) {
+          schoolsByState[school.state] = (schoolsByState[school.state] || 0) + 1;
+        }
       });
 
-      const data = await response.json();
+      const schoolStats = {
+        total: schools.length,
+        byState: schoolsByState,
+        recentlyAdded: schools.filter((s: any) => {
+          const createdAt = new Date(s.createdAt);
+          const weekAgo = new Date();
+          weekAgo.setDate(weekAgo.getDate() - 7);
+          return createdAt > weekAgo;
+        }).length,
+      };
 
-      if (response.ok) {
-        setMessage(`✅ ${data.message}`);
-        loadEmailStats(); // Reload stats
-      } else {
-        setMessage(`❌ ${data.error || 'Failed to send test email'}`);
-      }
+      // Process email stats
+      const emailStats = emailData?.stats || {};
+      const emailEvents = emailData?.recentEvents || [];
+      const deliveryStats = emailData?.deliveryStats || {};
+
+      const processedStats: DashboardStats = {
+        users: userStats,
+        schools: schoolStats,
+        events: {
+          total: 0, // Would need events API
+          pending: 0,
+          thisMonth: 0,
+        },
+        email: {
+          totalEvents: emailStats.totalEmailEvents || 0,
+          deliveries: deliveryStats.DELIVERY || 0,
+          bounces: deliveryStats.BOUNCE || 0,
+          complaints: deliveryStats.COMPLAINT || 0,
+          recentActivity: emailEvents.slice(0, 5),
+        },
+      };
+
+      setStats(processedStats);
     } catch (error) {
-      console.error('Error sending test email:', error);
-      setMessage('❌ Failed to send test email');
-    } finally {
-      setTestEmailLoading(false);
+      console.error('Error loading dashboard stats:', error);
     }
   };
 
   if (loading) {
     return (
-      <div>
-        <AppHeader user={currentUser} showNotifications={false} />
-        <div className="container mx-auto p-6">
-          <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
-          <p>Loading admin dashboard...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (isAdmin === false) {
-    return (
-      <div>
-        <AppHeader user={currentUser} showNotifications={false} />
-        <div className="container mx-auto p-6">
-          <h1 className="text-3xl font-bold mb-6">Access Denied</h1>
-          <p className="text-red-600">You do not have admin privileges to access this page.</p>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div>
-      <AppHeader user={currentUser} showNotifications={false} />
-      <div className="container mx-auto p-6 space-y-8">
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-          <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-            Admin Panel
-          </span>
-        </div>
-
-      {message && (
-        <div className={`p-4 rounded-lg ${message.startsWith('✅') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-          {message}
-        </div>
-      )}
-
-      {/* Email Statistics */}
-      {emailStats && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Email Statistics</h2>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <div className="text-2xl font-bold">{emailStats.stats.totalUsers}</div>
-              <div className="text-sm text-gray-600">Total Users</div>
-            </div>
-            <div className="bg-green-50 p-4 rounded-lg">
-              <div className="text-2xl font-bold text-green-600">{emailStats.stats.subscribedUsers}</div>
-              <div className="text-sm text-gray-600">Subscribed Users</div>
-            </div>
-            <div className="bg-red-50 p-4 rounded-lg">
-              <div className="text-2xl font-bold text-red-600">{emailStats.stats.recentBouncesCount}</div>
-              <div className="text-sm text-gray-600">Recent Bounces</div>
-            </div>
-            <div className="bg-orange-50 p-4 rounded-lg">
-              <div className="text-2xl font-bold text-orange-600">{emailStats.stats.recentComplaintsCount}</div>
-              <div className="text-sm text-gray-600">Recent Complaints</div>
-            </div>
-          </div>
-
-          <div className="mt-6">
-            <h3 className="text-lg font-medium mb-3">Delivery Statistics (Last 30 Days)</h3>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              {Object.entries(emailStats.deliveryStats).map(([type, count]) => (
-                <div key={type} className="text-center bg-gray-50 p-3 rounded">
-                  <div className="text-xl font-bold">{count}</div>
-                  <div className="text-sm text-gray-600">{type}</div>
-                </div>
+      <AdminLayout user={currentUser}>
+        <div className="p-6">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="h-24 bg-gray-200 rounded"></div>
               ))}
             </div>
           </div>
         </div>
-      )}
+      </AdminLayout>
+    );
+  }
 
-      {/* Test Email Section */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-semibold mb-4">Send Test Email</h2>
-        <div className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <label className="block text-sm font-medium mb-1">Email Type</label>
-              <select
-                value={testEmail.type}
-                onChange={(e) => setTestEmail({ ...testEmail, type: e.target.value })}
-                className="w-full p-2 border border-gray-300 rounded-md"
+  return (
+    <AdminLayout user={currentUser}>
+      <div className="space-y-8">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+            <p className="text-gray-600 mt-1">
+              Welcome back, {currentUser?.name || 'Admin'}. Here's what's happening with SchoolScope.
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+              System Online
+            </span>
+            <span className="text-sm text-gray-500">
+              Last updated: {new Date().toLocaleTimeString()}
+            </span>
+          </div>
+        </div>
+
+        {/* Key Metrics */}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <Users className="h-8 w-8 text-blue-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500">Total Users</p>
+                <p className="text-2xl font-semibold text-gray-900">{stats?.users.total || 0}</p>
+                <p className="text-xs text-green-600">
+                  +{stats?.users.recentSignups || 0} this week
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <School className="h-8 w-8 text-green-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500">Schools</p>
+                <p className="text-2xl font-semibold text-gray-900">{stats?.schools.total || 0}</p>
+                <p className="text-xs text-green-600">
+                  +{stats?.schools.recentlyAdded || 0} this week
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <Mail className="h-8 w-8 text-purple-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500">Email Events</p>
+                <p className="text-2xl font-semibold text-gray-900">{stats?.email.totalEvents || 0}</p>
+                <p className="text-xs text-blue-600">
+                  {stats?.email.deliveries || 0} delivered
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <Shield className="h-8 w-8 text-orange-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500">Admin Users</p>
+                <p className="text-2xl font-semibold text-gray-900">{stats?.users.admins || 0}</p>
+                <p className="text-xs text-gray-600">
+                  {((stats?.users.admins || 0) / (stats?.users.total || 1) * 100).toFixed(1)}% of users
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="bg-white rounded-lg shadow">
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900">Quick Actions</h2>
+          </div>
+          <div className="p-6">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <Link
+                href="/admin/users"
+                className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
               >
-                <option value="welcome">Welcome Email</option>
-                <option value="event">Event Notification</option>
-                <option value="custom">Custom Email</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Recipient Email</label>
-              <input
-                type="email"
-                value={testEmail.email}
-                onChange={(e) => setTestEmail({ ...testEmail, email: e.target.value })}
-                placeholder="test@example.com"
-                className="w-full p-2 border border-gray-300 rounded-md"
-              />
-            </div>
-          </div>
-
-          {testEmail.type === 'custom' && (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Subject</label>
-                <input
-                  type="text"
-                  value={testEmail.subject}
-                  onChange={(e) => setTestEmail({ ...testEmail, subject: e.target.value })}
-                  className="w-full p-2 border border-gray-300 rounded-md"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">HTML Content (optional)</label>
-                <textarea
-                  value={testEmail.html}
-                  onChange={(e) => setTestEmail({ ...testEmail, html: e.target.value })}
-                  placeholder="Leave empty for default test email content"
-                  rows={6}
-                  className="w-full p-2 border border-gray-300 rounded-md"
-                />
-              </div>
-            </div>
-          )}
-
-          {testEmail.type === 'welcome' && (
-            <div>
-              <label className="block text-sm font-medium mb-1">User Name</label>
-              <input
-                type="text"
-                value={testEmail.name}
-                onChange={(e) => setTestEmail({ ...testEmail, name: e.target.value })}
-                className="w-full p-2 border border-gray-300 rounded-md"
-              />
-            </div>
-          )}
-
-          {testEmail.type === 'event' && (
-            <div className="grid gap-4 md:grid-cols-2">
-              <div>
-                <label className="block text-sm font-medium mb-1">Event Title</label>
-                <input
-                  type="text"
-                  value={testEmail.eventTitle}
-                  onChange={(e) => setTestEmail({ ...testEmail, eventTitle: e.target.value })}
-                  className="w-full p-2 border border-gray-300 rounded-md"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">School Name</label>
-                <input
-                  type="text"
-                  value={testEmail.schoolName}
-                  onChange={(e) => setTestEmail({ ...testEmail, schoolName: e.target.value })}
-                  className="w-full p-2 border border-gray-300 rounded-md"
-                />
-              </div>
-            </div>
-          )}
-
-          <button
-            onClick={sendTestEmail}
-            disabled={!testEmail.email || testEmailLoading}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-          >
-            {testEmailLoading ? 'Sending...' : 'Send Test Email'}
-          </button>
-        </div>
-      </div>
-
-      {/* Recent Email Events */}
-      {emailStats && emailStats.recentEvents.length > 0 && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Recent Email Events</h2>
-          <div className="space-y-3">
-            {emailStats.recentEvents.slice(0, 10).map((event) => (
-              <div key={event.id} className="flex items-center justify-between p-3 border rounded-lg">
+                <Users className="h-8 w-8 text-blue-600 mr-3" />
                 <div>
-                  <div className="font-medium">{event.email}</div>
-                  <div className="text-sm text-gray-600">
-                    {new Date(event.timestamp).toLocaleString()}
-                  </div>
-                  {event.reason && (
-                    <div className="text-xs text-gray-500">{event.reason}</div>
-                  )}
+                  <h3 className="font-medium text-gray-900">Manage Users</h3>
+                  <p className="text-sm text-gray-500">View and edit user accounts</p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`px-2 py-1 rounded text-xs font-medium ${
-                      event.eventType === 'DELIVERY' ? 'bg-green-100 text-green-800' :
-                      event.eventType === 'BOUNCE' ? 'bg-red-100 text-red-800' :
-                      event.eventType === 'COMPLAINT' ? 'bg-red-100 text-red-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}
-                  >
-                    {event.eventType}
-                  </span>
-                  {event.bounceType && (
-                    <span className="px-2 py-1 rounded text-xs bg-gray-100 text-gray-600">
-                      {event.bounceType}
-                    </span>
-                  )}
+              </Link>
+
+              <Link
+                href="/admin/schools/add"
+                className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <Plus className="h-8 w-8 text-green-600 mr-3" />
+                <div>
+                  <h3 className="font-medium text-gray-900">Add School</h3>
+                  <p className="text-sm text-gray-500">Register a new school</p>
                 </div>
-              </div>
-            ))}
+              </Link>
+
+              <Link
+                href="/admin/email/test"
+                className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <Send className="h-8 w-8 text-purple-600 mr-3" />
+                <div>
+                  <h3 className="font-medium text-gray-900">Test Email</h3>
+                  <p className="text-sm text-gray-500">Send test emails</p>
+                </div>
+              </Link>
+
+              <Link
+                href="/admin/system/settings"
+                className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <Settings className="h-8 w-8 text-gray-600 mr-3" />
+                <div>
+                  <h3 className="font-medium text-gray-900">Settings</h3>
+                  <p className="text-sm text-gray-500">System configuration</p>
+                </div>
+              </Link>
+            </div>
           </div>
         </div>
-      )}
 
-      {/* Quick Actions */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
-        <div className="space-y-2 text-sm">
-          <p><strong>View detailed email stats:</strong> <code>GET /api/admin/email-stats</code></p>
-          <p><strong>Manage users:</strong> <code>GET /api/admin/users</code></p>
-          <p><strong>SNS Webhook endpoint:</strong> <code>POST /api/webhooks/sns</code></p>
-          <p><strong>Unsubscribe page:</strong> <code>GET /api/email/unsubscribe</code></p>
+        {/* Detailed Stats Grid */}
+        <div className="grid gap-6 lg:grid-cols-2">
+          {/* User Statistics */}
+          <div className="bg-white rounded-lg shadow">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-gray-900">User Statistics</h2>
+                <Link href="/admin/users" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                  View All →
+                </Link>
+              </div>
+            </div>
+            <div className="p-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <UserCheck className="h-5 w-5 text-green-600 mr-2" />
+                    <span className="text-sm font-medium">Email Subscribed</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-lg font-semibold">{stats?.users.subscribed || 0}</span>
+                    <span className="text-sm text-gray-500 ml-1">
+                      ({((stats?.users.subscribed || 0) / (stats?.users.total || 1) * 100).toFixed(1)}%)
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <UserX className="h-5 w-5 text-red-600 mr-2" />
+                    <span className="text-sm font-medium">Unsubscribed</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-lg font-semibold">{stats?.users.unsubscribed || 0}</span>
+                    <span className="text-sm text-gray-500 ml-1">
+                      ({((stats?.users.unsubscribed || 0) / (stats?.users.total || 1) * 100).toFixed(1)}%)
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <Shield className="h-5 w-5 text-purple-600 mr-2" />
+                    <span className="text-sm font-medium">Admin Users</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-lg font-semibold">{stats?.users.admins || 0}</span>
+                    <Link href="/admin/users/admins" className="text-blue-600 hover:text-blue-700 text-sm ml-2">
+                      Manage
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Email System Health */}
+          <div className="bg-white rounded-lg shadow">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-gray-900">Email System Health</h2>
+                <Link href="/admin/email" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                  View Details →
+                </Link>
+              </div>
+            </div>
+            <div className="p-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
+                    <span className="text-sm font-medium">Successful Deliveries</span>
+                  </div>
+                  <span className="text-lg font-semibold text-green-600">{stats?.email.deliveries || 0}</span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <AlertTriangle className="h-5 w-5 text-orange-600 mr-2" />
+                    <span className="text-sm font-medium">Bounces</span>
+                  </div>
+                  <span className="text-lg font-semibold text-orange-600">{stats?.email.bounces || 0}</span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <AlertTriangle className="h-5 w-5 text-red-600 mr-2" />
+                    <span className="text-sm font-medium">Complaints</span>
+                  </div>
+                  <span className="text-lg font-semibold text-red-600">{stats?.email.complaints || 0}</span>
+                </div>
+
+                {stats?.email.bounces || stats?.email.complaints ? (
+                  <Link 
+                    href="/admin/users/banned"
+                    className="block w-full text-center py-2 px-4 bg-red-50 text-red-700 rounded-md hover:bg-red-100 transition-colors text-sm font-medium"
+                  >
+                    Review Problematic Emails
+                  </Link>
+                ) : (
+                  <div className="text-center py-2 px-4 bg-green-50 text-green-700 rounded-md text-sm">
+                    ✅ No email issues detected
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Schools by State & Recent Activity */}
+        <div className="grid gap-6 lg:grid-cols-2">
+          {/* Schools by State */}
+          <div className="bg-white rounded-lg shadow">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-gray-900">Schools by State</h2>
+                <Link href="/admin/schools" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                  Manage Schools →
+                </Link>
+              </div>
+            </div>
+            <div className="p-6">
+              {stats?.schools.byState && Object.keys(stats.schools.byState).length > 0 ? (
+                <div className="space-y-3">
+                  {Object.entries(stats.schools.byState)
+                    .sort(([,a], [,b]) => b - a)
+                    .slice(0, 6)
+                    .map(([state, count]) => (
+                    <div key={state} className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <MapPin className="h-4 w-4 text-gray-400 mr-2" />
+                        <span className="text-sm font-medium">{state}</span>
+                      </div>
+                      <span className="text-lg font-semibold">{count}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <School className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                  <p>No schools registered yet</p>
+                  <Link 
+                    href="/admin/schools/add"
+                    className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                  >
+                    Add the first school
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Recent Email Activity */}
+          <div className="bg-white rounded-lg shadow">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-gray-900">Recent Email Activity</h2>
+                <Link href="/admin/email" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                  View All →
+                </Link>
+              </div>
+            </div>
+            <div className="p-6">
+              {stats?.email.recentActivity && stats.email.recentActivity.length > 0 ? (
+                <div className="space-y-3">
+                  {stats.email.recentActivity.map((event) => (
+                    <div key={event.id} className="flex items-center justify-between py-2">
+                      <div className="flex items-center min-w-0 flex-1">
+                        <div className={`w-2 h-2 rounded-full mr-3 ${
+                          event.eventType === 'DELIVERY' ? 'bg-green-500' :
+                          event.eventType === 'BOUNCE' ? 'bg-orange-500' :
+                          event.eventType === 'COMPLAINT' ? 'bg-red-500' :
+                          'bg-gray-500'
+                        }`} />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium text-gray-900 truncate">{event.email}</p>
+                          <p className="text-xs text-gray-500">{event.eventType}</p>
+                        </div>
+                      </div>
+                      <span className="text-xs text-gray-400 ml-2">
+                        {new Date(event.timestamp).toLocaleDateString()}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <Activity className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                  <p>No recent email activity</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* System Status */}
+        <div className="bg-white rounded-lg shadow">
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900">System Status</h2>
+          </div>
+          <div className="p-6">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <div className="flex items-center">
+                <div className="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
+                <div>
+                  <p className="text-sm font-medium">Database</p>
+                  <p className="text-xs text-gray-500">Connected</p>
+                </div>
+              </div>
+              <div className="flex items-center">
+                <div className="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
+                <div>
+                  <p className="text-sm font-medium">Email Service</p>
+                  <p className="text-xs text-gray-500">AWS SES Active</p>
+                </div>
+              </div>
+              <div className="flex items-center">
+                <div className="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
+                <div>
+                  <p className="text-sm font-medium">Notifications</p>
+                  <p className="text-xs text-gray-500">SNS Connected</p>
+                </div>
+              </div>
+              <div className="flex items-center">
+                <div className="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
+                <div>
+                  <p className="text-sm font-medium">Admin Panel</p>
+                  <p className="text-xs text-gray-500">Operational</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      </div>
-    </div>
+    </AdminLayout>
   );
 } 

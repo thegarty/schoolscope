@@ -3,6 +3,8 @@ import { requireAdmin } from '@/lib/admin';
 import { db } from '@/lib/db';
 import { updateSubscriptionStatus } from '@/lib/email-utils';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     // Check admin access
@@ -13,6 +15,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '50');
     const search = searchParams.get('search') || '';
     const subscriptionFilter = searchParams.get('subscription'); // 'subscribed', 'unsubscribed', or null
+    const adminFilter = searchParams.get('admin'); // 'true' to filter only admins
 
     const skip = (page - 1) * limit;
 
@@ -30,6 +33,10 @@ export async function GET(request: NextRequest) {
       where.emailSubscribed = true;
     } else if (subscriptionFilter === 'unsubscribed') {
       where.emailSubscribed = false;
+    }
+
+    if (adminFilter === 'true') {
+      where.isAdmin = true;
     }
 
     const [users, totalCount] = await Promise.all([

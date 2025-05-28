@@ -3,6 +3,8 @@ import { db } from '@/lib/db';
 import { getBouncedEmails, getComplaintEmails } from '@/lib/email-utils';
 import { requireAdmin } from '@/lib/admin';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     // Check admin access
