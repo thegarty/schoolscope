@@ -3,6 +3,7 @@ import { lucia } from "@/auth/lucia";
 import { db } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
+import { sendWelcomeEmail } from "@/lib/email";
 
 export async function POST(request: NextRequest) {
   try {
@@ -51,6 +52,11 @@ export async function POST(request: NextRequest) {
     const sessionCookie = lucia.createSessionCookie(session.id);
     
     cookies().set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
+
+    // Send welcome email (don't wait for it to complete)
+    sendWelcomeEmail(user.email, user.name || 'User', user.id).catch(error => {
+      console.error('Failed to send welcome email:', error);
+    });
 
     return NextResponse.json({
       success: true,

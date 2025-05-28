@@ -17,9 +17,12 @@
     "db:seed:safe": "node prisma/seed-safe.js",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
-    "docker:logs": "docker-compose logs -f postgres"
+    "docker:logs": "docker-compose logs -f postgres",
+    "make-admin": "node scripts/make-admin.js"
   },
   "dependencies": {
+    "@aws-sdk/client-ses": "^3.817.0",
+    "@aws-sdk/client-sns": "^3.817.0",
     "@lucia-auth/adapter-prisma": "^4.0.1",
     "@prisma/client": "^5.7.1",
     "@radix-ui/react-avatar": "^1.0.4",
