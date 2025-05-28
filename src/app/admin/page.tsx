@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import AppHeader from '@/components/AppHeader';
 
 interface EmailStats {
   stats: {
@@ -27,6 +29,9 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [testEmailLoading, setTestEmailLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const router = useRouter();
 
   // Test email form state
   const [testEmail, setTestEmail] = useState({
@@ -40,8 +45,43 @@ export default function AdminDashboard() {
   });
 
   useEffect(() => {
-    loadEmailStats();
+    checkAdminAccess();
   }, []);
+
+  const checkAdminAccess = async () => {
+    try {
+      // First check if user is logged in and get user info
+      const userResponse = await fetch('/api/auth/me');
+      if (!userResponse.ok) {
+        router.push('/login');
+        return;
+      }
+      const userData = await userResponse.json();
+      setCurrentUser(userData.user);
+
+      // Then check admin access
+      const response = await fetch('/api/admin/email-stats');
+      if (response.status === 403) {
+        // Not admin, redirect to home
+        router.push('/');
+        return;
+      }
+      if (response.ok) {
+        setIsAdmin(true);
+        const data = await response.json();
+        setEmailStats(data);
+      } else {
+        setMessage('Failed to load email statistics');
+        setIsAdmin(false);
+      }
+    } catch (error) {
+      console.error('Error checking admin access:', error);
+      setMessage('Failed to verify admin access');
+      setIsAdmin(false);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const loadEmailStats = async () => {
     try {
@@ -88,21 +128,38 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-6">
-        <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
-        <p>Loading admin dashboard...</p>
+      <div>
+        <AppHeader user={currentUser} showNotifications={false} />
+        <div className="container mx-auto p-6">
+          <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
+          <p>Loading admin dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isAdmin === false) {
+    return (
+      <div>
+        <AppHeader user={currentUser} showNotifications={false} />
+        <div className="container mx-auto p-6">
+          <h1 className="text-3xl font-bold mb-6">Access Denied</h1>
+          <p className="text-red-600">You do not have admin privileges to access this page.</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-        <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-          Admin Panel
-        </span>
-      </div>
+    <div>
+      <AppHeader user={currentUser} showNotifications={false} />
+      <div className="container mx-auto p-6 space-y-8">
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+          <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+            Admin Panel
+          </span>
+        </div>
 
       {message && (
         <div className={`p-4 rounded-lg ${message.startsWith('✅') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
@@ -293,6 +350,7 @@ export default function AdminDashboard() {
           <p><strong>SNS Webhook endpoint:</strong> <code>POST /api/webhooks/sns</code></p>
           <p><strong>Unsubscribe page:</strong> <code>GET /api/email/unsubscribe</code></p>
         </div>
+      </div>
       </div>
     </div>
   );

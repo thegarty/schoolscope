@@ -2,10 +2,11 @@
 
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { School, Calendar, Users, Plus, Home, Menu, X } from 'lucide-react'
+import { School, Calendar, Users, Plus, Home, Menu, X, Settings } from 'lucide-react'
 import NotificationBell from './NotificationBell'
 import { useState } from 'react'
 import { logout } from '@/lib/actions'
+import { useAdmin } from '@/lib/hooks/useAdmin'
 
 interface User {
   id: string
@@ -20,6 +21,7 @@ interface AppHeaderProps {
 
 export default function AppHeader({ user, showNotifications = true }: AppHeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const { isAdmin } = useAdmin()
 
   return (
     <header className="bg-white shadow">
@@ -60,6 +62,16 @@ export default function AppHeader({ user, showNotifications = true }: AppHeaderP
                   Schools
                 </Link>
               </Button>
+              
+              {/* Admin Link */}
+              {isAdmin && (
+                <Button asChild variant="ghost" size="sm">
+                  <Link href="/admin" className="flex items-center text-blue-600">
+                    <Settings className="h-4 w-4 mr-2" />
+                    Admin
+                  </Link>
+                </Button>
+              )}
               
               {/* Quick Actions */}
               <div className="border-l border-gray-200 pl-4 ml-4">
@@ -128,6 +140,19 @@ export default function AppHeader({ user, showNotifications = true }: AppHeaderP
                             <School className="h-4 w-4 mr-3" />
                             Schools
                           </Link>
+                          
+                          {/* Admin Link for Mobile */}
+                          {isAdmin && (
+                            <Link
+                              href="/admin"
+                              className="flex items-center w-full px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-md font-medium"
+                              onClick={() => setIsMobileMenuOpen(false)}
+                            >
+                              <Settings className="h-4 w-4 mr-3" />
+                              Admin Panel
+                            </Link>
+                          )}
+                          
                           <div className="border-t border-gray-200 my-2"></div>
                           <Link
                             href="/events/create"
