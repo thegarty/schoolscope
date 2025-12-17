@@ -1,5 +1,6 @@
 "use client"
 import React, { useState, useEffect } from 'react'
+import { trackSearch } from '@/lib/analytics'
 
 export default function SchoolAutocomplete({ preselected, name = 'schoolId' }: { preselected?: any, name?: string }) {
   const [query, setQuery] = useState('')
@@ -19,7 +20,10 @@ export default function SchoolAutocomplete({ preselected, name = 'schoolId' }: {
     setLoading(true)
     fetch(`/api/schools/search?q=${encodeURIComponent(query)}`)
       .then(res => res.json())
-      .then(data => setResults(data))
+      .then(data => {
+        setResults(data)
+        trackSearch(query, data.length, 'school')
+      })
       .finally(() => setLoading(false))
   }, [query])
 

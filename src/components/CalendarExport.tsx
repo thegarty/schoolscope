@@ -3,6 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { Calendar, Download, ExternalLink } from 'lucide-react'
 import { format } from 'date-fns'
+import { trackCalendar } from '@/lib/analytics'
 
 interface Event {
   id: string
@@ -60,6 +61,7 @@ END:VCALENDAR`
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
+    trackCalendar('export', 'ics')
   }
 
   const createGoogleCalendarUrl = () => {
@@ -102,7 +104,10 @@ END:VCALENDAR`
       <Button
         variant="outline"
         size="sm"
-        onClick={() => window.open(createGoogleCalendarUrl(), '_blank')}
+        onClick={() => {
+          trackCalendar('export', 'google')
+          window.open(createGoogleCalendarUrl(), '_blank')
+        }}
         className="flex items-center space-x-1"
       >
         <ExternalLink className="h-4 w-4" />
@@ -112,7 +117,10 @@ END:VCALENDAR`
       <Button
         variant="outline"
         size="sm"
-        onClick={() => window.open(createOutlookUrl(), '_blank')}
+        onClick={() => {
+          trackCalendar('export', 'outlook')
+          window.open(createOutlookUrl(), '_blank')
+        }}
         className="flex items-center space-x-1"
       >
         <ExternalLink className="h-4 w-4" />

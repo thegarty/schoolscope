@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { Suspense } from 'react'
 import SchoolAutocomplete from '@/components/SchoolAutocomplete'
 import SchoolQuickSelect from '@/components/SchoolQuickSelect'
+import { trackEventAction, trackForm, trackError, trackConversion } from '@/lib/analytics'
 
 interface School {
   id: string
@@ -67,24 +68,33 @@ export default function CreateEventForm({ createEventAction, uniqueSchools, user
 
     if (!title || !description || !startDate || !schoolId || !category) {
       setError('Please fill in all required fields.')
+      trackForm('create_event', 'error', 'Missing required fields')
       return
     }
 
     if (isPrivateEvent && !childId) {
       setError('Please select a child for private events.')
+      trackForm('create_event', 'error', 'Missing child selection')
       return
     }
 
     if (!isPrivateEvent && yearLevels.length === 0) {
       setError('Please select at least one year level for public events.')
+      trackForm('create_event', 'error', 'Missing year levels')
       return
     }
 
     startTransition(async () => {
       try {
         await createEventAction(formData)
+        trackEventAction('create', undefined, title, !isPrivateEvent)
+        trackForm('create_event', 'success')
+        trackConversion('event_created')
       } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to create event'
         setError('Failed to create event. Please try again.')
+        trackError(err instanceof Error ? err : new Error(errorMessage), 'create_event')
+        trackForm('create_event', 'error', errorMessage)
         console.error('Form submission error:', err)
       }
     })

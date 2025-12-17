@@ -8,6 +8,8 @@ import { School, Search, MapPin } from 'lucide-react'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createSchoolSlug } from '@/lib/school-utils'
+import { Suspense } from 'react'
+import { SchoolSearchTracker } from '@/components/SchoolSearchTracker'
 
 export const dynamic = 'force-dynamic'
 
@@ -60,6 +62,9 @@ export default async function BrowseSchoolsPage({ searchParams }: { searchParams
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Suspense fallback={null}>
+        <SchoolSearchTracker />
+      </Suspense>
       {/* Header */}
       <header className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

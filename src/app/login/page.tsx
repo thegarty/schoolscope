@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { School, AlertCircle } from 'lucide-react'
+import { trackAuth, trackForm, trackError } from '@/lib/analytics'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -33,13 +34,20 @@ export default function LoginPage() {
 
       if (response.ok) {
         // Login successful, redirect to dashboard
+        trackAuth('login', 'email')
+        trackForm('login', 'success')
         router.push('/dashboard')
         router.refresh()
       } else {
         setError(data.error || 'Login failed')
+        trackAuth('login', 'email')
+        trackForm('login', 'error', data.error || 'Login failed')
       }
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Network error'
       setError('Network error. Please try again.')
+      trackError(errorMessage, 'login')
+      trackForm('login', 'error', errorMessage)
     } finally {
       setIsLoading(false)
     }

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { CheckCircle, XCircle, Users } from 'lucide-react'
+import { trackEventAction, trackConversion, trackError } from '@/lib/analytics'
 
 interface EventConfirmationProps {
   eventId: string
@@ -36,8 +37,17 @@ export default function EventConfirmation({
 
       if (response.ok) {
         const data = await response.json()
+        const wasConfirmed = isConfirmed
         setIsConfirmed(!isConfirmed)
         setCount(data.confirmationCount)
+        
+        // Track analytics
+        if (!wasConfirmed) {
+          trackEventAction('confirm', eventId)
+          trackConversion('event_confirmed')
+        } else {
+          trackEventAction('unconfirm', eventId)
+        }
         
         // If the event status changed (confirmed/unconfirmed), refresh the page
         if (data.eventConfirmed !== undefined) {
@@ -48,9 +58,11 @@ export default function EventConfirmation({
         }
       } else {
         console.error('Failed to update confirmation')
+        trackError(new Error('Failed to update confirmation'), 'event_confirmation')
       }
     } catch (error) {
       console.error('Error updating confirmation:', error)
+      trackError(error instanceof Error ? error : new Error('Unknown error'), 'event_confirmation')
     } finally {
       setIsLoading(false)
     }

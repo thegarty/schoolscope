@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Check, X, Clock, User, Vote } from 'lucide-react'
 import Link from 'next/link'
+import { trackVote, trackError } from '@/lib/analytics'
 
 interface SchoolEdit {
   id: string
@@ -57,14 +58,18 @@ export default function DashboardVoting({ schoolEdits, currentUserId }: Dashboar
       })
 
       if (response.ok) {
+        // Track voting
+        trackVote(vote === 'APPROVE' ? 'approve' : 'reject', 'school_edit', editId)
         // Refresh the page to show updated data
         window.location.reload()
       } else {
         const error = await response.json()
+        trackError(new Error(error.error || 'Failed to vote'), 'vote')
         alert(error.error || 'Failed to vote')
       }
     } catch (error) {
       console.error('Error voting on edit:', error)
+      trackError(error instanceof Error ? error : new Error('Unknown error'), 'vote')
       alert('Failed to vote')
     } finally {
       setVotingStates(prev => ({ ...prev, [editId]: false }))

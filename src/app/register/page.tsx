@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { School, AlertCircle } from 'lucide-react'
+import { trackAuth, trackForm, trackConversion, trackError } from '@/lib/analytics'
 
 export default function RegisterPage() {
   const [name, setName] = useState('')
@@ -24,12 +25,14 @@ export default function RegisterPage() {
 
     if (password !== confirmPassword) {
       setError('Passwords do not match')
+      trackForm('register', 'error', 'Passwords do not match')
       setIsLoading(false)
       return
     }
 
     if (password.length < 6) {
       setError('Password must be at least 6 characters long')
+      trackForm('register', 'error', 'Password too short')
       setIsLoading(false)
       return
     }
@@ -47,13 +50,20 @@ export default function RegisterPage() {
 
       if (response.ok) {
         // Registration successful, redirect to dashboard
+        trackAuth('register', 'email')
+        trackForm('register', 'success')
+        trackConversion('signup')
         router.push('/dashboard')
         router.refresh()
       } else {
         setError(data.error || 'Registration failed')
+        trackForm('register', 'error', data.error || 'Registration failed')
       }
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Network error'
       setError('Network error. Please try again.')
+      trackError(errorMessage, 'register')
+      trackForm('register', 'error', errorMessage)
     } finally {
       setIsLoading(false)
     }
