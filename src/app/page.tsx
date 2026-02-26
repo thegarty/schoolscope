@@ -1,3 +1,6 @@
+// ISR: re-render homepage in background every hour
+export const revalidate = 3600
+
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'

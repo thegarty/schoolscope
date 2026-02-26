@@ -7,6 +7,9 @@ import Link from 'next/link'
 import { Metadata } from 'next'
 import { createSchoolSlug, findSchoolBySlug } from '@/lib/school-utils'
 
+// ISR: cache event listing pages for 10 minutes
+export const revalidate = 600
+
 interface SchoolEventsPageProps {
   params: { slug: string }
   searchParams?: { category?: string; confirmed?: string; page?: string }
