@@ -276,7 +276,7 @@ export default async function SchoolPage({ params }: SchoolPageProps) {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center">
-            <p className="text-xs text-gray-400">© 2024 SchoolScope. All rights reserved.</p>
+            <p className="text-xs text-gray-400">© 2026 SchoolScope. All rights reserved.</p>
             <p className="text-xs text-gray-400 mt-2 sm:mt-0">Connecting 10,000+ Australian schools nationwide</p>
           </div>
         </div>

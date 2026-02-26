@@ -70,7 +70,7 @@ export default function NotFound() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <p className="text-sm text-gray-500">
-              © 2024 SchoolScope. All rights reserved.
+              © 2026 SchoolScope. All rights reserved.
             </p>
           </div>
         </div>
