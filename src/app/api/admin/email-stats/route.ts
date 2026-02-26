@@ -55,10 +55,10 @@ export async function GET(request: NextRequest) {
         recentBouncesCount: recentBounces.length,
         recentComplaintsCount: recentComplaints.length,
       },
-      deliveryStats: deliveryStats.reduce((acc, stat) => {
+      deliveryStats: deliveryStats.reduce((acc: Record<string, number>, stat) => {
         acc[stat.eventType] = stat._count.eventType;
         return acc;
-      }, {} as Record<string, number>),
+      }, {}),
       recentBounces,
       recentComplaints,
       recentEvents: recentEvents.map(event => ({
