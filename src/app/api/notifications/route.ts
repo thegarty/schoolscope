@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
         take: 10
       })
 
-      eventsNeedingConfirmation.forEach(event => {
+      eventsNeedingConfirmation.forEach((event: typeof eventsNeedingConfirmation[number]) => {
         notifications.push({
           id: `event-confirm-${event.id}`,
           type: 'EVENT_CONFIRMATION',
@@ -102,7 +102,7 @@ export async function GET(request: NextRequest) {
         take: 10
       })
 
-      schoolEditsNeedingVotes.forEach(edit => {
+      schoolEditsNeedingVotes.forEach((edit: typeof schoolEditsNeedingVotes[number]) => {
         const approveCount = edit.votes.filter(v => v.vote === 'APPROVE').length
         const rejectCount = edit.votes.filter(v => v.vote === 'REJECT').length
         
@@ -167,7 +167,7 @@ export async function GET(request: NextRequest) {
         take: 5
       })
 
-      upcomingEvents.forEach(event => {
+      upcomingEvents.forEach((event: typeof upcomingEvents[number]) => {
         const daysUntil = Math.ceil((new Date(event.startDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
         
         notifications.push({
