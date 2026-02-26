@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { Prisma } from '@prisma/client'
 import crypto from 'crypto'
 
 // Resend webhook event types
@@ -131,6 +132,11 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ received: true })
   } catch (error) {
+    // Duplicate event delivery — Resend retries until it gets a 2xx, so return
+    // 200 to stop the retry loop rather than letting it keep failing.
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      return NextResponse.json({ received: true, duplicate: true })
+    }
     console.error('Error processing Resend webhook:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
