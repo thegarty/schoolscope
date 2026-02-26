@@ -103,8 +103,8 @@ export async function GET(request: NextRequest) {
       })
 
       schoolEditsNeedingVotes.forEach((edit: typeof schoolEditsNeedingVotes[number]) => {
-        const approveCount = edit.votes.filter(v => v.vote === 'APPROVE').length
-        const rejectCount = edit.votes.filter(v => v.vote === 'REJECT').length
+        const approveCount = edit.votes.filter((v: typeof edit.votes[number]) => v.vote === 'APPROVE').length
+        const rejectCount = edit.votes.filter((v: typeof edit.votes[number]) => v.vote === 'REJECT').length
         
         notifications.push({
           id: `school-edit-${edit.id}`,
