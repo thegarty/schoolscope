@@ -56,6 +56,13 @@ export default function RootLayout({
             `,
           }}
         />
+        {/* Google AdSense */}
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5603475049488422"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
         <GoogleAnalytics />
         <div className="min-h-screen bg-background">
           {children}
