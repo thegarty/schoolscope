@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
         recentBouncesCount: recentBounces.length,
         recentComplaintsCount: recentComplaints.length,
       },
-      deliveryStats: deliveryStats.reduce((acc: Record<string, number>, stat) => {
+      deliveryStats: deliveryStats.reduce((acc: Record<string, number>, stat: typeof deliveryStats[number]) => {
         acc[stat.eventType] = stat._count.eventType;
         return acc;
       }, {}),
