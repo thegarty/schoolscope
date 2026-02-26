@@ -9,9 +9,8 @@ import { notFound } from 'next/navigation'
 import { createSchoolSlug } from '@/lib/school-utils'
 import { UserNavButton } from '@/components/UserNavButton'
 
-// ISR: re-render all 8 state pages every 30 days in the background
-export const revalidate = 2592000
-export const dynamicParams = false
+// Render at request time — DB (Railway internal) is not reachable during Docker build
+export const dynamic = 'force-dynamic'
 
 const VALID_STATES = ['NSW', 'VIC', 'QLD', 'WA', 'SA', 'TAS', 'NT', 'ACT']
 
@@ -26,9 +25,6 @@ const STATE_NAMES: Record<string, string> = {
   ACT: 'Australian Capital Territory',
 }
 
-export function generateStaticParams() {
-  return VALID_STATES.map(state => ({ state: state.toLowerCase() }))
-}
 
 interface StatePageProps {
   params: { state: string }
