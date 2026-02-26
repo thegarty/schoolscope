@@ -18,8 +18,8 @@ export async function GET(request: NextRequest) {
       include: { school: true }
     })
 
-    const schoolIds = children.map(child => child.schoolId)
-    const yearLevels = Array.from(new Set(children.map(child => child.yearLevel)))
+    const schoolIds = children.map((child: typeof children[number]) => child.schoolId)
+    const yearLevels = Array.from(new Set(children.map((child: typeof children[number]) => child.yearLevel)))
 
     interface Notification {
       id: string
