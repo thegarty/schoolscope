@@ -19,21 +19,49 @@ interface ResendWebhookEvent {
   }
 }
 
-function verifySignature(payload: string, signature: string): boolean {
+// Resend webhooks are delivered via svix.
+// Signed content = "{svix-id}.{svix-timestamp}.{raw-body}"
+// Secret is base64-encoded (with optional "whsec_" prefix).
+// Signature is base64, prefixed with "v1," — multiple may be present space-separated.
+function verifySignature(
+  payload: string,
+  svixId: string,
+  svixTimestamp: string,
+  svixSignature: string
+): boolean {
   const secret = process.env.RESEND_WEBHOOK_SECRET
   if (!secret) return false
-  const expected = crypto.createHmac('sha256', secret).update(payload).digest('hex')
-  return crypto.timingSafeEqual(Buffer.from(signature, 'hex'), Buffer.from(expected, 'hex'))
+
+  const rawSecret = secret.startsWith('whsec_') ? secret.slice(6) : secret
+  const secretBytes = Buffer.from(rawSecret, 'base64')
+
+  const signedContent = `${svixId}.${svixTimestamp}.${payload}`
+  const expected = crypto
+    .createHmac('sha256', secretBytes)
+    .update(signedContent)
+    .digest('base64')
+
+  return svixSignature.split(' ').some(sig => {
+    const value = sig.startsWith('v1,') ? sig.slice(3) : sig
+    return value === expected
+  })
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.text()
 
-    // Verify signature if secret is configured
-    const signature = request.headers.get('resend-signature')
+    // Verify svix signature headers if secret is configured
+    const svixId = request.headers.get('svix-id')
+    const svixTimestamp = request.headers.get('svix-timestamp')
+    const svixSignature = request.headers.get('svix-signature')
     if (process.env.RESEND_WEBHOOK_SECRET) {
-      if (!signature || !verifySignature(body, signature)) {
+      if (
+        !svixId ||
+        !svixTimestamp ||
+        !svixSignature ||
+        !verifySignature(body, svixId, svixTimestamp, svixSignature)
+      ) {
         return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
       }
     }
