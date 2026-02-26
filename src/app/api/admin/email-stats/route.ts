@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
       }, {}),
       recentBounces,
       recentComplaints,
-      recentEvents: recentEvents.map(event => ({
+      recentEvents: recentEvents.map((event: typeof recentEvents[number]) => ({
         id: event.id,
         email: event.email,
         userName: event.user?.name,
