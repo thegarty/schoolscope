@@ -1,7 +1,9 @@
+// This route is no longer in use — Resend webhooks are handled at /api/webhooks/resend
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { SNS_CONFIG } from '@/lib/aws';
 import crypto from 'crypto';
+
+const SNS_CONFIG = { webhookSecret: process.env.SNS_WEBHOOK_SECRET || '' };
 
 interface SNSMessage {
   Type: string;
