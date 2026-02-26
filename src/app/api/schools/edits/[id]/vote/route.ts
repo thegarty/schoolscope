@@ -66,8 +66,8 @@ export async function POST(
       where: { schoolEditId: editId }
     })
 
-    const approveCount = votes.filter(v => v.vote === 'APPROVE').length
-    const rejectCount = votes.filter(v => v.vote === 'REJECT').length
+    const approveCount = votes.filter((v: typeof votes[number]) => v.vote === 'APPROVE').length
+    const rejectCount = votes.filter((v: typeof votes[number]) => v.vote === 'REJECT').length
 
     // Auto-approve/reject based on vote threshold (e.g., 3 votes)
     const VOTE_THRESHOLD = 3
