@@ -193,7 +193,7 @@ export type SchoolAboutVersionGroupByOutputType = {
   _max: SchoolAboutVersionMaxAggregateOutputType | null
 }
 
-type GetSchoolAboutVersionGroupByPayload<T extends SchoolAboutVersionGroupByArgs> = Prisma.PrismaPromise<
+export type GetSchoolAboutVersionGroupByPayload<T extends SchoolAboutVersionGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<SchoolAboutVersionGroupByOutputType, T['by']> &
       {

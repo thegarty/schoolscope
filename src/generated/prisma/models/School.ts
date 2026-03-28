@@ -375,7 +375,7 @@ export type SchoolGroupByOutputType = {
   _max: SchoolMaxAggregateOutputType | null
 }
 
-type GetSchoolGroupByPayload<T extends SchoolGroupByArgs> = Prisma.PrismaPromise<
+export type GetSchoolGroupByPayload<T extends SchoolGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<SchoolGroupByOutputType, T['by']> &
       {

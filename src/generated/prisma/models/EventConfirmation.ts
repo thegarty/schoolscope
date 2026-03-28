@@ -151,7 +151,7 @@ export type EventConfirmationGroupByOutputType = {
   _max: EventConfirmationMaxAggregateOutputType | null
 }
 
-type GetEventConfirmationGroupByPayload<T extends EventConfirmationGroupByArgs> = Prisma.PrismaPromise<
+export type GetEventConfirmationGroupByPayload<T extends EventConfirmationGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<EventConfirmationGroupByOutputType, T['by']> &
       {

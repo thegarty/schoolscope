@@ -272,7 +272,7 @@ export type SchoolEnrichmentProposalGroupByOutputType = {
   _max: SchoolEnrichmentProposalMaxAggregateOutputType | null
 }
 
-type GetSchoolEnrichmentProposalGroupByPayload<T extends SchoolEnrichmentProposalGroupByArgs> = Prisma.PrismaPromise<
+export type GetSchoolEnrichmentProposalGroupByPayload<T extends SchoolEnrichmentProposalGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<SchoolEnrichmentProposalGroupByOutputType, T['by']> &
       {

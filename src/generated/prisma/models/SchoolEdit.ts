@@ -193,7 +193,7 @@ export type SchoolEditGroupByOutputType = {
   _max: SchoolEditMaxAggregateOutputType | null
 }
 
-type GetSchoolEditGroupByPayload<T extends SchoolEditGroupByArgs> = Prisma.PrismaPromise<
+export type GetSchoolEditGroupByPayload<T extends SchoolEditGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<SchoolEditGroupByOutputType, T['by']> &
       {

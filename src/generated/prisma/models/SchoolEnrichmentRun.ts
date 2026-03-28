@@ -249,7 +249,7 @@ export type SchoolEnrichmentRunGroupByOutputType = {
   _max: SchoolEnrichmentRunMaxAggregateOutputType | null
 }
 
-type GetSchoolEnrichmentRunGroupByPayload<T extends SchoolEnrichmentRunGroupByArgs> = Prisma.PrismaPromise<
+export type GetSchoolEnrichmentRunGroupByPayload<T extends SchoolEnrichmentRunGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<SchoolEnrichmentRunGroupByOutputType, T['by']> &
       {

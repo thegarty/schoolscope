@@ -271,7 +271,7 @@ export type SchoolSourceDiscoveryRunGroupByOutputType = {
   _max: SchoolSourceDiscoveryRunMaxAggregateOutputType | null
 }
 
-type GetSchoolSourceDiscoveryRunGroupByPayload<T extends SchoolSourceDiscoveryRunGroupByArgs> = Prisma.PrismaPromise<
+export type GetSchoolSourceDiscoveryRunGroupByPayload<T extends SchoolSourceDiscoveryRunGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<SchoolSourceDiscoveryRunGroupByOutputType, T['by']> &
       {
