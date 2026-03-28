@@ -1,4 +1,3 @@
-const { PrismaClient } = require('@prisma/client');
 const { exec } = require('child_process');
 const { promisify } = require('util');
 
@@ -14,28 +13,12 @@ async function runStartup() {
       console.log('📦 Running database migrations...');
       await execAsync('npx prisma migrate deploy');
       console.log('✅ Migrations completed');
-      
-      // Check if seeding is needed
-      const prisma = new PrismaClient();
-      
-      try {
-        const schoolCount = await prisma.school.count();
-        const userCount = await prisma.user.count();
-        
-        if (schoolCount === 0 && userCount === 0) {
-          console.log('📦 Database is empty, running seed...');
-          await execAsync('npm run db:seed');
-          console.log('✅ Seeding completed');
-        } else {
-          console.log(`✅ Database already contains data (${schoolCount} schools, ${userCount} users)`);
-          console.log('🚫 Skipping seed to prevent duplicates');
-        }
-      } catch (dbError) {
-        console.log('⚠️ Database not ready yet, skipping seed check');
-      } finally {
-        await prisma.$disconnect();
-      }
-      
+
+      // Seeding is intentionally not automatic in production startup.
+      // The project uses a custom Prisma client output, and startup should
+      // only ensure schema migrations are applied before app boot.
+      console.log('ℹ️ Automatic seed skipped on startup');
+
       console.log('🎉 Startup tasks completed successfully!');
       
     } catch (error) {
