@@ -57,6 +57,19 @@ export async function GET(req: Request) {
     }
   })
 
-  // Return in format expected by admin page
+  // Legacy autocomplete callers expect an array when using `q`.
+  if (q) {
+    return NextResponse.json(
+      schools.map((school) => ({
+        id: school.id,
+        name: school.name,
+        suburb: school.suburb,
+        state: school.state,
+        postcode: school.postcode,
+      }))
+    )
+  }
+
+  // Admin and richer list pages consume the wrapped shape.
   return NextResponse.json({ schools })
 } 

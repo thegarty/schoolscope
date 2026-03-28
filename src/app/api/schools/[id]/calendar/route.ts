@@ -3,9 +3,10 @@ import { db } from '@/lib/db'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const { searchParams } = new URL(request.url)
     const month = parseInt(searchParams.get('month') || String(new Date().getMonth() + 1), 10)
     const year = parseInt(searchParams.get('year') || String(new Date().getFullYear()), 10)
@@ -15,7 +16,7 @@ export async function GET(
 
     const events = await db.event.findMany({
       where: {
-        schoolId: params.id,
+        schoolId: id,
         isPrivate: false,
         startDate: { gte: startOfMonth, lte: endOfMonth },
       },

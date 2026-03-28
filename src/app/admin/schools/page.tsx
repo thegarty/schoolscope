@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import AdminLayout from '@/components/admin/AdminLayout';
-import { School, Search, MapPin, Users, Calendar, Edit, Trash2 } from 'lucide-react';
+import { School, Search, MapPin, Users, Calendar, Edit, Trash2, Bot } from 'lucide-react';
 
 interface School {
   id: string;
@@ -30,6 +30,11 @@ export default function SchoolsPage() {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [search, setSearch] = useState('');
   const [selectedState, setSelectedState] = useState('');
+  const [enrichmentMetrics, setEnrichmentMetrics] = useState<{
+    pendingProposals: number;
+    approvedOrApplied: number;
+    aiUpcomingEvents: number;
+  } | null>(null);
   const router = useRouter();
 
   const australianStates = [
@@ -43,6 +48,7 @@ export default function SchoolsPage() {
   useEffect(() => {
     if (currentUser) {
       loadSchools();
+        loadEnrichmentMetrics();
     }
   }, [currentUser, search, selectedState]);
 
@@ -58,6 +64,18 @@ export default function SchoolsPage() {
     } catch (error) {
       console.error('Error checking admin access:', error);
       router.push('/login');
+    }
+  };
+
+  const loadEnrichmentMetrics = async () => {
+    try {
+      const response = await fetch('/api/admin/enrichment/metrics');
+      if (response.ok) {
+        const data = await response.json();
+        setEnrichmentMetrics(data.metrics);
+      }
+    } catch (error) {
+      console.error('Error loading enrichment metrics:', error);
     }
   };
 
@@ -200,6 +218,13 @@ export default function SchoolsPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <button
+                      onClick={() => router.push(`/admin/schools/${school.id}/enrichment`)}
+                      className="p-2 text-gray-400 hover:text-indigo-600"
+                      title="AI enrichment"
+                    >
+                      <Bot className="h-4 w-4" />
+                    </button>
+                    <button
                       onClick={() => router.push(`/admin/schools/${school.id}/edit`)}
                       className="p-2 text-gray-400 hover:text-blue-600"
                       title="Edit school"
@@ -287,6 +312,20 @@ export default function SchoolsPage() {
                 <p className="text-sm font-medium text-gray-500">States Covered</p>
                 <p className="text-2xl font-semibold text-gray-900">
                   {new Set(schools.map(s => s.state).filter(Boolean)).size}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow">
+            <div className="flex items-center">
+              <Bot className="h-8 w-8 text-indigo-600" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500">AI Proposals Pending</p>
+                <p className="text-2xl font-semibold text-gray-900">
+                  {enrichmentMetrics?.pendingProposals ?? 0}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  AI events: {enrichmentMetrics?.aiUpcomingEvents ?? 0}
                 </p>
               </div>
             </div>

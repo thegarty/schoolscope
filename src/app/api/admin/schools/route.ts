@@ -58,6 +58,9 @@ export async function POST(request: NextRequest) {
         phone,
         email,
         website,
+        aboutContent: description || null,
+        aboutSummary: description ? String(description).slice(0, 180) : null,
+        aboutUpdatedAt: description ? new Date() : null,
       },
     });
 

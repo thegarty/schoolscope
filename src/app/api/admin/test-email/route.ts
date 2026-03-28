@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
         messageId = await sendWelcomeEmail(
           email,
           params.name || 'Test User',
-          params.userId || 'test-user-id'
+          params.userId
         );
         result = { type: 'welcome', messageId };
         break;

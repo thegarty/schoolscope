@@ -6,9 +6,10 @@ export const dynamic = 'force-dynamic';
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     // Check admin access
     await requireAdmin();
 
@@ -24,7 +25,7 @@ export async function PUT(
 
     // Get the edit request
     const editRequest = await db.schoolEdit.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         school: true,
       },
@@ -46,7 +47,7 @@ export async function PUT(
 
     // Update the edit request status
     const updatedEdit = await db.schoolEdit.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         status,
       },

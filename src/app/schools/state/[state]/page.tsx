@@ -27,12 +27,13 @@ const STATE_NAMES: Record<string, string> = {
 
 
 interface StatePageProps {
-  params: { state: string }
-  searchParams?: { page?: string; type?: string; sector?: string; suburb?: string }
+  params: Promise<{ state: string }>
+  searchParams?: Promise<{ page?: string; type?: string; sector?: string; suburb?: string }>
 }
 
 export async function generateMetadata({ params }: StatePageProps): Promise<Metadata> {
-  const state = params.state.toUpperCase()
+  const { state: rawState } = await params
+  const state = rawState.toUpperCase()
 
   if (!VALID_STATES.includes(state)) {
     return { title: 'State Not Found', description: 'The requested state could not be found.' }
@@ -60,14 +61,16 @@ export async function generateMetadata({ params }: StatePageProps): Promise<Meta
 }
 
 export default async function StateSchoolsPage({ params, searchParams }: StatePageProps) {
-  const state = params.state.toUpperCase()
+  const { state: rawState } = await params
+  const state = rawState.toUpperCase()
+  const resolvedSearchParams = (await searchParams) ?? {}
 
   if (!VALID_STATES.includes(state)) notFound()
 
-  const type = searchParams?.type || ''
-  const sector = searchParams?.sector || ''
-  const suburb = searchParams?.suburb || ''
-  const page = parseInt(searchParams?.page || '1', 10)
+  const type = resolvedSearchParams.type || ''
+  const sector = resolvedSearchParams.sector || ''
+  const suburb = resolvedSearchParams.suburb || ''
+  const page = parseInt(resolvedSearchParams.page || '1', 10)
   const pageSize = 24
 
   const [types, sectors, suburbs] = await Promise.all([

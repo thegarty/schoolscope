@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { validateRequest } from '@/auth/lucia'
+import { validateRequest } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -9,7 +9,11 @@ import EventConfirmation from '@/components/EventConfirmation'
 import CalendarExport from '@/components/CalendarExport'
 import AppHeader from '@/components/AppHeader'
 
-export default async function EventsPage({ searchParams }: { searchParams?: Record<string, string> }) {
+export default async function EventsPage({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string>>
+}) {
   const { user } = await validateRequest()
   
   if (!user) {
@@ -25,10 +29,11 @@ export default async function EventsPage({ searchParams }: { searchParams?: Reco
   const schoolIds = children.map(child => child.schoolId)
 
   // Filters
-  const category = searchParams?.category || ''
-  const confirmed = searchParams?.confirmed || ''
-  const eventType = searchParams?.eventType || '' // 'public', 'private', or ''
-  const page = parseInt(searchParams?.page || '1', 10)
+  const resolvedSearchParams = (await searchParams) ?? {}
+  const category = resolvedSearchParams.category || ''
+  const confirmed = resolvedSearchParams.confirmed || ''
+  const eventType = resolvedSearchParams.eventType || '' // 'public', 'private', or ''
+  const page = parseInt(resolvedSearchParams.page || '1', 10)
   const pageSize = 20
 
   // Build query for public events

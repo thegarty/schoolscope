@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { validateRequest } from '@/auth/lucia'
+import { validateRequest } from '@/lib/auth'
 import { db } from '@/lib/db'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const schoolId = params.id
+    const { id: schoolId } = await params
 
     // Get pending edits for this school
     const edits = await db.schoolEdit.findMany({
@@ -45,14 +45,14 @@ export async function GET(
   }
 }
 
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { user } = await validateRequest()
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const schoolId = params.id
+    const { id: schoolId } = await params
     const body = await request.json()
     const { field, newValue, reason } = body
 

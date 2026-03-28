@@ -1,27 +1,31 @@
 import { db } from '@/lib/db'
-import { validateRequest } from '@/auth/lucia'
-import { logout } from '@/lib/actions'
+import { validateRequest } from '@/lib/auth'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { SuburbSearch } from '@/components/ui/suburb-search'
 import { School, Search, MapPin } from 'lucide-react'
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
 import { createSchoolSlug } from '@/lib/school-utils'
 import { Suspense } from 'react'
 import { SchoolSearchTracker } from '@/components/SchoolSearchTracker'
+import AppHeader from '@/components/AppHeader'
 
 export const dynamic = 'force-dynamic'
 
-export default async function BrowseSchoolsPage({ searchParams }: { searchParams?: Record<string, string> }) {
+export default async function BrowseSchoolsPage({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string>>
+}) {
   const { user } = await validateRequest()
+  const resolvedSearchParams = (await searchParams) ?? {}
   // Filters
-  const name = searchParams?.name?.trim() || ''
-  const suburb = searchParams?.suburb?.trim() || ''
-  const state = searchParams?.state || ''
-  const type = searchParams?.type || ''
-  const sector = searchParams?.sector || ''
-  const page = parseInt(searchParams?.page || '1', 10)
+  const name = resolvedSearchParams.name?.trim() || ''
+  const suburb = resolvedSearchParams.suburb?.trim() || ''
+  const state = resolvedSearchParams.state || ''
+  const type = resolvedSearchParams.type || ''
+  const sector = resolvedSearchParams.sector || ''
+  const page = parseInt(resolvedSearchParams.page || '1', 10)
   const pageSize = 20
 
   // Get distinct values for filters
@@ -65,41 +69,7 @@ export default async function BrowseSchoolsPage({ searchParams }: { searchParams
       <Suspense fallback={null}>
         <SchoolSearchTracker />
       </Suspense>
-      {/* Header */}
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center">
-              <School className="h-8 w-8 text-blue-600 mr-3" />
-              <Link href="/" className="text-2xl font-bold text-gray-900">SchoolScope</Link>
-            </div>
-            <div className="flex items-center space-x-4">
-              {user ? (
-                <>
-                  <Button asChild variant="outline">
-                    <Link href="/dashboard">Dashboard</Link>
-                  </Button>
-                  <span className="text-sm text-gray-700">Welcome, {user.name || user.email}</span>
-                  <form action={logout}>
-                    <Button variant="outline" type="submit">
-                      Logout
-                    </Button>
-                  </form>
-                </>
-              ) : (
-                <>
-                  <Button asChild variant="outline">
-                    <Link href="/login">Login</Link>
-                  </Button>
-                  <Button asChild>
-                    <Link href="/register">Register</Link>
-                  </Button>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
+      <AppHeader user={user} />
 
       {/* Hero Section */}
       <section className="bg-blue-600 text-white py-12">

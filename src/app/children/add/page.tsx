@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { validateRequest } from '@/auth/lucia'
+import { validateRequest } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -7,7 +7,6 @@ import { Input } from '@/components/ui/input'
 import Link from 'next/link'
 import { revalidatePath } from 'next/cache'
 import { Suspense } from 'react'
-import React, { useState, useEffect } from 'react'
 import SchoolAutocomplete from '@/components/SchoolAutocomplete'
 
 async function addChild(formData: FormData) {
@@ -43,10 +42,15 @@ async function getSchoolById(schoolId: string) {
   })
 }
 
-export default async function AddChildPage({ searchParams }: { searchParams?: Record<string, string> }) {
+export default async function AddChildPage({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string>>
+}) {
   const { user } = await validateRequest()
   if (!user) redirect('/login')
-  const schoolId = searchParams?.schoolId || ''
+  const resolvedSearchParams = (await searchParams) ?? {}
+  const schoolId = resolvedSearchParams.schoolId || ''
   const preselected = schoolId ? await getSchoolById(schoolId) : null
 
   return (

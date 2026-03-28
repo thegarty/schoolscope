@@ -1,10 +1,10 @@
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model School {
@@ -28,20 +28,34 @@ model School {
   email             String?
   principalName     String?
   address           String?
+  aboutContent      String?
+  aboutSummary      String?
+  aboutUpdatedAt    DateTime?
+  enrichmentEnabled Boolean  @default(false)
+  enrichmentPaused  Boolean  @default(false)
+  enrichmentPilot   Boolean  @default(false)
+  enrichmentFrequencyHours Int @default(168)
+  lastEnrichmentAt  DateTime?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
   children          Child[]
   events            Event[]
   schoolEdits       SchoolEdit[]
+  schoolSources     SchoolSource[]
+  enrichmentRuns    SchoolEnrichmentRun[]
+  enrichmentProposals SchoolEnrichmentProposal[]
+  aboutVersions     SchoolAboutVersion[]
+  sourceDiscoveryRuns SchoolSourceDiscoveryRun[]
 
   @@map("schools")
 }
 
 model User {
   id        String    @id @default(cuid())
+  clerkId   String?   @unique
   email     String    @unique
   name      String?
-  password  String
+  password  String?
   isAdmin   Boolean   @default(false)
   emailVerified Boolean @default(false)
   emailSubscribed Boolean @default(true)
@@ -49,22 +63,13 @@ model User {
   updatedAt DateTime  @updatedAt
   children  Child[]
   events    Event[]
-  sessions  Session[]
   eventConfirmations EventConfirmation[]
   schoolEdits       SchoolEdit[]
   schoolEditVotes   SchoolEditVote[]
   emailEvents EmailEvent[]
+  reviewedEnrichmentProposals SchoolEnrichmentProposal[] @relation("ReviewedEnrichmentProposals")
 
   @@map("users")
-}
-
-model Session {
-  id        String   @id
-  userId    String
-  expiresAt DateTime
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("sessions")
 }
 
 model Child {
@@ -93,6 +98,10 @@ model Event {
   confirmed   Boolean  @default(false)
   isPrivate   Boolean  @default(false)
   location    String?
+  sourceUrl   String?
+  sourceType  String?
+  sourceConfidence Float?
+  isAiGenerated Boolean @default(false)
   childId     String?
   schoolId    String
   userId      String
@@ -116,6 +125,111 @@ model EventConfirmation {
 
   @@unique([eventId, userId])
   @@map("event_confirmations")
+}
+
+model SchoolSource {
+  id            String   @id @default(cuid())
+  schoolId      String
+  label         String
+  url           String
+  sourceType    SchoolSourceType
+  isOfficial    Boolean  @default(true)
+  isActive      Boolean  @default(true)
+  lastFetchedAt DateTime?
+  lastSuccessAt DateTime?
+  lastError     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  school        School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  proposals     SchoolEnrichmentProposal[]
+  runs          SchoolEnrichmentRun[] @relation("RunSource")
+
+  @@unique([schoolId, url])
+  @@map("school_sources")
+}
+
+model SchoolEnrichmentRun {
+  id               String                      @id @default(cuid())
+  schoolId         String
+  status           SchoolEnrichmentRunStatus   @default(PENDING)
+  triggerType      SchoolEnrichmentTriggerType @default(MANUAL)
+  totalSources     Int                         @default(0)
+  processedSources Int                         @default(0)
+  proposalsCreated Int                         @default(0)
+  startedAt        DateTime?
+  completedAt      DateTime?
+  errorMessage     String?
+  createdAt        DateTime                    @default(now())
+  updatedAt        DateTime                    @updatedAt
+  school           School                      @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  proposals        SchoolEnrichmentProposal[]
+  sources          SchoolSource[]              @relation("RunSource")
+
+  @@map("school_enrichment_runs")
+}
+
+model SchoolEnrichmentProposal {
+  id              String                         @id @default(cuid())
+  schoolId        String
+  runId           String?
+  sourceId        String?
+  proposalType    SchoolEnrichmentProposalType
+  targetField     String?
+  existingValue   String?
+  proposedValue   Json
+  confidence      Float                          @default(0)
+  sourceUrl       String
+  evidenceSnippet String?
+  status          SchoolEnrichmentProposalStatus @default(PENDING)
+  reviewNotes     String?
+  reviewedById    String?
+  reviewedAt      DateTime?
+  createdAt       DateTime                       @default(now())
+  updatedAt       DateTime                       @updatedAt
+  school          School                         @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  run             SchoolEnrichmentRun?           @relation(fields: [runId], references: [id], onDelete: SetNull)
+  source          SchoolSource?                  @relation(fields: [sourceId], references: [id], onDelete: SetNull)
+  reviewedBy      User?                          @relation("ReviewedEnrichmentProposals", fields: [reviewedById], references: [id], onDelete: SetNull)
+  aboutVersions   SchoolAboutVersion[]
+
+  @@map("school_enrichment_proposals")
+}
+
+model SchoolAboutVersion {
+  id          String                   @id @default(cuid())
+  schoolId    String
+  proposalId  String?
+  content     String
+  summary     String?
+  sourceUrl   String?
+  status      SchoolAboutVersionStatus @default(PENDING)
+  publishedAt DateTime?
+  createdAt   DateTime                 @default(now())
+  updatedAt   DateTime                 @updatedAt
+  school      School                   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  proposal    SchoolEnrichmentProposal? @relation(fields: [proposalId], references: [id], onDelete: SetNull)
+
+  @@map("school_about_versions")
+}
+
+model SchoolSourceDiscoveryRun {
+  id                    String   @id @default(cuid())
+  schoolId              String
+  status                SchoolSourceDiscoveryStatus @default(RUNNING)
+  provider              String   @default("gemini")
+  queryCount            Int      @default(0)
+  geminiHits            Int      @default(0)
+  candidateCount        Int      @default(0)
+  officialCandidateCount Int     @default(0)
+  discoveredCount       Int      @default(0)
+  addedCount            Int      @default(0)
+  errorMessage          String?
+  details               Json?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  school                School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@map("school_source_discovery_runs")
 }
 
 model SchoolEdit {
@@ -184,4 +298,49 @@ enum EmailEventType {
   BOUNCE
   COMPLAINT
   REJECT
+}
+
+enum SchoolSourceType {
+  SCHOOL_WEBSITE
+  EDUCATION_DEPARTMENT
+  GOVERNMENT_DIRECTORY
+  OTHER_OFFICIAL
+}
+
+enum SchoolEnrichmentRunStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+enum SchoolEnrichmentTriggerType {
+  MANUAL
+  SCHEDULED
+}
+
+enum SchoolEnrichmentProposalType {
+  FIELD
+  ABOUT
+  EVENT
+}
+
+enum SchoolEnrichmentProposalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  APPLIED
+}
+
+enum SchoolAboutVersionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  PUBLISHED
+}
+
+enum SchoolSourceDiscoveryStatus {
+  RUNNING
+  COMPLETED
+  FAILED
 }

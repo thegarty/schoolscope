@@ -18,27 +18,33 @@ interface SchoolInfoEditorLoaderProps {
 }
 
 export function SchoolInfoEditorLoader({ school }: SchoolInfoEditorLoaderProps) {
-  const [state, setState] = useState<'loading' | 'unauthenticated' | 'ready'>('loading')
+  const [state, setState] = useState<'loading' | 'ready'>('loading')
   const [currentUserId, setCurrentUserId] = useState<string>('')
   const [pendingEdits, setPendingEdits] = useState<any[]>([])
 
   useEffect(() => {
-    fetch('/api/auth/me')
+    fetch(`/api/schools/${school.id}/edits`)
       .then(async r => {
-        if (!r.ok) { setState('unauthenticated'); return }
-        const { user } = await r.json()
-        setCurrentUserId(user.id)
-        return fetch(`/api/schools/${school.id}/edits`)
-      })
-      .then(async r => {
-        if (!r) return
         if (r.ok) {
           const data = await r.json()
           setPendingEdits(data.edits ?? [])
         }
-        setState('ready')
       })
-      .catch(() => setState('unauthenticated'))
+      .catch(() => {
+        // School info remains public even if edits cannot be loaded.
+      })
+      .finally(() => {
+        fetch('/api/auth/me')
+          .then(async r => {
+            if (!r.ok) return
+            const { user } = await r.json()
+            setCurrentUserId(user.id)
+          })
+          .catch(() => {
+            // Unauthenticated users can still view school information.
+          })
+          .finally(() => setState('ready'))
+      })
   }, [school.id])
 
   if (state === 'loading') {
@@ -47,14 +53,6 @@ export function SchoolInfoEditorLoader({ school }: SchoolInfoEditorLoaderProps) 
         {[1, 2, 3].map(i => (
           <div key={i} className="h-16 rounded-md bg-gray-100 animate-pulse" />
         ))}
-      </div>
-    )
-  }
-
-  if (state === 'unauthenticated') {
-    return (
-      <div className="text-center py-12 text-gray-500">
-        Please <a href="/login" className="text-blue-600 hover:underline">log in</a> to view and edit school information.
       </div>
     )
   }

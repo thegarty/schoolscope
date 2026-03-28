@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Calendar, Users } from 'lucide-react'
+import { SignInButton, SignUpButton } from '@clerk/nextjs'
 
 interface SchoolUserActionsProps {
   schoolId: string
@@ -31,11 +32,16 @@ export function SchoolUserActions({ schoolId }: SchoolUserActionsProps) {
     return (
       <div className="text-center">
         <p className="text-sm text-gray-600 mb-3">
-          Login to add children and create events
+          Sign in to add children and create events
         </p>
-        <Button asChild className="w-full">
-          <Link href="/login">Login / Register</Link>
-        </Button>
+        <div className="flex gap-2">
+          <SignInButton mode="modal">
+            <Button className="w-full" type="button">Login</Button>
+          </SignInButton>
+          <SignUpButton mode="modal">
+            <Button className="w-full" variant="outline" type="button">Sign Up</Button>
+          </SignUpButton>
+        </div>
       </div>
     )
   }

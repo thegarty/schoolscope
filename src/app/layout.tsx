@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import Script from 'next/script'
 import { Suspense } from 'react'
+import { ClerkProvider } from '@clerk/nextjs'
 import { GoogleAnalytics } from '@/components/GoogleAnalytics'
 import './globals.css'
 
@@ -35,41 +36,52 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+  const content = (
+    <>
+      {/* Google Analytics */}
+      <Script
+        strategy="afterInteractive"
+        src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}
+      />
+      <Script
+        id="google-analytics"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${GA_TRACKING_ID}', {
+              page_path: window.location.pathname,
+            });
+          `,
+        }}
+      />
+      {/* Google AdSense */}
+      <Script
+        async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5603475049488422"
+        crossOrigin="anonymous"
+        strategy="afterInteractive"
+      />
+      <Suspense fallback={null}>
+        <GoogleAnalytics />
+      </Suspense>
+      <div className="min-h-screen bg-background">
+        {children}
+      </div>
+    </>
+  )
+
   return (
     <html lang="en">
       <body className={inter.className}>
-        {/* Google Analytics */}
-        <Script
-          strategy="afterInteractive"
-          src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}
-        />
-        <Script
-          id="google-analytics"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', '${GA_TRACKING_ID}', {
-                page_path: window.location.pathname,
-              });
-            `,
-          }}
-        />
-        {/* Google AdSense */}
-        <Script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5603475049488422"
-          crossOrigin="anonymous"
-          strategy="afterInteractive"
-        />
-        <Suspense fallback={null}>
-          <GoogleAnalytics />
-        </Suspense>
-        <div className="min-h-screen bg-background">
-          {children}
-        </div>
+        {publishableKey ? (
+          <ClerkProvider publishableKey={publishableKey}>{content}</ClerkProvider>
+        ) : (
+          content
+        )}
       </body>
     </html>
   )

@@ -3,9 +3,9 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { School, Calendar, Users, Plus, Home, Menu, X, Settings } from 'lucide-react'
+import { SignInButton, SignUpButton, UserButton } from '@clerk/nextjs'
 import NotificationBell from './NotificationBell'
 import { useState } from 'react'
-import { logout } from '@/lib/actions'
 import { useAdmin } from '@/lib/hooks/useAdmin'
 
 interface User {
@@ -179,36 +179,29 @@ export default function AppHeader({ user, showNotifications = true }: AppHeaderP
                 {/* Notifications */}
                 {showNotifications && <NotificationBell />}
 
-                {/* User Info */}
+                {/* User Menu */}
                 <div className="hidden sm:flex items-center space-x-3">
-                  <span className="text-sm text-gray-700">
-                    Welcome, {user.name || user.email.split('@')[0]}
-                  </span>
-                  <form action={logout}>
-                    <Button variant="outline" type="submit" size="sm">
-                      Logout
-                    </Button>
-                  </form>
+                  <UserButton />
                 </div>
 
                 {/* Mobile User Menu */}
                 <div className="sm:hidden">
-                  <form action={logout}>
-                    <Button variant="outline" type="submit" size="sm">
-                      Logout
-                    </Button>
-                  </form>
+                  <UserButton />
                 </div>
               </>
             ) : (
               /* Guest Navigation */
               <div className="flex items-center space-x-4">
-                <Button asChild variant="outline" size="sm">
-                  <Link href="/login">Login</Link>
-                </Button>
-                <Button asChild size="sm">
-                  <Link href="/register">Register</Link>
-                </Button>
+                <SignInButton mode="modal">
+                  <Button variant="outline" size="sm" type="button">
+                    Login
+                  </Button>
+                </SignInButton>
+                <SignUpButton mode="modal">
+                  <Button size="sm" type="button">
+                    Sign Up
+                  </Button>
+                </SignUpButton>
               </div>
             )}
           </div>

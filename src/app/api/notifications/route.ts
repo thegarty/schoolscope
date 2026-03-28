@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { validateRequest } from '@/auth/lucia'
+import { validateRequest } from '@/lib/auth'
 import { db } from '@/lib/db'
 
 // Force this route to be dynamic

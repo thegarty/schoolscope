@@ -1,30 +1,17 @@
-// ISR: re-render homepage in background every hour
-export const revalidate = 3600
-
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Calendar, School, Users, MapPin } from 'lucide-react'
 import SchoolTicker from '@/components/SchoolTicker'
+import AppHeader from '@/components/AppHeader'
+import { validateRequest } from '@/lib/auth'
 
-export default function HomePage() {
+export default async function HomePage() {
+  const { user } = await validateRequest()
+
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Header */}
-      <header className="px-4 lg:px-6 h-14 flex items-center border-b">
-        <Link className="flex items-center justify-center" href="/">
-          <School className="h-6 w-6 mr-2" />
-          <span className="font-bold text-xl">SchoolScope</span>
-        </Link>
-        <nav className="ml-auto flex gap-4 sm:gap-6">
-          <Link className="text-sm font-medium hover:underline underline-offset-4" href="/login">
-            Login
-          </Link>
-          <Link className="text-sm font-medium hover:underline underline-offset-4" href="/register">
-            Register
-          </Link>
-        </nav>
-      </header>
+      <AppHeader user={user} />
 
       {/* Hero Section */}
       <section 

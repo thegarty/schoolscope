@@ -55,9 +55,22 @@ export async function sendEmail(options: EmailOptions): Promise<string | null> {
       return null
     }
 
+    let validUserId: string | undefined
+    if (options.userId) {
+      const existingUser = await db.user.findUnique({
+        where: { id: options.userId },
+        select: { id: true },
+      })
+      if (existingUser) {
+        validUserId = existingUser.id
+      } else {
+        console.warn(`Skipping emailEvent.userId; user not found: ${options.userId}`)
+      }
+    }
+
     await db.emailEvent.create({
       data: {
-        userId: options.userId,
+        userId: validUserId,
         email: primaryEmail,
         messageId: data.id,
         eventType: 'SEND',

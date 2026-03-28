@@ -5,20 +5,21 @@ import { Button } from '@/components/ui/button'
 import { Calendar, School, MapPin, Clock, Users, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { Metadata } from 'next'
-import { createSchoolSlug, findSchoolBySlug } from '@/lib/school-utils'
+import { findSchoolBySlug } from '@/lib/school-utils'
 
 // ISR: cache event listing pages for 10 minutes
 export const revalidate = 600
 
 interface SchoolEventsPageProps {
-  params: { slug: string }
-  searchParams?: { category?: string; confirmed?: string; page?: string }
+  params: Promise<{ slug: string }>
+  searchParams?: Promise<{ category?: string; confirmed?: string; page?: string }>
 }
 
 
 
 export async function generateMetadata({ params }: SchoolEventsPageProps): Promise<Metadata> {
-  const schoolId = await findSchoolBySlug(params.slug, db)
+  const { slug } = await params
+  const schoolId = await findSchoolBySlug(slug, db)
   
   if (!schoolId) {
     return {
@@ -42,14 +43,34 @@ export async function generateMetadata({ params }: SchoolEventsPageProps): Promi
   return {
     title: `Events at ${school.name} - ${school.suburb}, ${school.state} | SchoolScope`,
     description: `View all upcoming and past events at ${school.name} in ${school.suburb}, ${school.state}. Stay connected with school activities, meetings, and important dates.`,
+    keywords: [
+      `${school.name} events`,
+      `${school.suburb} school events`,
+      `${school.state} school calendar`,
+      "school calendar",
+      "public school events",
+    ],
+    openGraph: {
+      title: `Events at ${school.name} | SchoolScope`,
+      description: `Upcoming and past events for ${school.name} in ${school.suburb}, ${school.state}.`,
+      type: 'website',
+      locale: 'en_AU',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `Events at ${school.name} | SchoolScope`,
+      description: `Upcoming and past events for ${school.name} in ${school.suburb}, ${school.state}.`,
+    },
     alternates: {
-      canonical: `/schools/${params.slug}/events`
+      canonical: `/schools/${slug}/events`
     }
   }
 }
 
 export default async function SchoolEventsPage({ params, searchParams }: SchoolEventsPageProps) {
-  const schoolId = await findSchoolBySlug(params.slug, db)
+  const { slug } = await params
+  const resolvedSearchParams = (await searchParams) ?? {}
+  const schoolId = await findSchoolBySlug(slug, db)
   
   if (!schoolId) {
     notFound()
@@ -73,9 +94,9 @@ export default async function SchoolEventsPage({ params, searchParams }: SchoolE
   }
 
   // Filters
-  const category = searchParams?.category || ''
-  const confirmed = searchParams?.confirmed || ''
-  const page = parseInt(searchParams?.page || '1', 10)
+  const category = resolvedSearchParams.category || ''
+  const confirmed = resolvedSearchParams.confirmed || ''
+  const page = parseInt(resolvedSearchParams.page || '1', 10)
   const pageSize = 20
 
   // Build query
@@ -103,6 +124,28 @@ export default async function SchoolEventsPage({ params, searchParams }: SchoolE
 
   const totalPages = Math.ceil(total / pageSize)
 
+  const eventsJsonLd = events.slice(0, 20).map((event) => ({
+    "@context": "https://schema.org",
+    "@type": "Event",
+    name: event.title,
+    description: event.description,
+    startDate: event.startDate.toISOString(),
+    endDate: event.endDate.toISOString(),
+    eventStatus: event.confirmed
+      ? "https://schema.org/EventScheduled"
+      : "https://schema.org/EventPostponed",
+    eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+    location: {
+      "@type": "Place",
+      name: event.location || school.name,
+      address: `${school.suburb}, ${school.state} ${school.postcode}`,
+    },
+    organizer: {
+      "@type": "School",
+      name: school.name,
+    },
+  }))
+
   // Get distinct categories for filter
   const categories = await db.event.findMany({
     where: { schoolId: school.id },
@@ -123,7 +166,7 @@ export default async function SchoolEventsPage({ params, searchParams }: SchoolE
             </div>
             <div className="flex items-center space-x-4">
               <Button asChild variant="outline">
-                <Link href={`/schools/${params.slug}`}>
+                <Link href={`/schools/${slug}`}>
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back to School
                 </Link>
@@ -141,7 +184,7 @@ export default async function SchoolEventsPage({ params, searchParams }: SchoolE
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center mb-4">
             <Link 
-              href={`/schools/${params.slug}`}
+              href={`/schools/${slug}`}
               className="text-blue-200 hover:text-white mr-4"
             >
               <ArrowLeft className="h-5 w-5" />
@@ -369,6 +412,10 @@ export default async function SchoolEventsPage({ params, searchParams }: SchoolE
           </div>
         </div>
       </footer>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(eventsJsonLd) }}
+      />
     </div>
   )
 } 

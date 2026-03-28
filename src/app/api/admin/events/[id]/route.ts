@@ -6,14 +6,15 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     // Check admin access
     await requireAdmin();
 
     const event = await db.event.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         school: {
           select: {
@@ -69,9 +70,10 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     // Check admin access
     await requireAdmin();
 
@@ -91,7 +93,7 @@ export async function PATCH(
     if (yearLevels !== undefined) updateData.yearLevels = yearLevels;
 
     const event = await db.event.update({
-      where: { id: params.id },
+      where: { id },
       data: updateData,
       include: {
         school: {
@@ -137,15 +139,16 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     // Check admin access
     await requireAdmin();
 
     // Check if event exists
     const event = await db.event.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         _count: {
           select: {
@@ -164,12 +167,12 @@ export async function DELETE(
 
     // Delete event confirmations first (cascade should handle this, but being explicit)
     await db.eventConfirmation.deleteMany({
-      where: { eventId: params.id },
+      where: { eventId: id },
     });
 
     // Delete the event
     await db.event.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({

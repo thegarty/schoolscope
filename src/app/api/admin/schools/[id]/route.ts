@@ -6,14 +6,15 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     // Check admin access
     await requireAdmin();
 
     const school = await db.school.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         _count: {
           select: {
@@ -52,14 +53,15 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     // Check admin access
     await requireAdmin();
 
     const data = await request.json();
-    const { name, address, city, state, postcode, phone, email, website } = data;
+    const { name, address, city, state, postcode, phone, email, website, aboutContent, aboutSummary } = data;
 
     if (!name) {
       return NextResponse.json(
@@ -76,7 +78,7 @@ export async function PUT(
           mode: 'insensitive'
         },
         NOT: {
-          id: params.id
+          id
         }
       }
     });
@@ -89,7 +91,7 @@ export async function PUT(
     }
 
     const school = await db.school.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         name,
         suburb: city || '',
@@ -99,6 +101,9 @@ export async function PUT(
         phone,
         email,
         website,
+        aboutContent: aboutContent || null,
+        aboutSummary: aboutSummary || null,
+        aboutUpdatedAt: aboutContent ? new Date() : null,
       },
       include: {
         _count: {
@@ -132,15 +137,16 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     // Check admin access
     await requireAdmin();
 
     // Check if school has associated events or children
     const school = await db.school.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         _count: {
           select: {
@@ -172,7 +178,7 @@ export async function DELETE(
     }
 
     await db.school.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({

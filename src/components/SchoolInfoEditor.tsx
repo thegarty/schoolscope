@@ -3,8 +3,8 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Edit, Check, X, Clock, User } from 'lucide-react'
+import { Card, CardContent } from '@/components/ui/card'
+import { Edit, Check, X, Clock } from 'lucide-react'
 
 interface School {
   id: string
@@ -59,6 +59,7 @@ export default function SchoolInfoEditor({ school, pendingEdits, currentUserId }
   const [newValue, setNewValue] = useState('')
   const [reason, setReason] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const isAuthenticated = Boolean(currentUserId)
 
   const handleEdit = (field: string) => {
     setEditingField(field)
@@ -142,20 +143,22 @@ export default function SchoolInfoEditor({ school, pendingEdits, currentUserId }
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>School Information</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      <Card className="border-slate-200 shadow-sm">
+        <CardContent className="space-y-4 p-6">
+          {!isAuthenticated && (
+            <div className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-800">
+              Viewing is public. <a href="/login" className="underline hover:no-underline">Log in</a> to suggest edits or vote on changes.
+            </div>
+          )}
           {EDITABLE_FIELDS.map((field) => {
             const pendingEdit = getPendingEditForField(field.key)
             const isEditing = editingField === field.key
 
             return (
-              <div key={field.key} className="border-b pb-4 last:border-b-0">
+              <div key={field.key} className="rounded-xl border border-slate-200 bg-white p-4">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-slate-700 mb-1">
                       {field.label}
                     </label>
                     {isEditing ? (
@@ -192,8 +195,8 @@ export default function SchoolInfoEditor({ school, pendingEdits, currentUserId }
                       </div>
                     ) : (
                       <div className="flex items-center justify-between">
-                        <span className="text-gray-900">{getFieldValue(field.key)}</span>
-                        {!pendingEdit && (
+                        <span className="text-slate-900">{getFieldValue(field.key)}</span>
+                        {!pendingEdit && isAuthenticated && (
                           <Button
                             size="sm"
                             variant="outline"
@@ -209,13 +212,13 @@ export default function SchoolInfoEditor({ school, pendingEdits, currentUserId }
                 </div>
 
                 {pendingEdit && (
-                  <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                  <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
                     <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center text-sm text-yellow-800">
+                      <div className="flex items-center text-sm text-amber-800">
                         <Clock className="h-4 w-4 mr-1" />
                         <span>Pending Change</span>
                       </div>
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-slate-500">
                         by {pendingEdit.user.name || pendingEdit.user.email}
                       </span>
                     </div>
@@ -224,16 +227,16 @@ export default function SchoolInfoEditor({ school, pendingEdits, currentUserId }
                         <strong>Proposed:</strong> {pendingEdit.newValue}
                       </div>
                       {pendingEdit.reason && (
-                        <div className="mb-2 text-gray-600">
+                        <div className="mb-2 text-slate-600">
                           <strong>Reason:</strong> {pendingEdit.reason}
                         </div>
                       )}
                       <div className="flex items-center justify-between">
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs text-slate-500">
                           Votes: {pendingEdit.votes.filter(v => v.vote === 'APPROVE').length} approve, {' '}
                           {pendingEdit.votes.filter(v => v.vote === 'REJECT').length} reject
                         </div>
-                        {pendingEdit.user.id !== currentUserId && (
+                        {isAuthenticated && pendingEdit.user.id !== currentUserId && (
                           <div className="flex space-x-1">
                             {getUserVote(pendingEdit)?.vote !== 'APPROVE' && (
                               <Button

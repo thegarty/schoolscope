@@ -1,16 +1,9 @@
 import { db } from './db';
-import { lucia } from '@/auth/lucia';
-import { cookies } from 'next/headers';
+import { getAuthUser } from '@/lib/auth';
 
 export async function getCurrentUser() {
   try {
-    const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null;
-    if (!sessionId) return null;
-
-    const { session, user } = await lucia.validateSession(sessionId);
-    if (!session) return null;
-
-    return user;
+    return await getAuthUser();
   } catch (error) {
     console.error('Error getting current user:', error);
     return null;

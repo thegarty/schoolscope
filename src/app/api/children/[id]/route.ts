@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { validateRequest } from '@/auth/lucia'
+import { validateRequest } from '@/lib/auth'
 import { db } from '@/lib/db'
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { user } = await validateRequest()
@@ -12,7 +12,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const childId = params.id
+    const { id: childId } = await params
     const body = await request.json()
     const { name, yearLevel, schoolId } = body
 
@@ -64,7 +64,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { user } = await validateRequest()
@@ -72,7 +72,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const childId = params.id
+    const { id: childId } = await params
 
     // Check if child exists and belongs to the user
     const existingChild = await db.child.findFirst({

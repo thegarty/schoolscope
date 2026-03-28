@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import AdminLayout from '@/components/admin/AdminLayout';
-import { School, Save, ArrowLeft, Trash2 } from 'lucide-react';
+import { School, Save, ArrowLeft, Trash2, Bot } from 'lucide-react';
 
 interface School {
   id: string;
@@ -16,6 +16,8 @@ interface School {
   phone?: string;
   email?: string;
   website?: string;
+  aboutContent?: string;
+  aboutSummary?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -34,6 +36,8 @@ export default function EditSchoolPage() {
     phone: '',
     email: '',
     website: '',
+    aboutContent: '',
+    aboutSummary: '',
   });
   const router = useRouter();
   const params = useParams();
@@ -83,6 +87,8 @@ export default function EditSchoolPage() {
           phone: data.school.phone || '',
           email: data.school.email || '',
           website: data.school.website || '',
+          aboutContent: data.school.aboutContent || '',
+          aboutSummary: data.school.aboutSummary || '',
         });
       } else {
         alert('School not found');
@@ -181,13 +187,22 @@ export default function EditSchoolPage() {
               <h1 className="text-2xl font-bold text-gray-900">Edit School</h1>
             </div>
           </div>
-          <button
-            onClick={handleDelete}
-            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 flex items-center gap-2"
-          >
-            <Trash2 className="h-4 w-4" />
-            Delete School
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => router.push(`/admin/schools/${schoolId}/enrichment`)}
+              className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 flex items-center gap-2"
+            >
+              <Bot className="h-4 w-4" />
+              AI Enrichment
+            </button>
+            <button
+              onClick={handleDelete}
+              className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 flex items-center gap-2"
+            >
+              <Trash2 className="h-4 w-4" />
+              Delete School
+            </button>
+          </div>
         </div>
 
         {/* School Info */}
@@ -335,6 +350,40 @@ export default function EditSchoolPage() {
                     onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                     placeholder="https://school.edu.au"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 mb-4">About / SEO Content</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    About Summary
+                  </label>
+                  <input
+                    type="text"
+                    name="aboutSummary"
+                    value={formData.aboutSummary}
+                    onChange={handleChange}
+                    maxLength={180}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Short summary used for SEO and snippets"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    About Content
+                  </label>
+                  <textarea
+                    name="aboutContent"
+                    value={formData.aboutContent}
+                    onChange={handleChange}
+                    rows={5}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Long-form school description"
                   />
                 </div>
               </div>
