@@ -1,7 +1,7 @@
 "use client"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Calendar, Clock } from 'lucide-react'
+import { Calendar, Clock, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import SchoolCalendar from '@/components/SchoolCalendar'
 import { SchoolUserActions } from '@/components/SchoolUserActions'
@@ -52,19 +52,19 @@ export function SchoolPageTabs({
 }: SchoolPageTabsProps) {
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
-      <section className="grid grid-cols-1 gap-8 lg:grid-cols-12">
-        <div className="lg:col-span-8">
-          <Card className="overflow-hidden border-slate-200 shadow-sm">
-            <CardHeader className="border-b border-slate-100 bg-white">
-              <CardTitle className="flex items-center text-slate-900">
-                <Calendar className="mr-2 h-5 w-5 text-blue-600" />
+      <section className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-12">
+        <div className="min-w-0 lg:col-span-8">
+          <Card className="overflow-hidden border-border shadow-sm">
+            <CardHeader className="border-b border-border bg-white">
+              <CardTitle className="flex items-center gap-2 text-xl text-foreground">
+                <Calendar className="h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
                 School Calendar
               </CardTitle>
               <CardDescription>
                 View upcoming activities and key dates for {school.name}.
               </CardDescription>
             </CardHeader>
-            <CardContent className="bg-white pt-6">
+            <CardContent className="min-w-0 bg-white px-3 pt-6 sm:px-6">
               <SchoolCalendar
                 schoolId={school.id}
                 schoolSlug={schoolSlug}
@@ -77,10 +77,10 @@ export function SchoolPageTabs({
         </div>
 
         <aside className="space-y-6 lg:col-span-4 lg:sticky lg:top-24 lg:self-start">
-          <Card className="border-slate-200 shadow-sm">
-            <CardHeader className="border-b border-slate-100">
-              <CardTitle className="flex items-center text-slate-900">
-                <Clock className="mr-2 h-5 w-5 text-blue-600" />
+          <Card className="border-border shadow-sm">
+            <CardHeader className="border-b border-border">
+              <CardTitle className="flex items-center gap-2 text-xl text-foreground">
+                <Clock className="h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
                 Upcoming Events
               </CardTitle>
             </CardHeader>
@@ -88,32 +88,32 @@ export function SchoolPageTabs({
               {upcomingEvents.length > 0 ? (
                 <>
                   {upcomingEvents.slice(0, 5).map(event => (
-                    <div key={event.id} className="rounded-lg border border-slate-200 p-3">
-                      <h4 className="text-sm font-semibold text-slate-900">{event.title}</h4>
-                      <p className="mt-1 text-xs text-slate-600">
+                    <div key={event.id} className="rounded-2xl border border-border bg-background p-4">
+                      <h4 className="break-words text-base font-semibold text-foreground">{event.title}</h4>
+                      <p className="mt-2 text-sm text-muted-foreground">
                         {new Date(event.startDate).toLocaleDateString()}
                       </p>
-                      <p className="text-xs text-slate-500">{event.category}</p>
+                      <p className="text-sm text-muted-foreground">{event.category}</p>
                     </div>
                   ))}
                   {upcomingEvents.length > 5 && (
                     <Link
                       href={`/schools/${schoolSlug}/events`}
-                      className="inline-flex text-sm font-medium text-blue-700 hover:underline"
+                      className="inline-flex min-h-11 items-center gap-2 rounded-xl px-2 text-sm font-medium text-primary hover:bg-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                     >
-                      View all {upcomingEvents.length} upcoming events →
+                      View all {upcomingEvents.length} upcoming events <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />
                     </Link>
                   )}
                 </>
               ) : (
-                <p className="text-sm text-slate-500">No upcoming events</p>
+                <p className="text-sm text-muted-foreground">No upcoming events</p>
               )}
             </CardContent>
           </Card>
 
-          <Card className="border-slate-200 shadow-sm">
-            <CardHeader className="border-b border-slate-100">
-              <CardTitle className="text-slate-900">Get Involved</CardTitle>
+          <Card className="border-border shadow-sm">
+            <CardHeader className="border-b border-border">
+              <CardTitle className="text-xl text-foreground">Get Involved</CardTitle>
               <CardDescription>
                 Join the community and contribute updates.
               </CardDescription>
@@ -127,8 +127,8 @@ export function SchoolPageTabs({
 
       <section className="mt-12">
         <div className="mb-5">
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900">School Information</h2>
-          <p className="mt-1 text-sm text-slate-600">
+          <h2 className="text-2xl font-bold tracking-tight text-foreground">School Information</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
             Public details maintained by the school community.
           </p>
         </div>

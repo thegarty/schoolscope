@@ -29,11 +29,12 @@ export default async function BrowseSchoolsPage({
   const pageSize = 20
 
   // Get distinct values for filters
-  const [states, types, sectors, suburbs] = await Promise.all([
+  const [states, types, sectors, suburbs, totalSchoolCount] = await Promise.all([
     db.school.findMany({ distinct: ['state'], select: { state: true }, orderBy: { state: 'asc' } }),
     db.school.findMany({ distinct: ['type'], select: { type: true }, orderBy: { type: 'asc' } }),
     db.school.findMany({ distinct: ['sector'], select: { sector: true }, orderBy: { sector: 'asc' } }),
-    db.school.findMany({ distinct: ['suburb'], select: { suburb: true }, orderBy: { suburb: 'asc' } })
+    db.school.findMany({ distinct: ['suburb'], select: { suburb: true }, orderBy: { suburb: 'asc' } }),
+    db.school.count()
   ])
 
   // Build query dynamically
@@ -64,54 +65,46 @@ export default async function BrowseSchoolsPage({
     totalPages = Math.ceil(total / pageSize)
   }
 
+  const pageLink = (targetPage: number) => `?name=${encodeURIComponent(name)}&suburb=${encodeURIComponent(suburb)}&state=${encodeURIComponent(state)}&type=${encodeURIComponent(type)}&sector=${encodeURIComponent(sector)}&page=${targetPage}`
+  const visiblePages = Array.from({ length: Math.min(totalPages, 5) }, (_, index) => Math.min(Math.max(1, page - 2), Math.max(1, totalPages - 4)) + index)
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Suspense fallback={null}>
         <SchoolSearchTracker />
       </Suspense>
       <AppHeader user={user} />
 
       {/* Hero Section */}
-      <section className="bg-blue-600 text-white py-12">
+      <section className="bg-secondary/60 text-foreground py-6 sm:py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl font-bold mb-4">Browse Australian Schools</h1>
-            <p className="text-xl text-blue-100 mb-6">
-              Discover schools across Australia and connect with their communities
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-3">Find your school</h1>
+            <p className="text-base sm:text-lg text-muted-foreground mb-3">
+              School details, events, and community, all in one place.
             </p>
-            <div className="flex items-center justify-center text-blue-100">
-              <MapPin className="h-5 w-5 mr-2" />
-              <span>10,868+ schools across all states and territories</span>
+            <div className="flex items-center justify-center text-sm text-muted-foreground">
+              <MapPin className="h-4 w-4 shrink-0 mr-2" />
+              <span>{totalSchoolCount.toLocaleString()} schools across Australia</span>
             </div>
           </div>
         </div>
       </section>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">Find Your School</h2>
-          <p className="text-gray-600">
-            Search by school name, suburb, state, type, and sector to find schools and view their events and information.
-          </p>
-        </div>
-        
+      <main className="max-w-7xl mx-auto py-6 sm:py-8 px-4 sm:px-6 lg:px-8">
         {/* Search Form */}
         <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Search className="h-5 w-5 mr-2" />
-              Search Australian Schools
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form className="grid grid-cols-1 md:grid-cols-5 gap-4">
+
+          <CardContent className="pt-5 sm:pt-6">
+            <form className="grid grid-cols-1 md:grid-cols-5 gap-4 [&_input]:min-h-12 [&_input]:rounded-xl [&_input]:text-base [&_input]:pr-12 [&_button]:min-h-11">
               <input
                 type="text"
                 name="name"
+                aria-label="School name"
                 placeholder="School name..."
                 defaultValue={name}
-                className="border rounded-md px-3 py-2 w-full"
+                className="min-h-12 border border-input rounded-xl bg-white text-base px-3 py-3 w-full"
               />
               <SuburbSearch 
                 suburbs={suburbs.map(s => s.suburb)}
@@ -119,19 +112,19 @@ export default async function BrowseSchoolsPage({
                 name="suburb"
                 placeholder="Search suburbs..."
               />
-              <select name="state" defaultValue={state} className="border rounded-md px-3 py-2 w-full">
+              <select aria-label="State or territory" name="state" defaultValue={state} className="min-h-12 border border-input rounded-xl bg-white text-base px-3 py-3 w-full">
                 <option value="">All States</option>
                 {states.map((s) => (
                   <option key={s.state} value={s.state}>{s.state}</option>
                 ))}
               </select>
-              <select name="type" defaultValue={type} className="border rounded-md px-3 py-2 w-full">
+              <select aria-label="School type" name="type" defaultValue={type} className="min-h-12 border border-input rounded-xl bg-white text-base px-3 py-3 w-full">
                 <option value="">All Types</option>
                 {types.map((t) => (
                   <option key={t.type} value={t.type}>{t.type}</option>
                 ))}
               </select>
-              <select name="sector" defaultValue={sector} className="border rounded-md px-3 py-2 w-full">
+              <select aria-label="School sector" name="sector" defaultValue={sector} className="min-h-12 border border-input rounded-xl bg-white text-base px-3 py-3 w-full">
                 <option value="">All Sectors</option>
                 {sectors.map((s) => (
                   <option key={s.sector} value={s.sector}>{s.sector}</option>
@@ -148,13 +141,13 @@ export default async function BrowseSchoolsPage({
         {!hasQuery && (
           <Card>
             <CardContent className="text-center py-16">
-              <School className="h-16 w-16 text-gray-400 mx-auto mb-6" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Ready to Find Schools?</h3>
-              <p className="text-gray-600 mb-6 max-w-md mx-auto">
+              <School className="h-16 w-16 text-muted-foreground mx-auto mb-6" />
+              <h3 className="text-xl font-semibold text-foreground mb-4">Ready to Find Schools?</h3>
+              <p className="text-muted-foreground mb-6 max-w-md mx-auto">
                 Use the search form above to find schools by name, location, or filter by state, type, and sector. 
                 We have over 10,000 Australian schools in our database.
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-lg mx-auto text-sm text-gray-500">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-lg mx-auto text-sm text-muted-foreground">
                 <div className="flex items-center justify-center">
                   <MapPin className="h-4 w-4 mr-1" />
                   <span>All States</span>
@@ -175,12 +168,12 @@ export default async function BrowseSchoolsPage({
         {hasQuery && schools.length === 0 && (
           <Card>
             <CardContent className="text-center py-12">
-              <Search className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No schools found</h3>
-              <p className="text-gray-600 mb-4">
+              <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-foreground mb-2">No schools found</h3>
+              <p className="text-muted-foreground mb-4">
                 No schools match your current search criteria. Try adjusting your search terms or filters.
               </p>
-              <div className="text-sm text-gray-500">
+              <div className="text-sm text-muted-foreground">
                 <p>Search tips:</p>
                 <ul className="mt-2 space-y-1">
                   <li>• Try searching with just the suburb name</li>
@@ -196,42 +189,42 @@ export default async function BrowseSchoolsPage({
           <>
             {/* Results Summary */}
             <div className="mb-6">
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">
+              <h3 className="text-2xl font-bold text-foreground mb-2">
                 Search Results
-                <span className="text-gray-500 text-lg ml-2">({total.toLocaleString()} schools)</span>
+                <span className="text-muted-foreground text-lg ml-2">({total.toLocaleString()} schools)</span>
               </h3>
               {(name || suburb || state || type || sector) && (
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {name && <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">Name: {name}</span>}
+                  {name && <span className="bg-secondary text-primary px-2 py-1 rounded text-sm">Name: {name}</span>}
                   {suburb && <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded text-sm">Suburb: {suburb}</span>}
                   {state && <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">State: {state}</span>}
                   {type && <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded text-sm">Type: {type}</span>}
                   {sector && <span className="bg-red-100 text-red-800 px-2 py-1 rounded text-sm">Sector: {sector}</span>}
-                  <Link href="/schools" className="bg-gray-100 text-gray-800 px-2 py-1 rounded text-sm hover:bg-gray-200">
+                  <Link href="/schools" className="bg-secondary text-foreground px-2 py-1 rounded-xl min-h-11 inline-flex items-center text-sm hover:bg-accent">
                     Clear all filters
                   </Link>
                 </div>
               )}
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 Showing {((page - 1) * pageSize) + 1}-{Math.min(page * pageSize, total)} of {total} results
               </p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {schools.map((school) => (
-                <Card key={school.id} className="hover:shadow-lg transition-shadow">
+                <Card key={school.id} className="hover:border-primary/30 hover:shadow-sm transition-shadow">
                   <CardHeader>
-                    <CardTitle className="text-lg">{school.name}</CardTitle>
+                    <CardTitle className="text-lg break-words">{school.name}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      <div className="flex items-center text-sm text-gray-600">
+                      <div className="flex items-center text-sm text-muted-foreground">
                         <MapPin className="h-4 w-4 mr-2" />
                         {school.suburb}, {school.state} {school.postcode}
                       </div>
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="bg-gray-100 px-2 py-1 rounded">{school.type}</span>
-                        <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">{school.sector}</span>
+                      <div className="flex flex-wrap gap-2 items-center justify-between text-sm">
+                        <span className="bg-secondary px-2 py-1 rounded">{school.type}</span>
+                        <span className="bg-secondary text-primary px-2 py-1 rounded">{school.sector}</span>
                       </div>
                       <div className="flex flex-col sm:flex-row gap-2 pt-2">
                         <Button asChild variant="outline" size="sm" className="flex-1">
@@ -252,23 +245,27 @@ export default async function BrowseSchoolsPage({
               ))}
             </div>
             {/* Pagination */}
-            <div className="flex justify-center mt-8 space-x-2">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+            <nav aria-label="School search pages" className="flex flex-wrap justify-center items-center gap-2 mt-8">
+              {page > 1 && <Button asChild variant="outline" size="sm"><Link href={pageLink(page - 1)}>Previous</Link></Button>}
+              {visiblePages.map(p => (
                 <Link
                   key={p}
-                  href={`?name=${encodeURIComponent(name)}&suburb=${encodeURIComponent(suburb)}&state=${encodeURIComponent(state)}&type=${encodeURIComponent(type)}&sector=${encodeURIComponent(sector)}&page=${p}`}
-                  className={`px-3 py-1 rounded-md border ${p === page ? 'bg-blue-600 text-white' : 'bg-white text-blue-600'}`}
+                  href={pageLink(p)}
+                  aria-label={`Page ${p}`}
+                  aria-current={p === page ? 'page' : undefined}
+                  className={`inline-flex min-h-11 min-w-11 items-center justify-center px-3 py-2 rounded-xl border font-semibold ${p === page ? 'bg-primary text-primary-foreground' : 'bg-white text-primary hover:bg-accent'}`}
                 >
                   {p}
                 </Link>
               ))}
-            </div>
+              {page < totalPages && <Button asChild variant="outline" size="sm"><Link href={pageLink(page + 1)}>Next</Link></Button>}
+            </nav>
           </>
         )}
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-white text-foreground border-t border-border py-10">
         <div className="container px-4 md:px-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {/* Brand */}
@@ -277,7 +274,7 @@ export default async function BrowseSchoolsPage({
                 <School className="h-6 w-6 mr-2" />
                 <span className="font-bold text-xl">SchoolScope</span>
               </div>
-              <p className="text-gray-400 text-sm">
+              <p className="text-muted-foreground text-sm">
                 Connecting Australian school communities through events, calendars, and information sharing.
               </p>
             </div>
@@ -286,16 +283,16 @@ export default async function BrowseSchoolsPage({
             <div>
               <h3 className="font-semibold mb-4">Schools by State</h3>
               <div className="space-y-2">
-                <Link href="/schools/state/nsw" className="block text-sm text-gray-400 hover:text-white transition-colors">
+                <Link href="/schools/state/nsw" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">
                   New South Wales Schools
                 </Link>
-                <Link href="/schools/state/vic" className="block text-sm text-gray-400 hover:text-white transition-colors">
+                <Link href="/schools/state/vic" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">
                   Victoria Schools
                 </Link>
-                <Link href="/schools/state/qld" className="block text-sm text-gray-400 hover:text-white transition-colors">
+                <Link href="/schools/state/qld" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">
                   Queensland Schools
                 </Link>
-                <Link href="/schools/state/wa" className="block text-sm text-gray-400 hover:text-white transition-colors">
+                <Link href="/schools/state/wa" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">
                   Western Australia Schools
                 </Link>
               </div>
@@ -304,16 +301,16 @@ export default async function BrowseSchoolsPage({
             <div>
               <h3 className="font-semibold mb-4">More States</h3>
               <div className="space-y-2">
-                <Link href="/schools/state/sa" className="block text-sm text-gray-400 hover:text-white transition-colors">
+                <Link href="/schools/state/sa" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">
                   South Australia Schools
                 </Link>
-                <Link href="/schools/state/tas" className="block text-sm text-gray-400 hover:text-white transition-colors">
+                <Link href="/schools/state/tas" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">
                   Tasmania Schools
                 </Link>
-                <Link href="/schools/state/nt" className="block text-sm text-gray-400 hover:text-white transition-colors">
+                <Link href="/schools/state/nt" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">
                   Northern Territory Schools
                 </Link>
-                <Link href="/schools/state/act" className="block text-sm text-gray-400 hover:text-white transition-colors">
+                <Link href="/schools/state/act" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">
                   ACT Schools
                 </Link>
               </div>
@@ -323,27 +320,27 @@ export default async function BrowseSchoolsPage({
             <div>
               <h3 className="font-semibold mb-4">Quick Links</h3>
               <div className="space-y-2">
-                <Link href="/schools" className="block text-sm text-gray-400 hover:text-white transition-colors">
+                <Link href="/schools" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">
                   Browse All Schools
                 </Link>
-                <Link href="/register" className="block text-sm text-gray-400 hover:text-white transition-colors">
+                <Link href="/register" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">
                   Join SchoolScope
                 </Link>
-                <Link href="/privacy" className="block text-sm text-gray-400 hover:text-white transition-colors">
+                <Link href="/privacy" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">
                   Privacy Policy
                 </Link>
-                <Link href="/terms" className="block text-sm text-gray-400 hover:text-white transition-colors">
+                <Link href="/terms" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">
                   Terms of Service
                 </Link>
               </div>
             </div>
           </div>
 
-          <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center">
-            <p className="text-xs text-gray-400">
+          <div className="border-t border-border mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center">
+            <p className="text-xs text-muted-foreground">
               © 2026 SchoolScope. All rights reserved.
             </p>
-            <p className="text-xs text-gray-400 mt-2 sm:mt-0">
+            <p className="text-xs text-muted-foreground mt-2 sm:mt-0">
               Connecting 10,000+ Australian schools nationwide
             </p>
           </div>

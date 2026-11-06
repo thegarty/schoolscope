@@ -7,7 +7,8 @@ import Link from 'next/link'
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { createSchoolSlug } from '@/lib/school-utils'
-import { UserNavButton } from '@/components/UserNavButton'
+import AppHeader from '@/components/AppHeader'
+import { validateRequest } from '@/lib/auth'
 
 // Render at request time — DB (Railway internal) is not reachable during Docker build
 export const dynamic = 'force-dynamic'
@@ -61,6 +62,7 @@ export async function generateMetadata({ params }: StatePageProps): Promise<Meta
 }
 
 export default async function StateSchoolsPage({ params, searchParams }: StatePageProps) {
+  const { user } = await validateRequest()
   const { state: rawState } = await params
   const state = rawState.toUpperCase()
   const resolvedSearchParams = (await searchParams) ?? {}
@@ -108,47 +110,31 @@ export default async function StateSchoolsPage({ params, searchParams }: StatePa
   const stateName = STATE_NAMES[state]
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center">
-              <School className="h-8 w-8 text-blue-600 mr-3" />
-              <Link href="/" className="text-2xl font-bold text-gray-900">SchoolScope</Link>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Button asChild variant="outline">
-                <Link href="/schools">All Schools</Link>
-              </Button>
-              <UserNavButton />
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-background">
+      <AppHeader user={user} />
 
       {/* Hero Section */}
-      <section className="bg-blue-600 text-white py-12">
+      <section className="bg-secondary/60 text-foreground py-10 sm:py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl font-bold mb-4">{stateName} Schools</h1>
-            <p className="text-xl text-blue-100 mb-6">
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">{stateName} Schools</h1>
+            <p className="text-base sm:text-lg text-muted-foreground mb-6">
               Discover and connect with {totalSchools.toLocaleString()} schools across {stateName}
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
               <div className="text-center">
                 <div className="text-3xl font-bold">{totalSchools.toLocaleString()}</div>
-                <div className="text-blue-200">Schools</div>
+                <div className="text-muted-foreground">Schools</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold">{totalEvents.toLocaleString()}</div>
-                <div className="text-blue-200">Upcoming Events</div>
+                <div className="text-muted-foreground">Upcoming Events</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold">
                   {schools.reduce((sum, s) => sum + s._count.children, 0).toLocaleString()}
                 </div>
-                <div className="text-blue-200">Students Connected</div>
+                <div className="text-muted-foreground">Students Connected</div>
               </div>
             </div>
           </div>
@@ -158,13 +144,13 @@ export default async function StateSchoolsPage({ params, searchParams }: StatePa
       {/* Main Content */}
       <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
-        <nav className="mb-6">
-          <ol className="flex items-center space-x-2 text-sm text-gray-500">
-            <li><Link href="/" className="hover:text-blue-600">Home</Link></li>
+        <nav aria-label="Breadcrumb" className="mb-6">
+          <ol className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+            <li><Link href="/" className="inline-flex items-center min-h-11 hover:text-primary">Home</Link></li>
             <li>/</li>
-            <li><Link href="/schools" className="hover:text-blue-600">Schools</Link></li>
+            <li><Link href="/schools" className="inline-flex items-center min-h-11 hover:text-primary">Schools</Link></li>
             <li>/</li>
-            <li className="text-gray-900">{stateName}</li>
+            <li className="text-foreground">{stateName}</li>
           </ol>
         </nav>
 
@@ -177,12 +163,12 @@ export default async function StateSchoolsPage({ params, searchParams }: StatePa
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <form className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <select name="type" defaultValue={type} className="border rounded-md px-3 py-2 w-full">
+            <form className="grid grid-cols-1 md:grid-cols-4 gap-4 [&_input]:min-h-12 [&_input]:rounded-xl [&_input]:text-base [&_input]:pr-12 [&_button]:min-h-11">
+              <select aria-label="School type" name="type" defaultValue={type} className="min-h-12 border border-input rounded-xl bg-white text-base px-3 py-3 w-full">
                 <option value="">All Types</option>
                 {types.map(t => <option key={t.type} value={t.type}>{t.type}</option>)}
               </select>
-              <select name="sector" defaultValue={sector} className="border rounded-md px-3 py-2 w-full">
+              <select aria-label="School sector" name="sector" defaultValue={sector} className="min-h-12 border border-input rounded-xl bg-white text-base px-3 py-3 w-full">
                 <option value="">All Sectors</option>
                 {sectors.map(s => <option key={s.sector} value={s.sector}>{s.sector}</option>)}
               </select>
@@ -202,16 +188,16 @@ export default async function StateSchoolsPage({ params, searchParams }: StatePa
 
         {/* Results */}
         <div className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          <h2 className="text-2xl font-bold text-foreground mb-2">
             {total === totalSchools ? 'All Schools' : 'Filtered Results'}
-            <span className="text-gray-500 text-lg ml-2">({total.toLocaleString()} schools)</span>
+            <span className="text-muted-foreground text-lg ml-2">({total.toLocaleString()} schools)</span>
           </h2>
           {(type || sector || suburb) && (
             <div className="flex flex-wrap gap-2 mb-4">
-              {type && <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">Type: {type}</span>}
+              {type && <span className="bg-secondary text-primary px-2 py-1 rounded text-sm">Type: {type}</span>}
               {sector && <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">Sector: {sector}</span>}
               {suburb && <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded text-sm">Suburb: {suburb}</span>}
-              <Link href={`/schools/state/${state.toLowerCase()}`} className="bg-gray-100 text-gray-800 px-2 py-1 rounded text-sm hover:bg-gray-200">
+              <Link href={`/schools/state/${state.toLowerCase()}`} className="bg-secondary text-foreground px-2 py-1 rounded-xl min-h-11 inline-flex items-center text-sm hover:bg-accent">
                 Clear filters
               </Link>
             </div>
@@ -221,21 +207,21 @@ export default async function StateSchoolsPage({ params, searchParams }: StatePa
         {/* Schools Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {schools.map(school => (
-            <Card key={school.id} className="hover:shadow-lg transition-shadow">
+            <Card key={school.id} className="hover:border-primary/30 hover:shadow-sm transition-shadow">
               <CardHeader>
-                <CardTitle className="text-lg">{school.name}</CardTitle>
+                <CardTitle className="text-lg break-words">{school.name}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <div className="flex items-center text-sm text-gray-600">
+                  <div className="flex items-center text-sm text-muted-foreground">
                     <MapPin className="h-4 w-4 mr-2" />
                     {school.suburb}, {school.state} {school.postcode}
                   </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="bg-gray-100 px-2 py-1 rounded">{school.type}</span>
-                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">{school.sector}</span>
+                  <div className="flex flex-wrap gap-2 items-center justify-between text-sm">
+                    <span className="bg-secondary px-2 py-1 rounded">{school.type}</span>
+                    <span className="bg-secondary text-primary px-2 py-1 rounded">{school.sector}</span>
                   </div>
-                  <div className="flex items-center justify-between text-sm text-gray-500">
+                  <div className="flex flex-wrap gap-2 items-center justify-between text-sm text-muted-foreground">
                     <div className="flex items-center">
                       <Calendar className="h-4 w-4 mr-1" />
                       {school._count.events} events
@@ -260,7 +246,7 @@ export default async function StateSchoolsPage({ params, searchParams }: StatePa
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex justify-center items-center space-x-2">
+          <div className="flex flex-wrap justify-center items-center gap-3">
             {page > 1 && (
               <Button asChild variant="outline">
                 <Link href={`/schools/state/${state.toLowerCase()}?page=${page - 1}${type ? `&type=${type}` : ''}${sector ? `&sector=${sector}` : ''}${suburb ? `&suburb=${suburb}` : ''}`}>
@@ -268,7 +254,7 @@ export default async function StateSchoolsPage({ params, searchParams }: StatePa
                 </Link>
               </Button>
             )}
-            <span className="text-sm text-gray-600">Page {page} of {totalPages}</span>
+            <span className="text-sm text-muted-foreground">Page {page} of {totalPages}</span>
             {page < totalPages && (
               <Button asChild variant="outline">
                 <Link href={`/schools/state/${state.toLowerCase()}?page=${page + 1}${type ? `&type=${type}` : ''}${sector ? `&sector=${sector}` : ''}${suburb ? `&suburb=${suburb}` : ''}`}>
@@ -281,26 +267,26 @@ export default async function StateSchoolsPage({ params, searchParams }: StatePa
 
         {/* SEO Content */}
         <section className="mt-12 prose max-w-none">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">About Schools in {stateName}</h2>
-          <p className="text-gray-600 mb-4">
+          <h2 className="text-2xl font-bold text-foreground mb-4">About Schools in {stateName}</h2>
+          <p className="text-muted-foreground mb-4">
             {stateName} is home to {totalSchools.toLocaleString()} schools across government, Catholic, and independent sectors.
             From primary schools to secondary colleges, {state} offers diverse educational opportunities for students of all ages.
           </p>
-          <p className="text-gray-600 mb-4">
+          <p className="text-muted-foreground mb-4">
             SchoolScope helps families across {stateName} stay connected with their school communities through our comprehensive
             event calendar and school information platform. Join thousands of families who use SchoolScope to never miss
             important school events, from academic activities to sports events and community gatherings.
           </p>
-          <h3 className="text-xl font-semibold text-gray-900 mb-3">Popular School Types in {stateName}</h3>
+          <h3 className="text-xl font-semibold text-foreground mb-3">Popular School Types in {stateName}</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 not-prose">
             {types.slice(0, 6).map(t => (
               <Link
                 key={t.type}
                 href={`/schools/state/${state.toLowerCase()}?type=${encodeURIComponent(t.type)}`}
-                className="block p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+                className="block p-4 min-h-12 border rounded-2xl bg-white hover:bg-background transition-colors"
               >
-                <div className="font-medium text-gray-900">{t.type} Schools</div>
-                <div className="text-sm text-gray-500">Browse {t.type.toLowerCase()} schools in {stateName}</div>
+                <div className="font-medium text-foreground">{t.type} Schools</div>
+                <div className="text-sm text-muted-foreground">Browse {t.type.toLowerCase()} schools in {stateName}</div>
               </Link>
             ))}
           </div>
@@ -308,7 +294,7 @@ export default async function StateSchoolsPage({ params, searchParams }: StatePa
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-white text-foreground border-t border-border py-10">
         <div className="container px-4 md:px-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="md:col-span-1">
@@ -316,41 +302,41 @@ export default async function StateSchoolsPage({ params, searchParams }: StatePa
                 <School className="h-6 w-6 mr-2" />
                 <span className="font-bold text-xl">SchoolScope</span>
               </div>
-              <p className="text-gray-400 text-sm">
+              <p className="text-muted-foreground text-sm">
                 Connecting Australian school communities through events, calendars, and information sharing.
               </p>
             </div>
             <div>
               <h3 className="font-semibold mb-4">Schools by State</h3>
               <div className="space-y-2">
-                <Link href="/schools/state/nsw" className="block text-sm text-gray-400 hover:text-white transition-colors">New South Wales Schools</Link>
-                <Link href="/schools/state/vic" className="block text-sm text-gray-400 hover:text-white transition-colors">Victoria Schools</Link>
-                <Link href="/schools/state/qld" className="block text-sm text-gray-400 hover:text-white transition-colors">Queensland Schools</Link>
-                <Link href="/schools/state/wa" className="block text-sm text-gray-400 hover:text-white transition-colors">Western Australia Schools</Link>
+                <Link href="/schools/state/nsw" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">New South Wales Schools</Link>
+                <Link href="/schools/state/vic" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">Victoria Schools</Link>
+                <Link href="/schools/state/qld" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">Queensland Schools</Link>
+                <Link href="/schools/state/wa" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">Western Australia Schools</Link>
               </div>
             </div>
             <div>
               <h3 className="font-semibold mb-4">More States</h3>
               <div className="space-y-2">
-                <Link href="/schools/state/sa" className="block text-sm text-gray-400 hover:text-white transition-colors">South Australia Schools</Link>
-                <Link href="/schools/state/tas" className="block text-sm text-gray-400 hover:text-white transition-colors">Tasmania Schools</Link>
-                <Link href="/schools/state/nt" className="block text-sm text-gray-400 hover:text-white transition-colors">Northern Territory Schools</Link>
-                <Link href="/schools/state/act" className="block text-sm text-gray-400 hover:text-white transition-colors">ACT Schools</Link>
+                <Link href="/schools/state/sa" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">South Australia Schools</Link>
+                <Link href="/schools/state/tas" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">Tasmania Schools</Link>
+                <Link href="/schools/state/nt" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">Northern Territory Schools</Link>
+                <Link href="/schools/state/act" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">ACT Schools</Link>
               </div>
             </div>
             <div>
               <h3 className="font-semibold mb-4">Quick Links</h3>
               <div className="space-y-2">
-                <Link href="/schools" className="block text-sm text-gray-400 hover:text-white transition-colors">Browse All Schools</Link>
-                <Link href="/register" className="block text-sm text-gray-400 hover:text-white transition-colors">Join SchoolScope</Link>
-                <Link href="/privacy" className="block text-sm text-gray-400 hover:text-white transition-colors">Privacy Policy</Link>
-                <Link href="/terms" className="block text-sm text-gray-400 hover:text-white transition-colors">Terms of Service</Link>
+                <Link href="/schools" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">Browse All Schools</Link>
+                <Link href="/register" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">Join SchoolScope</Link>
+                <Link href="/privacy" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">Privacy Policy</Link>
+                <Link href="/terms" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">Terms of Service</Link>
               </div>
             </div>
           </div>
-          <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center">
-            <p className="text-xs text-gray-400">© 2026 SchoolScope. All rights reserved.</p>
-            <p className="text-xs text-gray-400 mt-2 sm:mt-0">Connecting 10,000+ Australian schools nationwide</p>
+          <div className="border-t border-border mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center">
+            <p className="text-xs text-muted-foreground">© 2026 SchoolScope. All rights reserved.</p>
+            <p className="text-xs text-muted-foreground mt-2 sm:mt-0">Connecting 10,000+ Australian schools nationwide</p>
           </div>
         </div>
       </footer>

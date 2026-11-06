@@ -23,8 +23,7 @@ async function runStartup() {
       
     } catch (error) {
       console.error('❌ Startup error:', error);
-      console.log('⚠️ Continuing with app startup...');
-      // Don't exit - let the app start anyway
+      throw error; // Never serve the application against an incompatible schema.
     }
   } else {
     console.log('🏠 Local development detected, skipping startup tasks');

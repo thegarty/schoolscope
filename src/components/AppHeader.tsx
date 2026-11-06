@@ -1,208 +1,76 @@
 'use client'
 
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { School, Calendar, Users, Plus, Home, Menu, X, Settings } from 'lucide-react'
+import { usePathname } from 'next/navigation'
+import { useEffect, useRef, useState } from 'react'
+import { CalendarDays, School, Users, Plus, House, Menu, X, Settings, Sparkles } from 'lucide-react'
 import { UserButton } from '@allauth/react'
+import { Button } from '@/components/ui/button'
+import { SchoolScopeBrand } from './SchoolScopeBrand'
 import NotificationBell from './NotificationBell'
-import { useState } from 'react'
 import { useAdmin } from '@/lib/hooks/useAdmin'
 
-interface User {
-  id: string
-  name?: string | null
-  email: string
-}
-
-interface AppHeaderProps {
-  user?: User | null
-  showNotifications?: boolean
-}
+interface User { id: string; name?: string | null; email: string }
+interface AppHeaderProps { user?: User | null; showNotifications?: boolean }
 
 export default function AppHeader({ user, showNotifications = true }: AppHeaderProps) {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const pathname = usePathname()
   const { isAdmin } = useAdmin()
+  const menuRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const nav = [
+    { href: user ? '/dashboard' : '/', label: 'Home', Icon: House },
+    { href: '/schools', label: 'Schools', Icon: School },
+    { href: '/tutor/demo', label: 'Tutor', Icon: Sparkles },
+    { href: '/events', label: 'Events', Icon: CalendarDays },
+  ]
+  const active = (href: string) => href === '/' ? pathname === '/' : href === '/dashboard' ? pathname === '/' || pathname.startsWith('/dashboard') : href === '/tutor/demo' ? pathname.startsWith('/tutor') : pathname.startsWith(href)
+
+  useEffect(() => { setMenuOpen(false) }, [pathname])
+  useEffect(() => {
+    if (!menuOpen) return
+    const close = (event: MouseEvent) => {
+      if (!menuRef.current?.contains(event.target as Node) && !triggerRef.current?.contains(event.target as Node)) setMenuOpen(false)
+    }
+    const escape = (event: KeyboardEvent) => { if (event.key === 'Escape') { setMenuOpen(false); triggerRef.current?.focus() } }
+    document.addEventListener('click', close)
+    document.addEventListener('keydown', escape)
+    return () => { document.removeEventListener('click', close); document.removeEventListener('keydown', escape) }
+  }, [menuOpen])
 
   return (
-    <header className="bg-white shadow">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center py-6">
-          {/* Logo and Brand */}
-          <div className="flex items-center">
-            <School className="h-8 w-8 text-blue-600 mr-3" />
-            <Link href={user ? "/dashboard" : "/"} className="text-2xl font-bold text-gray-900">
-              SchoolScope
-            </Link>
-          </div>
-
-          {/* Navigation Links (when logged in) */}
-          {user && (
-            <nav className="hidden md:flex items-center space-x-4">
-              <Button asChild variant="ghost" size="sm">
-                <Link href="/dashboard" className="flex items-center">
-                  <Calendar className="h-4 w-4 mr-2" />
-                  My Calendar
-                </Link>
-              </Button>
-              <Button asChild variant="ghost" size="sm">
-                <Link href="/events" className="flex items-center">
-                  <Home className="h-4 w-4 mr-2" />
-                  All Events
-                </Link>
-              </Button>
-              <Button asChild variant="ghost" size="sm">
-                <Link href="/children" className="flex items-center">
-                  <Users className="h-4 w-4 mr-2" />
-                  Children
-                </Link>
-              </Button>
-              <Button asChild variant="ghost" size="sm">
-                <Link href="/schools" className="flex items-center">
-                  <School className="h-4 w-4 mr-2" />
-                  Schools
-                </Link>
-              </Button>
-              
-              {/* Admin Link */}
-              {isAdmin && (
-                <Button asChild variant="ghost" size="sm">
-                  <Link href="/admin" className="flex items-center text-blue-600">
-                    <Settings className="h-4 w-4 mr-2" />
-                    Admin
-                  </Link>
-                </Button>
-              )}
-              
-              {/* Quick Actions */}
-              <div className="border-l border-gray-200 pl-4 ml-4">
-                <Button asChild size="sm">
-                  <Link href="/events/create" className="flex items-center">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Event
-                  </Link>
-                </Button>
+    <>
+      {pathname === '/' && <a href="#main-content" className="scope-skip-link">Skip to content</a>}
+      <header className="scope-header">
+        <div className="scope-header-inner">
+          <SchoolScopeBrand href={user ? '/dashboard' : '/'} />
+          <nav className="scope-desktop-nav" aria-label="Main navigation">
+            {nav.map(({ href, label, Icon }) => <Link key={href} href={href} aria-current={active(href) ? 'page' : undefined} className={active(href) ? 'active' : ''}><Icon size={18} aria-hidden="true" />{label}</Link>)}
+          </nav>
+          <div className="scope-header-actions">
+            {user ? <>
+              {showNotifications && <NotificationBell />}
+              <UserButton variant="avatar" managementMode="modal" />
+              <div className="scope-menu-container">
+                <Button ref={triggerRef} variant="outline" size="icon" aria-label={menuOpen ? 'Close more options' : 'More options'} aria-expanded={menuOpen} aria-controls="scope-more-menu" onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X size={20} /> : <Menu size={20} />}</Button>
+                {menuOpen && <div ref={menuRef} className="scope-more-menu" id="scope-more-menu">
+                  <Link href="/dashboard" onClick={() => setMenuOpen(false)}><CalendarDays size={19} />My calendar</Link>
+                  <Link href="/children" onClick={() => setMenuOpen(false)}><Users size={19} />My children</Link>
+                  <Link href="/events/create" onClick={() => setMenuOpen(false)}><Plus size={19} />Add an event</Link>
+                  {isAdmin && <Link href="/admin" onClick={() => setMenuOpen(false)}><Settings size={19} />Admin</Link>}
+                </div>}
               </div>
-            </nav>
-          )}
-
-          {/* User Menu and Actions */}
-          <div className="flex items-center space-x-4">
-            {user ? (
-              <>
-                {/* Mobile Navigation Menu */}
-                <div className="md:hidden relative">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                    className="relative"
-                  >
-                    {isMobileMenuOpen ? (
-                      <X className="h-4 w-4" />
-                    ) : (
-                      <Menu className="h-4 w-4" />
-                    )}
-                  </Button>
-
-                  {isMobileMenuOpen && (
-                    <div className="absolute right-0 top-full mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-                      <div className="p-2">
-                        <div className="space-y-1">
-                          <Link
-                            href="/dashboard"
-                            className="flex items-center w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                          >
-                            <Calendar className="h-4 w-4 mr-3" />
-                            My Calendar
-                          </Link>
-                          <Link
-                            href="/events"
-                            className="flex items-center w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                          >
-                            <Home className="h-4 w-4 mr-3" />
-                            All Events
-                          </Link>
-                          <Link
-                            href="/children"
-                            className="flex items-center w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                          >
-                            <Users className="h-4 w-4 mr-3" />
-                            Children
-                          </Link>
-                          <Link
-                            href="/schools"
-                            className="flex items-center w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                          >
-                            <School className="h-4 w-4 mr-3" />
-                            Schools
-                          </Link>
-                          
-                          {/* Admin Link for Mobile */}
-                          {isAdmin && (
-                            <Link
-                              href="/admin"
-                              className="flex items-center w-full px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-md font-medium"
-                              onClick={() => setIsMobileMenuOpen(false)}
-                            >
-                              <Settings className="h-4 w-4 mr-3" />
-                              Admin Panel
-                            </Link>
-                          )}
-                          
-                          <div className="border-t border-gray-200 my-2"></div>
-                          <Link
-                            href="/events/create"
-                            className="flex items-center w-full px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-md font-medium"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                          >
-                            <Plus className="h-4 w-4 mr-3" />
-                            Add Event
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Overlay to close dropdown when clicking outside */}
-                  {isMobileMenuOpen && (
-                    <div
-                      className="fixed inset-0 z-40"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    />
-                  )}
-                </div>
-
-                {/* Notifications */}
-                {showNotifications && <NotificationBell />}
-
-                {/* User Menu */}
-                <div className="hidden sm:flex items-center space-x-3">
-                  <UserButton variant="avatar" managementMode="modal" />
-                </div>
-
-                {/* Mobile User Menu */}
-                <div className="sm:hidden">
-                  <UserButton variant="avatar" managementMode="modal" />
-                </div>
-              </>
-            ) : (
-              /* Guest Navigation */
-              <div className="flex items-center space-x-4">
-                <Button variant="outline" size="sm" type="button" asChild><Link href="/sign-in">
-                    Login
-                  </Link></Button>
-                <Button size="sm" type="button" asChild><Link href="/sign-up">
-                    Sign Up
-                  </Link></Button>
-              </div>
-            )}
+            </> : <>
+              <Button variant="ghost" size="sm" asChild><Link href="/sign-in">Log in</Link></Button>
+              <Button className="scope-signup" size="sm" asChild><Link href="/sign-up">Join us</Link></Button>
+            </>}
           </div>
         </div>
-      </div>
-    </header>
+      </header>
+      <nav className="scope-mobile-nav" aria-label="Main navigation">
+        {nav.map(({ href, label, Icon }) => <Link key={href} href={href} aria-current={active(href) ? 'page' : undefined} className={active(href) ? 'active' : ''}><span><Icon size={22} aria-hidden="true" /></span>{label}</Link>)}
+      </nav>
+    </>
   )
-} 
+}

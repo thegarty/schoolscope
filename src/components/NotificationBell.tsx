@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Bell, Calendar, Vote, Clock, Check, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -45,6 +45,13 @@ export default function NotificationBell() {
   const [counts, setCounts] = useState<NotificationCounts>({ total: 0, eventsNeedingConfirmation: 0, schoolEditsNeedingVotes: 0, upcomingEvents: 0 })
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  useEffect(() => {
+    if (!isOpen) return
+    const close = (event: KeyboardEvent) => { if (event.key === 'Escape') { setIsOpen(false); triggerRef.current?.focus() } }
+    document.addEventListener('keydown', close)
+    return () => document.removeEventListener('keydown', close)
+  }, [isOpen])
 
   const fetchNotifications = async () => {
     setIsLoading(true)
@@ -148,7 +155,11 @@ export default function NotificationBell() {
     <div className="relative">
       <Button
         variant="outline"
-        size="sm"
+        size="icon"
+        ref={triggerRef}
+        aria-label={counts.total ? `Notifications, ${counts.total} unread` : 'Notifications'}
+        aria-expanded={isOpen}
+        aria-controls="scope-notifications"
         onClick={() => setIsOpen(!isOpen)}
         className="relative"
       >
@@ -161,7 +172,7 @@ export default function NotificationBell() {
       </Button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-96 max-h-96 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+        <div id="scope-notifications" role="region" aria-label="Notifications" className="fixed inset-x-4 top-20 max-h-[70dvh] overflow-y-auto bg-white border border-border rounded-2xl shadow-lg z-50 sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-96">
           <div className="p-4 border-b border-gray-200">
             <h3 className="font-semibold text-gray-900">Notifications</h3>
             {counts.total > 0 && (

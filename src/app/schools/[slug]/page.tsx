@@ -1,10 +1,10 @@
 import { notFound } from 'next/navigation'
 import { db } from '@/lib/db'
-import { Button } from '@/components/ui/button'
 import { School, MapPin, Phone, Globe } from 'lucide-react'
 import Link from 'next/link'
 import { Metadata } from 'next'
-import { UserNavButton } from '@/components/UserNavButton'
+import AppHeader from '@/components/AppHeader'
+import { validateRequest } from '@/lib/auth'
 import { SchoolPageTabs } from '@/components/SchoolPageTabs'
 import { findSchoolBySlug } from '@/lib/school-utils'
 
@@ -51,6 +51,7 @@ export async function generateMetadata({ params }: SchoolPageProps): Promise<Met
 }
 
 export default async function SchoolPage({ params }: SchoolPageProps) {
+  const { user } = await validateRequest()
   const { slug } = await params
   const schoolId = await findSchoolBySlug(slug, db)
 
@@ -154,46 +155,25 @@ export default async function SchoolPage({ params }: SchoolPageProps) {
   }))
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/90 backdrop-blur">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center">
-              <div className="rounded-lg bg-blue-100 p-2 mr-3">
-                <School className="h-5 w-5 text-blue-700" />
-              </div>
-              <Link href="/" className="text-xl font-bold text-slate-900">SchoolScope</Link>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Button asChild variant="outline">
-                <Link href="/schools">Browse Schools</Link>
-              </Button>
-              <UserNavButton />
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-background">
+      <AppHeader user={user} />
 
       {/* School Header */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-700 text-white">
-        <div className="absolute inset-0 opacity-20">
-          <div className="h-full w-full bg-[radial-gradient(circle_at_20%_20%,white,transparent_35%),radial-gradient(circle_at_80%_20%,white,transparent_30%),radial-gradient(circle_at_50%_80%,white,transparent_25%)]" />
-        </div>
+      <section className="relative bg-secondary/60 text-foreground">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative py-12 md:py-16">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="relative py-7 md:py-12">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:gap-8">
               <div className="lg:col-span-2">
-                <div className="mb-4 inline-flex items-center rounded-full border border-white/30 bg-white/10 px-3 py-1 text-xs font-medium text-blue-50">
+                <div className="mb-4 inline-flex items-center rounded-full border border-primary/10 bg-white px-3 py-1 text-xs font-medium text-primary">
                   {school.type} · {school.sector}
                 </div>
-                <h1 className="text-3xl md:text-5xl font-bold tracking-tight mb-5">{school.name}</h1>
-                <div className="flex flex-wrap items-center gap-3 text-blue-100 mb-5">
-                  <div className="inline-flex items-center rounded-full bg-white/10 px-3 py-1.5">
+                <h1 className="text-3xl md:text-5xl font-bold tracking-tight leading-tight break-words mb-5">{school.name}</h1>
+                <div className="flex flex-wrap items-center gap-3 text-muted-foreground mb-5">
+                  <div className="inline-flex items-center rounded-full bg-white/80 px-3 py-1.5">
                     <MapPin className="h-4 w-4 mr-2" />
                     <span>{school.suburb}, {school.state} {school.postcode}</span>
                   </div>
-                  <div className="inline-flex items-center rounded-full bg-white/10 px-3 py-1.5">
+                  <div className="hidden sm:inline-flex items-center rounded-full bg-white/80 px-3 py-1.5">
                     <School className="h-4 w-4 mr-2" />
                     <span>School Profile</span>
                   </div>
@@ -202,7 +182,7 @@ export default async function SchoolPage({ params }: SchoolPageProps) {
                       href={school.website}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center rounded-full bg-white/10 px-3 py-1.5 hover:bg-white/20 transition-colors"
+                      className="inline-flex min-h-11 items-center rounded-full bg-white/80 px-3 py-1.5 hover:bg-white transition-colors"
                     >
                       <Globe className="h-4 w-4 mr-2" />
                       Visit Website
@@ -211,32 +191,32 @@ export default async function SchoolPage({ params }: SchoolPageProps) {
                   {school.phone && (
                     <a
                       href={`tel:${school.phone}`}
-                      className="inline-flex items-center rounded-full bg-white/10 px-3 py-1.5 hover:bg-white/20 transition-colors"
+                      className="inline-flex min-h-11 items-center rounded-full bg-white/80 px-3 py-1.5 hover:bg-white transition-colors"
                     >
                       <Phone className="h-4 w-4 mr-2" />
                       {school.phone}
                     </a>
                   )}
                 </div>
-                <p className="max-w-3xl text-base md:text-lg text-blue-50/95 leading-relaxed">
-                  Stay connected with {school.name}'s community through our event calendar and school information.
+                <p className="max-w-3xl text-base md:text-lg text-muted-foreground leading-relaxed">
+                  School details, important dates, and your community.
                 </p>
               </div>
               <div className="lg:col-span-1">
-                <div className="rounded-2xl border border-white/25 bg-white/10 p-6 backdrop-blur-sm">
-                  <h3 className="text-lg font-semibold mb-4">Quick Stats</h3>
-                  <div className="space-y-3">
-                    <div className="flex justify-between rounded-lg bg-white/10 px-3 py-2">
-                      <span className="text-blue-100">Students on Platform</span>
-                      <span className="font-semibold">{totalStudents}</span>
+                <div className="rounded-2xl border border-border bg-white p-4 lg:p-6">
+                  <h3 className="sr-only lg:not-sr-only lg:text-lg lg:font-semibold lg:mb-4">School activity</h3>
+                  <div className="grid grid-cols-3 gap-2 lg:block lg:space-y-3">
+                    <div className="flex flex-col-reverse lg:flex-row justify-between rounded-lg bg-white/80 px-1 lg:px-3 py-2 text-center lg:text-left">
+                      <span className="text-xs lg:text-sm text-muted-foreground">Connected students</span>
+                      <span className="text-xl lg:text-base font-semibold">{totalStudents}</span>
                     </div>
-                    <div className="flex justify-between rounded-lg bg-white/10 px-3 py-2">
-                      <span className="text-blue-100">Total Events</span>
-                      <span className="font-semibold">{totalEvents}</span>
+                    <div className="flex flex-col-reverse lg:flex-row justify-between rounded-lg bg-white/80 px-1 lg:px-3 py-2 text-center lg:text-left">
+                      <span className="text-xs lg:text-sm text-muted-foreground">All events</span>
+                      <span className="text-xl lg:text-base font-semibold">{totalEvents}</span>
                     </div>
-                    <div className="flex justify-between rounded-lg bg-white/10 px-3 py-2">
-                      <span className="text-blue-100">Upcoming Events</span>
-                      <span className="font-semibold">{upcomingEvents.length}</span>
+                    <div className="flex flex-col-reverse lg:flex-row justify-between rounded-lg bg-white/80 px-1 lg:px-3 py-2 text-center lg:text-left">
+                      <span className="text-xs lg:text-sm text-muted-foreground">Coming up</span>
+                      <span className="text-xl lg:text-base font-semibold">{upcomingEvents.length}</span>
                     </div>
                   </div>
                 </div>
@@ -246,16 +226,16 @@ export default async function SchoolPage({ params }: SchoolPageProps) {
         </div>
       </section>
 
-      <div className="border-b border-slate-200 bg-white/70">
+      <div className="border-b border-border bg-white/70">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <p className="text-sm text-slate-600">
-            Home / Schools / <span className="font-medium text-slate-900">{school.name}</span>
+          <p className="text-sm text-muted-foreground">
+            Home / Schools / <span className="font-medium text-foreground">{school.name}</span>
           </p>
         </div>
       </div>
 
       {/* Content */}
-      <div className="py-8">
+      <div className="py-8 min-w-0">
         <SchoolPageTabs
           school={schoolForClient}
           schoolSlug={slug}
@@ -267,25 +247,25 @@ export default async function SchoolPage({ params }: SchoolPageProps) {
       </div>
 
       {/* SEO Content */}
-      <section className="bg-white py-12 border-y border-slate-200/70">
+      <section className="bg-white py-12 border-y border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4">About {school.name}</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">About {school.name}</h2>
           {school.aboutContent ? (
-            <p className="text-slate-700 mb-4 whitespace-pre-line leading-relaxed">{school.aboutContent}</p>
+            <p className="text-muted-foreground mb-4 whitespace-pre-line leading-relaxed">{school.aboutContent}</p>
           ) : (
             <>
-              <p className="text-slate-700 mb-4 leading-relaxed">
+              <p className="text-muted-foreground mb-4 leading-relaxed">
                 {school.name} is a {school.type.toLowerCase()} {school.sector.toLowerCase()} school located in {school.suburb}, {school.state}.
                 Our school community uses SchoolScope to stay connected and informed about important events, activities, and announcements.
               </p>
-              <p className="text-slate-700 mb-4 leading-relaxed">
+              <p className="text-muted-foreground mb-4 leading-relaxed">
                 Join our growing community of {totalStudents} students and families who use SchoolScope to never miss important school events.
                 From academic activities to sports events, parent meetings to school holidays, our calendar keeps everyone in the loop.
               </p>
             </>
           )}
-          <h3 className="text-xl font-semibold text-slate-900 mb-3 mt-8">School Events and Activities</h3>
-          <p className="text-slate-700 leading-relaxed">
+          <h3 className="text-xl font-semibold text-foreground mb-3 mt-8">School Events and Activities</h3>
+          <p className="text-muted-foreground leading-relaxed">
             Stay up to date with all the latest happenings at {school.name}. Our community-driven calendar includes events across all year levels,
             from Kindergarten to Year 12. Whether you're looking for academic events, sports activities, arts and culture programs, or social events,
             you'll find everything you need to stay connected with your school community.
@@ -294,7 +274,7 @@ export default async function SchoolPage({ params }: SchoolPageProps) {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-white text-foreground border-t border-border py-10">
         <div className="container px-4 md:px-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="md:col-span-1">
@@ -302,41 +282,41 @@ export default async function SchoolPage({ params }: SchoolPageProps) {
                 <School className="h-6 w-6 mr-2" />
                 <span className="font-bold text-xl">SchoolScope</span>
               </div>
-              <p className="text-gray-400 text-sm">
+              <p className="text-muted-foreground text-sm">
                 Connecting Australian school communities through events, calendars, and information sharing.
               </p>
             </div>
             <div>
               <h3 className="font-semibold mb-4">Schools by State</h3>
               <div className="space-y-2">
-                <Link href="/schools/state/nsw" className="block text-sm text-gray-400 hover:text-white transition-colors">New South Wales Schools</Link>
-                <Link href="/schools/state/vic" className="block text-sm text-gray-400 hover:text-white transition-colors">Victoria Schools</Link>
-                <Link href="/schools/state/qld" className="block text-sm text-gray-400 hover:text-white transition-colors">Queensland Schools</Link>
-                <Link href="/schools/state/wa" className="block text-sm text-gray-400 hover:text-white transition-colors">Western Australia Schools</Link>
+                <Link href="/schools/state/nsw" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">New South Wales Schools</Link>
+                <Link href="/schools/state/vic" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">Victoria Schools</Link>
+                <Link href="/schools/state/qld" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">Queensland Schools</Link>
+                <Link href="/schools/state/wa" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">Western Australia Schools</Link>
               </div>
             </div>
             <div>
               <h3 className="font-semibold mb-4">More States</h3>
               <div className="space-y-2">
-                <Link href="/schools/state/sa" className="block text-sm text-gray-400 hover:text-white transition-colors">South Australia Schools</Link>
-                <Link href="/schools/state/tas" className="block text-sm text-gray-400 hover:text-white transition-colors">Tasmania Schools</Link>
-                <Link href="/schools/state/nt" className="block text-sm text-gray-400 hover:text-white transition-colors">Northern Territory Schools</Link>
-                <Link href="/schools/state/act" className="block text-sm text-gray-400 hover:text-white transition-colors">ACT Schools</Link>
+                <Link href="/schools/state/sa" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">South Australia Schools</Link>
+                <Link href="/schools/state/tas" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">Tasmania Schools</Link>
+                <Link href="/schools/state/nt" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">Northern Territory Schools</Link>
+                <Link href="/schools/state/act" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">ACT Schools</Link>
               </div>
             </div>
             <div>
               <h3 className="font-semibold mb-4">Quick Links</h3>
               <div className="space-y-2">
-                <Link href="/schools" className="block text-sm text-gray-400 hover:text-white transition-colors">Browse All Schools</Link>
-                <Link href="/register" className="block text-sm text-gray-400 hover:text-white transition-colors">Join SchoolScope</Link>
-                <Link href="/privacy" className="block text-sm text-gray-400 hover:text-white transition-colors">Privacy Policy</Link>
-                <Link href="/terms" className="block text-sm text-gray-400 hover:text-white transition-colors">Terms of Service</Link>
+                <Link href="/schools" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">Browse All Schools</Link>
+                <Link href="/register" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">Join SchoolScope</Link>
+                <Link href="/privacy" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">Privacy Policy</Link>
+                <Link href="/terms" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">Terms of Service</Link>
               </div>
             </div>
           </div>
-          <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center">
-            <p className="text-xs text-gray-400">© 2026 SchoolScope. All rights reserved.</p>
-            <p className="text-xs text-gray-400 mt-2 sm:mt-0">Connecting 10,000+ Australian schools nationwide</p>
+          <div className="border-t border-border mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center">
+            <p className="text-xs text-muted-foreground">© 2026 SchoolScope. All rights reserved.</p>
+            <p className="text-xs text-muted-foreground mt-2 sm:mt-0">Connecting 10,000+ Australian schools nationwide</p>
           </div>
         </div>
       </footer>

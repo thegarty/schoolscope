@@ -3,7 +3,7 @@ import { validateRequest } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { School, Users, Calendar, MapPin, Lock, Globe, Edit } from 'lucide-react'
+import { School, Users, Calendar, MapPin, Lock, Globe, Edit, Sparkles, ArrowRight, Plus } from 'lucide-react'
 import Link from 'next/link'
 import AppHeader from '@/components/AppHeader'
 import DashboardVoting from '@/components/DashboardVoting'
@@ -163,303 +163,137 @@ export default async function DashboardPage({
   }) : []
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <AppHeader user={user} />
+      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+        <div className="mb-8">
+          <p className="mb-2 text-sm font-semibold text-primary">YOUR SCHOOL DAY, SIMPLIFIED</p>
+          <h1 className="mb-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+            Hello, {user.name?.split(' ')[0] || 'there'}.
+          </h1>
+          <p className="max-w-xl text-base leading-relaxed text-muted-foreground">
+            A little less to remember. A little more room to learn.
+          </p>
+        </div>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          {/* Welcome Section */}
-          <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <section aria-label="Your family at a glance" className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+          {[
+            { label: 'Children', value: children.length, Icon: Users, colour: 'bg-[#eeebfa] text-primary' },
+            { label: 'School events', value: totalPublicEvents, Icon: Globe, colour: 'bg-[#e7f4ed] text-[#37684d]' },
+            { label: 'Personal events', value: totalPrivateEvents, Icon: Lock, colour: 'bg-[#fff0e6] text-[#8e542e]' },
+            { label: 'Schools', value: new Set(children.map(child => child.schoolId)).size, Icon: School, colour: 'bg-[#eeebfa] text-primary' },
+          ].map(({ label, value, Icon, colour }) => (
+            <Card key={label}>
+              <CardContent className="flex items-center gap-3 p-4 sm:p-5">
+                <span className={`hidden h-11 w-11 shrink-0 items-center justify-center rounded-2xl min-[360px]:flex ${colour}`}><Icon className="h-5 w-5" aria-hidden="true" /></span>
+                <div className="min-w-0"><p className="text-2xl font-bold text-foreground">{value}</p><p className="text-sm text-muted-foreground">{label}</p></div>
+              </CardContent>
+            </Card>
+          ))}
+        </section>
+
+        <section aria-labelledby="tutor-title" className="mb-8 flex flex-col gap-5 rounded-3xl border border-[#ded7f5] bg-[#eeebfa] p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+          <div className="flex items-start gap-4">
+            <span className="hidden h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white text-primary sm:flex"><Sparkles className="h-7 w-7" aria-hidden="true" /></span>
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                Dashboard
-              </h2>
-              <p className="text-gray-600">
-                Your at-a-glance view of children, events, and community activity.
-              </p>
-            </div>
-            <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
-              <Button asChild variant="outline" size="sm">
-                <Link href="/children/add">Add Child</Link>
-              </Button>
-              <Button asChild variant="outline" size="sm"><Link href="/tutor/demo">Try the AI tutor</Link>
-              </Button>
-              <Button asChild variant="outline" size="sm">
-                <Link href="/events/create">Create Event</Link>
-              </Button>
-              <Button asChild variant="outline" size="sm">
-                <Link href="/events">All Events</Link>
-              </Button>
-              <Button asChild variant="outline" size="sm">
-                <Link href="/schools">Schools</Link>
-              </Button>
+              <span className="mb-2 inline-flex rounded-full bg-white px-3 py-1 text-xs font-semibold text-primary">Adult preview</span>
+              <h2 id="tutor-title" className="mb-2 text-2xl font-bold tracking-tight text-foreground">Meet your learning sidekick.</h2>
+              <p className="max-w-xl text-sm leading-relaxed text-[#615575]">Explore maths with Ripple, one friendly step at a time. Try the tutor with a fictional learner.</p>
             </div>
           </div>
+          <Button asChild className="shrink-0 gap-2"><Link href="/tutor/demo">Meet Ripple <ArrowRight className="h-4 w-4" aria-hidden="true" /></Link></Button>
+        </section>
 
-          {/* At-a-glance stats */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center">
-                  <Users className="h-6 w-6 text-blue-600" />
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Children</p>
-                    <p className="text-xl font-bold text-gray-900">{children.length}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center">
-                  <Globe className="h-6 w-6 text-green-600" />
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Public Events</p>
-                    <p className="text-xl font-bold text-gray-900">{totalPublicEvents}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center">
-                  <Lock className="h-6 w-6 text-blue-600" />
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Private Events</p>
-                    <p className="text-xl font-bold text-gray-900">{totalPrivateEvents}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center">
-                  <School className="h-6 w-6 text-purple-600" />
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Schools</p>
-                    <p className="text-xl font-bold text-gray-900">{new Set(children.map(c => c.schoolId)).size}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Above-the-fold focus area */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            <div className="lg:col-span-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Calendar className="h-5 w-5 mr-2" />
-                    Upcoming Events
-                  </CardTitle>
-                  <CardDescription>
-                    Next events across your schools and private calendar
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {upcomingEvents.length > 0 ? (
-                    <div className="space-y-3">
-                      {upcomingEvents.slice(0, 4).map((event) => (
-                        <div key={event.id} className={`border rounded-lg p-3 ${
-                          event.isPrivate ? 'border-blue-200 bg-blue-50' : ''
-                        }`}>
-                          <div className="flex justify-between items-start gap-3">
-                            <div className="min-w-0">
-                              <div className="flex items-center mb-1">
-                                {event.isPrivate ? (
-                                  <Lock className="h-4 w-4 mr-2 text-blue-600" />
-                                ) : (
-                                  <Globe className="h-4 w-4 mr-2 text-green-600" />
-                                )}
-                                <h3 className="font-semibold truncate">{event.title}</h3>
-                              </div>
-                              <p className="text-sm text-gray-600 truncate">
-                                {event.school.name} • {new Date(event.startDate).toLocaleDateString()}
-                              </p>
-                            </div>
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
-                              event.isPrivate
-                                ? 'bg-blue-100 text-blue-800'
-                                : event.confirmed
-                                  ? 'bg-green-100 text-green-800'
-                                  : 'bg-yellow-100 text-yellow-800'
-                            }`}>
-                              {event.isPrivate ? 'Private' : event.confirmed ? 'Confirmed' : 'Pending'}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                      <Button asChild variant="outline" className="w-full">
-                        <Link href="/events">View All Events</Link>
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="text-center py-6">
-                      <Calendar className="h-10 w-10 text-gray-400 mx-auto mb-3" />
-                      <p className="text-gray-500 mb-4">No upcoming events</p>
-                      <Button asChild>
-                        <Link href="/events/create">Create Event</Link>
-                      </Button>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-
-            <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Users className="h-5 w-5 mr-2" />
-                    Family Snapshot
-                  </CardTitle>
-                  <CardDescription>
-                    Quick access to children management
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {children.slice(0, 3).map((child) => (
-                      <div key={child.id} className="flex items-center justify-between border rounded-lg p-3">
-                        <div>
-                          <p className="font-medium text-gray-900">{child.name}</p>
-                          <p className="text-xs text-gray-500">{child.yearLevel} • {child.school.name}</p>
-                        </div>
-                        <Button asChild variant="outline" size="sm"><Link href={`/tutor/children/${child.id}`}>Start tutoring</Link></Button>
-                        <Button asChild variant="outline" size="sm">
-                          <Link href={`/children/${child.id}/edit`}>
-                            <Edit className="h-4 w-4" />
-                          </Link>
-                        </Button>
-                      </div>
-                    ))}
-                    <div className="pt-2 flex gap-2">
-                      <Button asChild variant="outline" className="flex-1">
-                        <Link href="/children">Manage Children</Link>
-                      </Button>
-                      <Button asChild className="flex-1">
-                        <Link href="/children/add">Add Child</Link>
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              {pendingSchoolEdits.length > 0 && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center">
-                      <Edit className="h-5 w-5 mr-2" />
-                      Community Votes
-                    </CardTitle>
-                    <CardDescription>
-                      {pendingSchoolEdits.length} school update{pendingSchoolEdits.length > 1 ? 's' : ''} need your vote
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Button asChild variant="outline" className="w-full">
-                      <Link href="#pending-edits">Review Pending Edits</Link>
-                    </Button>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-          </div>
-
-          {/* Personal Calendar */}
-          <div className="mb-8">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Calendar className="h-6 w-6 mr-2" />
-                  Your Personal Calendar
-                </CardTitle>
-                <CardDescription>
-                  All events for your children across all their schools
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <PersonalCalendar 
-                  events={calendarEvents}
-                  currentMonth={month}
-                  currentYear={year}
-                />
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Voting Section */}
-          {pendingSchoolEdits.length > 0 && (
-            <div className="mb-8" id="pending-edits">
-              <DashboardVoting 
-                schoolEdits={pendingSchoolEdits} 
-                currentUserId={user.id}
-              />
-            </div>
-          )}
-
-          {/* Children Section */}
-          <Card>
+        <div className="mb-8 grid min-w-0 gap-6 lg:grid-cols-[1.1fr_1fr]">
+          <Card className="min-w-0">
             <CardHeader>
-              <CardTitle className="flex items-center">
-                <Users className="h-5 w-5 mr-2" />
-                Your Children
-              </CardTitle>
-              <CardDescription>
-                Manage your children's school information
-              </CardDescription>
+              <div className="flex items-center justify-between gap-3">
+                <CardTitle className="flex items-center gap-2 text-xl"><Calendar className="h-5 w-5 text-primary" aria-hidden="true" />Coming up</CardTitle>
+                <Button asChild variant="ghost" size="sm" className="gap-1"><Link href="/events/create"><Plus className="h-4 w-4" aria-hidden="true" />Add event</Link></Button>
+              </div>
+              <CardDescription>Your school and personal events, together.</CardDescription>
             </CardHeader>
             <CardContent>
-              {children.length > 0 ? (
-                <div className="space-y-4">
-                  {children.map((child) => (
-                    <div key={child.id} className="border rounded-lg p-4">
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-lg">{child.name}</h3>
-                          <p className="text-sm text-gray-600">{child.yearLevel}</p>
-                          <div className="flex items-center mt-2 text-sm text-gray-500">
-                            <MapPin className="h-4 w-4 mr-1" />
-                            {child.school.name}
-                          </div>
-                          <p className="text-xs text-gray-400">
-                            {child.school.suburb}, {child.school.state}
-                          </p>
-                        </div>
-                        <div className="ml-4 flex gap-2">
-                          <Button asChild size="sm"><Link href={`/tutor/children/${child.id}`}>Start tutoring</Link></Button>
-                          <Button asChild variant="outline" size="sm">
-                            <Link href={`/children/${child.id}/edit`}>
-                              <Edit className="h-4 w-4" />
-                            </Link>
-                          </Button>
-                        </div>
+              {upcomingEvents.length ? (
+                <div className="space-y-3">
+                  {upcomingEvents.slice(0, 4).map(event => (
+                    <article key={event.id} className="rounded-2xl border border-border p-4">
+                      <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                        <p className="text-sm font-semibold text-primary">{new Date(event.startDate).toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short' })}</p>
+                        <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${event.isPrivate ? 'bg-[#eeebfa] text-[#5946a8]' : event.confirmed ? 'bg-[#e7f4ed] text-[#37684d]' : 'bg-[#fff0e6] text-[#8e542e]'}`}>
+                          {event.isPrivate ? 'Personal' : event.confirmed ? 'Confirmed' : 'Pending'}
+                        </span>
                       </div>
-                    </div>
+                      <h3 className="break-words font-semibold leading-snug text-foreground">{event.title}</h3>
+                      <p className="mt-1 break-words text-sm text-muted-foreground">{event.school.name}</p>
+                    </article>
                   ))}
-                  <div className="pt-4 border-t flex space-x-2">
-                    <Button asChild variant="outline" className="flex-1">
-                      <Link href="/children">Manage Children</Link>
-                    </Button>
-                    <Button asChild variant="outline" className="flex-1">
-                      <Link href="/children/add">Add Child</Link>
-                    </Button>
-                  </div>
+                  <Button asChild variant="outline" className="w-full"><Link href="/events">See all events</Link></Button>
                 </div>
               ) : (
-                <div className="text-center py-6">
-                  <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500 mb-4">No children added yet</p>
-                  <Button asChild>
-                    <Link href="/children/add">Add Child</Link>
-                  </Button>
+                <div className="rounded-2xl bg-[#f8f7fc] px-5 py-8 text-center">
+                  <Calendar className="mx-auto mb-3 h-9 w-9 text-primary" aria-hidden="true" />
+                  <p className="mb-1 font-semibold text-foreground">A little breathing room.</p>
+                  <p className="text-sm leading-relaxed text-muted-foreground">You have no upcoming events. Add one when you're ready.</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card className="min-w-0">
+            <CardHeader>
+              <div className="flex items-center justify-between gap-3">
+                <CardTitle className="flex items-center gap-2 text-xl"><Users className="h-5 w-5 text-primary" aria-hidden="true" />Your family</CardTitle>
+                <Button asChild variant="ghost" size="sm" className="gap-1"><Link href="/children/add"><Plus className="h-4 w-4" aria-hidden="true" />Add child</Link></Button>
+              </div>
+              <CardDescription>School details and learning, in one place.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {children.length ? (
+                <div className="space-y-3">
+                  {children.map(child => (
+                    <article key={child.id} className="rounded-2xl border border-border p-4">
+                      <div className="mb-3 flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <h3 className="break-words text-lg font-semibold text-foreground">{child.name}</h3>
+                          <p className="text-sm text-muted-foreground">{child.yearLevel}</p>
+                        </div>
+                        <Button asChild variant="ghost" size="icon" className="shrink-0"><Link href={`/children/${child.id}/edit`} aria-label={`Edit ${child.name}'s details`}><Edit className="h-4 w-4" aria-hidden="true" /></Link></Button>
+                      </div>
+                      <p className="mb-1 flex items-start gap-2 text-sm text-muted-foreground"><MapPin className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" /><span className="break-words">{child.school.name}<span className="mt-1 block text-xs">{child.school.suburb}, {child.school.state}</span></span></p>
+                      <Button asChild variant="outline" className="mt-3 w-full gap-2"><Link href={`/tutor/children/${child.id}`}><Sparkles className="h-4 w-4" aria-hidden="true" />Open tutoring</Link></Button>
+                    </article>
+                  ))}
+                  <Button asChild variant="outline" className="w-full"><Link href="/children">Manage children</Link></Button>
+                </div>
+              ) : (
+                <div className="rounded-2xl bg-[#f8f7fc] px-5 py-8 text-center">
+                  <Users className="mx-auto mb-3 h-9 w-9 text-primary" aria-hidden="true" />
+                  <p className="mb-1 font-semibold text-foreground">Let's bring your school day together.</p>
+                  <p className="mb-5 text-sm leading-relaxed text-muted-foreground">Add your child to see events from their school.</p>
+                  <Button asChild><Link href="/children/add">Add your first child</Link></Button>
                 </div>
               )}
             </CardContent>
           </Card>
         </div>
+
+        <Card className="mb-8 min-w-0">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-xl"><Calendar className="h-5 w-5 text-primary" aria-hidden="true" />Your calendar</CardTitle>
+            <CardDescription>A clear view of the month ahead. Tap a date for the details.</CardDescription>
+          </CardHeader>
+          <CardContent className="px-3 pb-4 sm:px-6 sm:pb-6">
+            <PersonalCalendar events={calendarEvents} currentMonth={month} currentYear={year} />
+          </CardContent>
+        </Card>
+
+        {pendingSchoolEdits.length > 0 && (
+          <section id="pending-edits" className="mb-8 scroll-mt-24">
+            <DashboardVoting schoolEdits={pendingSchoolEdits} currentUserId={user.id} />
+          </section>
+        )}
       </main>
     </div>
   )
-} 
+}

@@ -57,7 +57,7 @@ Before deploying this authentication migration, provision/select SchoolScope's P
 
 Verify each desired social provider for that environment. Google, Apple and Microsoft controls appear only when AllAuth advertises them. Optional application email requires `RESEND_API_KEY`; authentication email is handled by AllAuth. The build works without an application email credential, and attempting delivery without it fails explicitly.
 
-Run `pnpm db:migrate:deploy` before serving the new application. The custom production server also runs migrations at startup, but its legacy error handler continues booting on migration failure; verify migrations explicitly during deployment. Remove obsolete provider variables from Railway after the cutover, and verify login, logout, recovery and existing-user data on the public origin. The local setup does not deploy or change Railway/Cloudflare.
+Run `pnpm db:migrate:deploy` before serving the new application. The custom production server also runs migrations at startup and fails closed if they fail. Railway web and controller start commands run migrations explicitly before serving. Remove obsolete provider variables from Railway after the cutover, and verify login, logout, recovery and existing-user data on the public origin. See [production operations](docs/PRODUCTION.md) for the live web/controller setup and release checks.
 
 ## Live tutoring preview
 
