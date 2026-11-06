@@ -1,61 +1,51 @@
-# SchoolScope Little Discoveries design QA
+# Little Ripple site branding QA
 
-Date: 6 November 2026 (Australia/Sydney)
+Date: 7 November 2026 (Australia/Sydney)
 
-## Comparison target and evidence
+## Visual truth and scope
 
-- Source visual truth: `/Users/tomhegarty/.codex/generated_images/01a1af18-341b-7d91-8670-b64731977f3b/exec-245a731d-050e-48dd-9ed0-14fd1aacf39c.png` (the third displayed homepage concept selected by the user).
-- Source pixels: 1487 × 1058.
-- Browser: Codex in-app browser, localhost:3000, signed-in homepage, light theme, page at top with pointer moved away from navigation.
-- Desktop CSS viewport: 1487 × 1058, devicePixelRatio 1. Browser screenshot content: 1472 × 1047, normalized by about 1.0102 to 1487 × 1058 for the comparison; no device chrome was added.
-- Initial capture: `/Users/tomhegarty/.codex/visualizations/2026/11/06/01a1af18-341b-7d91-8670-b64731977f3b/option-3/home-desktop-initial.png`.
-- Final capture: `/Users/tomhegarty/.codex/visualizations/2026/11/06/01a1af18-341b-7d91-8670-b64731977f3b/option-3/home-desktop-final.png`.
-- Full-view side-by-side comparison, source left and implementation right: `option-3/comparison-final.png` in the same evidence directory above.
-- Focused hero copy comparison, source left and implementation right: `option-3/comparison-hero-copy.png` in the same evidence directory.
-- Phone evidence: `option-3/home-phone.png` at 390 × 844 and `option-3/home-narrow.png` at 320 × 740.
+Selected logo: first displayed concept, Little Ripple, at `/Users/tomhegarty/.codex/generated_images/01a1b29d-e4c1-7cd0-a0b9-c10ff77a5484/exec-a26294c3-5f3c-439a-bea4-b7bed982a01c.png` (1536 × 1024). The existing Little Discoveries homepage supplies the site layout, typography and warm palette. The concept board is a logo reference, not a replacement website layout.
 
-The source and implementation were opened together in each combined comparison input. The focused hero comparison checked headline wrapping, paragraph line breaks, the primary action and preview notice. The full view checked the illustration, hero proportions, shared navigation and lower school/calendar rows.
+The transparent derived mark is `public/brand/ripple-master.png`; the optimised mark is `public/brand/ripple-mark.png`. Both preserve the smiling bulb, purple base, golden rays and pink tongue. The wordmark uses live Nunito text so it stays sharp and accessible at small sizes.
 
-## Comparison history
+## Browser evidence
 
-1. Initial result: blocked. [P2] The hero paragraph wrapped after “work” rather than “you”, and the main copy sat slightly higher than the selected composition. Reduced desktop paragraph width to 575px and adjusted hero vertical padding while preserving its overall height.
-2. Final comparison: the paragraph now has the selected line breaks; the hero, action and artwork retain the intended hierarchy. Both phone widths preserve readable two-line headlines, visible preview wording, a full-width primary action, compact artwork and the persistent navigation. No horizontal overflow was measured (390 viewport / 375 content; 320 viewport / 307 content).
+Evidence root: `/Users/tomhegarty/Documents/ChatGPT/School Scope/output/releases/little-ripple-20261107/`.
+
+- `homepage-desktop.png`: final homepage, desktop CSS viewport 1440 × 1024, full-page pixels 1425 × 1374, density 1. The 15px difference is the browser scrollbar; no stretching or density normalization applied.
+- `homepage-mobile.png`, `homepage-narrow.png`: phone layout at 375 × 812 and 320 × 740; the latter includes the final shared footer. DOM content widths 360 and 305 respectively; no horizontal overflow.
+- `schools-desktop.png`, `schools-mobile.png`: shared school-search surfaces and logo, 1280 × 720 default desktop viewport and 375 × 812 phone viewport.
+- `sign-in-mobile.png`: final loaded Google/email controls, 375 × 812, 360 × 1267 full-page pixels, density 1. Purple primary computed as `#7046d4`.
+- `tutor-mobile.png`: adult tutor setup, consistent mark, Nunito and cream/purple palette.
+- `privacy-mobile.png`: readable legal content, shared header/footer.
+- `logo-comparison.png`: source logo top and browser-rendered header crop bottom, composed together for direct comparison. Interface logo uses a smaller mark-to-wordmark ratio for header legibility; that adaptation is intentional. The header crop is enlarged for inspection, so screenshot interpolation is visible; the actual interface uses the high-resolution asset.
 
 ## Required fidelity surfaces
 
-- Fonts/typography: variable Nunito provides the rounded heavy display and readable body treatment. Headline, button, support headings and disclosure remain real selectable text. The two-line heading and paragraph hierarchy match the selected direction. Small residual glyph-shape differences from the generated mock are P3.
-- Spacing/layout rhythm: white shared header, full-width cream hero, approximately equal copy/art tracks, large primary action, and two lower actions with a light divider reproduce the source composition. Phones stack the content and school/calendar rows and retain safe-area navigation spacing.
-- Colours/tokens: cream and yellow hero field, lavender accents, purple CTA, plum foreground, mint school icon and peach calendar icon follow the source. The wave is a generated raster asset, not a CSS drawing.
-- Image quality/asset fidelity: the bespoke transparent Ripple/fraction asset was generated from the selected reference, placed at its natural ratio and delivered through Next Image. Exactly two of four equal tiles are shaded. Caption remains in the illustration and has equivalent accessible alt text. The separate wave background follows the source. The shared logo and standard UI icons remain the existing icon components, with no custom SVG approximations.
-- Copy/content: selected headline, tutor description, primary action, adult-preview/fictional-learner wording, lower school/calendar actions and community line are retained. Privacy, terms and state directory links remain available below the composition in a compact footer.
+- Typography: Nunito loaded at the root; computed body family confirmed. Rounded heavy headings and SchoolScope wordmark remain legible on desktop and phone. The root font removes the former homepage/Inter split.
+- Spacing/layout: consistent shared desktop and mobile header sizing, rounded controls and restrained borders. Phone content and bottom navigation stay contained at 320 and 375 CSS px. Compact tutor navigation remains purpose-specific.
+- Colours/tokens: purple `#7046d4`, plum `#342248`, cream `#fff9e6`/`#fffcf3`. SDK auth forms explicitly use the same purple even when remote branding or OS colour preference supplies another colour. Semantic success, error and warning colours remain distinct.
+- Image quality: transparent generated mark is optimised from the approved reference, displayed with contain sizing. Existing homepage illustration is preserved. No handcrafted substitute art. Matching favicon, Apple icon and Open Graph image use the same mark.
+- Copy/content: SchoolScope name retained, homepage copy retained, state-directory links preserved, adult-preview language retained. Legal body text is unchanged.
 
-## Interactions and checks
+## Comparison history
 
-- Meet Ripple opens the existing adult-demo setup; it does not request microphone access or create a lesson from the homepage.
-- Signed-in calendar points to the dashboard; guest calendar points to sign-in. Schools and shared navigation retain their original routes.
-- Actual authentication/profile controls remain in the shared header, with active navigation, keyboard focus and labelled buttons.
-- Tutor lesson review, hints, chat, notes and worksheet panels were checked in the preceding shared-design pass. The current integration gate passed 10 unit checks, 10 isolated database checks and 12 real-AI public API checks. Synthetic voice verification received a full spoken explanation, a delegated canvas update and a saved summary without using a real microphone.
-- Production build, TypeScript and anonymous/forged-session authentication smoke passed.
-- Browser console was inspected: development Fast Refresh messages only, no console errors in the homepage review.
+1. Initial review identified cooler global colours, Inter on inner pages, old school-building brand marks and duplicated footers. Replaced company marks through the shared component; retained school icons for school-specific content.
+2. During isolated-release validation, three school routes were missing their updated footer from the snapshot. Added them to the explicit release manifest and confirmed the shared footer in the browser. Added all eight state links to the shared footer.
+3. Loaded authentication controls initially inherited a blue SDK primary. Added scoped effective-colour variables; final screenshot and computed primary show `#7046d4` and white button text.
+4. Final full-view and focused-logo review: no actionable P0/P1/P2 visual findings on the verified public and authentication surfaces.
 
-## Findings
+## Validation and limits
 
-No actionable P0, P1 or P2 design mismatches remain.
-
-## Open questions
-
-None blocking. The phone layout is a responsive adaptation of the selected desktop concept rather than a separately supplied phone mockup.
+- Isolated release TypeScript and production build passed.
+- Existing tutor unit tests: 10 passed.
+- Authentication smoke passed: native config, anonymous/forged sessions, protected dashboard redirect, admin allowlist, cross-origin rejection.
+- Browser: school search for Sydney returned 71 schools; navigation, phone layout and fully loaded sign-in controls verified. Events correctly redirects anonymous users to sign-in. No console errors in the checked browser state.
+- Authenticated dashboard, children forms and admin screens use the updated shared styles/components but were not visually exercised with a signed-in account. No user data or account mutations were performed.
+- The main checkout has unrelated curriculum changes and test errors. The branding-only snapshot excludes them and passed its own build/typecheck. No curriculum/database/controller changes belong to this release.
 
 ## Follow-up polish
 
-[P3] Generated illustration details and precise glyph shapes vary slightly from the raster concept. Existing logo/account controls are retained as functional components. A compact legal/state footer is intentionally available below the reference's initial viewport.
-
-## Implementation checklist
-
-- [x] Exact selected concept resolved and inspected.
-- [x] Custom assets generated, inspected and placed in the project.
-- [x] Desktop and two phone widths captured and checked.
-- [x] Full and focused source/implementation comparisons completed after fixes.
-- [x] Navigation, preview gate, real tutor integration and build checks passed.
+None required for this branding release. Authenticated screen walkthrough remains an explicit coverage gap.
 
 final result: passed

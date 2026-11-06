@@ -157,7 +157,7 @@ export default function UsersPage() {
                   placeholder="Search users by name or email..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-violet-500 focus:border-violet-500"
                 />
               </div>
             </div>
@@ -165,7 +165,7 @@ export default function UsersPage() {
               <select
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="px-4 py-2 border border-gray-300 rounded-md focus:ring-violet-500 focus:border-violet-500"
               >
                 <option value="all">All Users</option>
                 <option value="subscribed">Subscribed</option>
@@ -176,9 +176,9 @@ export default function UsersPage() {
 
           {/* Bulk Actions */}
           {selectedUsers.length > 0 && (
-            <div className="mt-4 p-4 bg-blue-50 rounded-md">
+            <div className="mt-4 p-4 bg-violet-50 rounded-md">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-blue-700">
+                <span className="text-sm text-violet-700">
                   {selectedUsers.length} users selected
                 </span>
                 <div className="flex gap-2">
@@ -196,7 +196,7 @@ export default function UsersPage() {
                   </button>
                   <button
                     onClick={() => bulkUpdateUsers({ isAdmin: true })}
-                    className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                    className="px-3 py-1 bg-violet-600 text-white text-sm rounded hover:bg-violet-700"
                   >
                     Make Admin
                   </button>
@@ -209,7 +209,7 @@ export default function UsersPage() {
         {/* Users Table */}
         <div className="bg-white shadow rounded-lg overflow-hidden">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="bg-background">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   <input
@@ -243,7 +243,7 @@ export default function UsersPage() {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {users.map((user) => (
-                <tr key={user.id} className="hover:bg-gray-50">
+                <tr key={user.id} className="hover:bg-background">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <input
                       type="checkbox"
@@ -254,7 +254,7 @@ export default function UsersPage() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">
-                        <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center">
+                        <div className="h-10 w-10 rounded-full bg-violet-500 flex items-center justify-center">
                           <span className="text-sm font-medium text-white">
                             {user.name?.[0] || user.email[0].toUpperCase()}
                           </span>
@@ -313,7 +313,7 @@ export default function UsersPage() {
                         className={`px-3 py-1 text-xs rounded ${
                           user.isAdmin
                             ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                            : 'bg-violet-100 text-violet-700 hover:bg-violet-200'
                         }`}
                       >
                         {user.isAdmin ? 'Remove Admin' : 'Make Admin'}
@@ -342,10 +342,10 @@ export default function UsersPage() {
         {pagination && pagination.pages > 1 && (
           <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 rounded-lg shadow">
             <div className="flex-1 flex justify-between sm:hidden">
-              <button className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+              <button className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-background">
                 Previous
               </button>
-              <button className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+              <button className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-background">
                 Next
               </button>
             </div>

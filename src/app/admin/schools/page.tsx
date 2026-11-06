@@ -134,7 +134,7 @@ export default function SchoolsPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <School className="h-6 w-6 text-blue-600" />
+            <School className="h-6 w-6 text-violet-600" />
             <h1 className="text-2xl font-bold text-gray-900">Schools Management</h1>
           </div>
           <div className="flex items-center gap-3">
@@ -143,7 +143,7 @@ export default function SchoolsPage() {
             </span>
             <button
               onClick={() => router.push('/admin/schools/add')}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              className="px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700"
             >
               Add School
             </button>
@@ -161,14 +161,14 @@ export default function SchoolsPage() {
                   placeholder="Search schools by name, city, or postcode..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-violet-500 focus:border-violet-500"
                 />
               </div>
             </div>
             <select
               value={selectedState}
               onChange={(e) => setSelectedState(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              className="px-4 py-2 border border-gray-300 rounded-md focus:ring-violet-500 focus:border-violet-500"
             >
               <option value="">All States</option>
               {australianStates.map(state => (
@@ -226,7 +226,7 @@ export default function SchoolsPage() {
                     </button>
                     <button
                       onClick={() => router.push(`/admin/schools/${school.id}/edit`)}
-                      className="p-2 text-gray-400 hover:text-blue-600"
+                      className="p-2 text-gray-400 hover:text-violet-600"
                       title="Edit school"
                     >
                       <Edit className="h-4 w-4" />
@@ -264,7 +264,7 @@ export default function SchoolsPage() {
             <div className="mt-6">
               <button
                 onClick={() => router.push('/admin/schools/add')}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                className="px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700"
               >
                 Add School
               </button>
@@ -276,7 +276,7 @@ export default function SchoolsPage() {
         <div className="grid gap-4 md:grid-cols-4">
           <div className="bg-white p-6 rounded-lg shadow">
             <div className="flex items-center">
-              <School className="h-8 w-8 text-blue-600" />
+              <School className="h-8 w-8 text-violet-600" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-500">Total Schools</p>
                 <p className="text-2xl font-semibold text-gray-900">{schools.length}</p>

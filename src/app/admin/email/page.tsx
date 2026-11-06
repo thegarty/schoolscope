@@ -145,7 +145,7 @@ export default function EmailManagementPage() {
             <div className="bg-white p-6 rounded-lg shadow">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <Users className="h-8 w-8 text-blue-600" />
+                  <Users className="h-8 w-8 text-violet-600" />
                 </div>
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-500">Total Users</p>
@@ -198,7 +198,7 @@ export default function EmailManagementPage() {
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Delivery Statistics (Last 30 Days)</h2>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               {Object.entries(emailStats.deliveryStats).map(([type, count]) => (
-                <div key={type} className="text-center p-4 bg-gray-50 rounded-lg">
+                <div key={type} className="text-center p-4 bg-background rounded-lg">
                   <div className="text-2xl font-bold text-gray-900">{count}</div>
                   <div className="text-sm text-gray-600 capitalize">{type.toLowerCase()}</div>
                 </div>
@@ -210,7 +210,7 @@ export default function EmailManagementPage() {
         {/* Test Email Section */}
         <div className="bg-white p-6 rounded-lg shadow">
           <div className="flex items-center mb-4">
-            <Send className="h-5 w-5 text-blue-600 mr-2" />
+            <Send className="h-5 w-5 text-violet-600 mr-2" />
             <h2 className="text-lg font-semibold text-gray-900">Send Test Email</h2>
           </div>
           
@@ -221,7 +221,7 @@ export default function EmailManagementPage() {
                 <select
                   value={testEmail.type}
                   onChange={(e) => setTestEmail({ ...testEmail, type: e.target.value })}
-                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-violet-500 focus:border-violet-500"
                 >
                   <option value="welcome">Welcome Email</option>
                   <option value="event">Event Notification</option>
@@ -235,7 +235,7 @@ export default function EmailManagementPage() {
                   value={testEmail.email}
                   onChange={(e) => setTestEmail({ ...testEmail, email: e.target.value })}
                   placeholder="test@example.com"
-                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-violet-500 focus:border-violet-500"
                 />
               </div>
             </div>
@@ -248,7 +248,7 @@ export default function EmailManagementPage() {
                     type="text"
                     value={testEmail.subject}
                     onChange={(e) => setTestEmail({ ...testEmail, subject: e.target.value })}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-violet-500 focus:border-violet-500"
                   />
                 </div>
                 <div>
@@ -258,7 +258,7 @@ export default function EmailManagementPage() {
                     onChange={(e) => setTestEmail({ ...testEmail, html: e.target.value })}
                     placeholder="Leave empty for default test email content"
                     rows={6}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-violet-500 focus:border-violet-500"
                   />
                 </div>
               </div>
@@ -271,7 +271,7 @@ export default function EmailManagementPage() {
                   type="text"
                   value={testEmail.name}
                   onChange={(e) => setTestEmail({ ...testEmail, name: e.target.value })}
-                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-violet-500 focus:border-violet-500"
                 />
               </div>
             )}
@@ -284,7 +284,7 @@ export default function EmailManagementPage() {
                     type="text"
                     value={testEmail.eventTitle}
                     onChange={(e) => setTestEmail({ ...testEmail, eventTitle: e.target.value })}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-violet-500 focus:border-violet-500"
                   />
                 </div>
                 <div>
@@ -293,7 +293,7 @@ export default function EmailManagementPage() {
                     type="text"
                     value={testEmail.schoolName}
                     onChange={(e) => setTestEmail({ ...testEmail, schoolName: e.target.value })}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-violet-500 focus:border-violet-500"
                   />
                 </div>
               </div>
@@ -302,7 +302,7 @@ export default function EmailManagementPage() {
             <button
               onClick={sendTestEmail}
               disabled={!testEmail.email || testEmailLoading}
-              className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium"
+              className="w-full bg-violet-600 text-white py-3 px-4 rounded-md hover:bg-violet-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium"
             >
               {testEmailLoading ? 'Sending...' : 'Send Test Email'}
             </button>
@@ -315,7 +315,7 @@ export default function EmailManagementPage() {
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Recent Email Events</h2>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+                <thead className="bg-background">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Email
@@ -333,7 +333,7 @@ export default function EmailManagementPage() {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {emailStats.recentEvents.slice(0, 10).map((event) => (
-                    <tr key={event.id} className="hover:bg-gray-50">
+                    <tr key={event.id} className="hover:bg-background">
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {event.email}
                       </td>
@@ -372,15 +372,15 @@ export default function EmailManagementPage() {
         <div className="bg-white p-6 rounded-lg shadow">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            <button className="p-4 border border-gray-300 rounded-lg hover:bg-gray-50 text-left">
+            <button className="p-4 border border-gray-300 rounded-lg hover:bg-background text-left">
               <div className="font-medium text-gray-900">Email Templates</div>
               <div className="text-sm text-gray-500">Manage email templates</div>
             </button>
-            <button className="p-4 border border-gray-300 rounded-lg hover:bg-gray-50 text-left">
+            <button className="p-4 border border-gray-300 rounded-lg hover:bg-background text-left">
               <div className="font-medium text-gray-900">Notification Settings</div>
               <div className="text-sm text-gray-500">Configure email notifications</div>
             </button>
-            <button className="p-4 border border-gray-300 rounded-lg hover:bg-gray-50 text-left">
+            <button className="p-4 border border-gray-300 rounded-lg hover:bg-background text-left">
               <div className="font-medium text-gray-900">Bulk Email</div>
               <div className="text-sm text-gray-500">Send emails to multiple users</div>
             </button>

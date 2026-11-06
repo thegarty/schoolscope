@@ -11,7 +11,7 @@ export default function SystemDatabasePage() {
     <AdminLayout user={currentUser}>
       <div className="space-y-6">
         <div className="flex items-center gap-3">
-          <Database className="h-6 w-6 text-blue-600" />
+          <Database className="h-6 w-6 text-violet-600" />
           <h1 className="text-2xl font-bold text-gray-900">Database Management</h1>
         </div>
 

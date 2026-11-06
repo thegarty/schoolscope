@@ -11,7 +11,7 @@ export default function EmailNotificationsPage() {
     <AdminLayout user={currentUser}>
       <div className="space-y-6">
         <div className="flex items-center gap-3">
-          <Bell className="h-6 w-6 text-blue-600" />
+          <Bell className="h-6 w-6 text-violet-600" />
           <h1 className="text-2xl font-bold text-gray-900">Email Notifications</h1>
         </div>
 

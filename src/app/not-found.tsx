@@ -1,29 +1,14 @@
+import AppHeader from '@/components/AppHeader'
+import AppFooter from '@/components/AppFooter'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { School, Home, Search } from 'lucide-react'
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center">
-              <School className="h-8 w-8 text-blue-600 mr-3" />
-              <Link href="/" className="text-2xl font-bold text-gray-900">SchoolScope</Link>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Button asChild variant="outline">
-                <Link href="/schools">Browse Schools</Link>
-              </Button>
-              <Button asChild variant="outline">
-                <Link href="/">Home</Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <AppHeader />
 
       {/* Main Content */}
       <main className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
@@ -56,7 +41,7 @@ export default function NotFound() {
           <div className="mt-8 pt-8 border-t border-gray-200">
             <p className="text-sm text-gray-500">
               Looking for a specific school? Try our{' '}
-              <Link href="/schools" className="text-blue-600 hover:text-blue-500 underline">
+              <Link href="/schools" className="text-violet-600 hover:text-violet-500 underline">
                 school search
               </Link>{' '}
               to find what you need.
@@ -66,15 +51,7 @@ export default function NotFound() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <p className="text-sm text-gray-500">
-              © 2026 SchoolScope. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
+      <AppFooter />
     </div>
   )
 } 

@@ -1,2 +1,3 @@
+import AuthShell from '@/components/AuthShell'
 import { ForgotPassword } from '@allauth/react'
-export default function Page() { return <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4"><ForgotPassword /></div> }
+export default function Page() { return <AuthShell title="Let’s get you back in" description="We’ll help you reset your password."><ForgotPassword /></AuthShell> }

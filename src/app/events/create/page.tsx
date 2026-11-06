@@ -1,3 +1,5 @@
+import AppHeader from '@/components/AppHeader'
+import AppFooter from '@/components/AppFooter'
 import { redirect } from 'next/navigation'
 import { validateRequest } from '@/lib/auth'
 import { db } from '@/lib/db'
@@ -141,7 +143,8 @@ export default async function CreateEventPage() {
   )
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <><AppHeader user={user} />
+    <div className="min-h-screen bg-background py-8">
       <div className="max-w-2xl mx-auto px-4">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900">Create Event</h1>
@@ -164,5 +167,6 @@ export default async function CreateEventPage() {
         </Card>
       </div>
     </div>
+    <AppFooter /></>
   )
 } 

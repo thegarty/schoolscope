@@ -1,3 +1,5 @@
+import AppHeader from '@/components/AppHeader'
+import AppFooter from '@/components/AppFooter'
 import { notFound } from 'next/navigation'
 import { db } from '@/lib/db'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -155,43 +157,23 @@ export default async function SchoolEventsPage({ params, searchParams }: SchoolE
   })
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center">
-              <School className="h-8 w-8 text-blue-600 mr-3" />
-              <Link href="/" className="text-2xl font-bold text-gray-900">SchoolScope</Link>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Button asChild variant="outline">
-                <Link href={`/schools/${slug}`}>
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back to School
-                </Link>
-              </Button>
-              <Button asChild variant="outline">
-                <Link href="/dashboard">Dashboard</Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <AppHeader />
 
       {/* School Header */}
-      <section className="bg-blue-600 text-white py-8">
+      <section className="bg-violet-600 text-white py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center mb-4">
             <Link 
               href={`/schools/${slug}`}
-              className="text-blue-200 hover:text-white mr-4"
+              className="text-violet-200 hover:text-white mr-4"
             >
               <ArrowLeft className="h-5 w-5" />
             </Link>
             <div>
               <h1 className="text-3xl font-bold">{school.name} Events</h1>
-              <div className="flex items-center text-blue-100 mt-2">
+              <div className="flex items-center text-violet-100 mt-2">
                 <MapPin className="h-4 w-4 mr-2" />
                 <span>{school.suburb}, {school.state} {school.postcode}</span>
                 <span className="mx-2">•</span>
@@ -319,7 +301,7 @@ export default async function SchoolEventsPage({ params, searchParams }: SchoolE
                   key={p}
                   href={`?category=${encodeURIComponent(category)}&confirmed=${encodeURIComponent(confirmed)}&page=${p}`}
                   className={`px-3 py-1 rounded-md border ${
-                    p === page ? 'bg-blue-600 text-white' : 'bg-white text-blue-600'
+                    p === page ? 'bg-violet-600 text-white' : 'bg-white text-violet-600'
                   }`}
                 >
                   {p}
@@ -331,87 +313,7 @@ export default async function SchoolEventsPage({ params, searchParams }: SchoolE
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
-        <div className="container px-4 md:px-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {/* Brand */}
-            <div className="md:col-span-1">
-              <div className="flex items-center mb-4">
-                <School className="h-6 w-6 mr-2" />
-                <span className="font-bold text-xl">SchoolScope</span>
-              </div>
-              <p className="text-gray-400 text-sm">
-                Connecting Australian school communities through events, calendars, and information sharing.
-              </p>
-            </div>
-
-            {/* Schools by State */}
-            <div>
-              <h3 className="font-semibold mb-4">Schools by State</h3>
-              <div className="space-y-2">
-                <Link href="/schools/state/nsw" className="block text-sm text-gray-400 hover:text-white transition-colors">
-                  New South Wales Schools
-                </Link>
-                <Link href="/schools/state/vic" className="block text-sm text-gray-400 hover:text-white transition-colors">
-                  Victoria Schools
-                </Link>
-                <Link href="/schools/state/qld" className="block text-sm text-gray-400 hover:text-white transition-colors">
-                  Queensland Schools
-                </Link>
-                <Link href="/schools/state/wa" className="block text-sm text-gray-400 hover:text-white transition-colors">
-                  Western Australia Schools
-                </Link>
-              </div>
-            </div>
-
-            <div>
-              <h3 className="font-semibold mb-4">More States</h3>
-              <div className="space-y-2">
-                <Link href="/schools/state/sa" className="block text-sm text-gray-400 hover:text-white transition-colors">
-                  South Australia Schools
-                </Link>
-                <Link href="/schools/state/tas" className="block text-sm text-gray-400 hover:text-white transition-colors">
-                  Tasmania Schools
-                </Link>
-                <Link href="/schools/state/nt" className="block text-sm text-gray-400 hover:text-white transition-colors">
-                  Northern Territory Schools
-                </Link>
-                <Link href="/schools/state/act" className="block text-sm text-gray-400 hover:text-white transition-colors">
-                  ACT Schools
-                </Link>
-              </div>
-            </div>
-
-            {/* Quick Links */}
-            <div>
-              <h3 className="font-semibold mb-4">Quick Links</h3>
-              <div className="space-y-2">
-                <Link href="/schools" className="block text-sm text-gray-400 hover:text-white transition-colors">
-                  Browse All Schools
-                </Link>
-                <Link href="/register" className="block text-sm text-gray-400 hover:text-white transition-colors">
-                  Join SchoolScope
-                </Link>
-                <Link href="/privacy" className="block text-sm text-gray-400 hover:text-white transition-colors">
-                  Privacy Policy
-                </Link>
-                <Link href="/terms" className="block text-sm text-gray-400 hover:text-white transition-colors">
-                  Terms of Service
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center">
-            <p className="text-xs text-gray-400">
-              © 2026 SchoolScope. All rights reserved.
-            </p>
-            <p className="text-xs text-gray-400 mt-2 sm:mt-0">
-              Connecting 10,000+ Australian schools nationwide
-            </p>
-          </div>
-        </div>
-      </footer>
+      <AppFooter />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(eventsJsonLd) }}

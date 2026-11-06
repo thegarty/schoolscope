@@ -155,7 +155,7 @@ export default function BannedUsersPage() {
               placeholder="Search by email or reason..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-violet-500 focus:border-violet-500"
             />
           </div>
         </div>
@@ -163,7 +163,7 @@ export default function BannedUsersPage() {
         {/* Banned Emails Table */}
         <div className="bg-white shadow rounded-lg overflow-hidden">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="bg-background">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Email Address
@@ -184,7 +184,7 @@ export default function BannedUsersPage() {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredEmails.map((emailEvent) => (
-                <tr key={emailEvent.id} className="hover:bg-gray-50">
+                <tr key={emailEvent.id} className="hover:bg-background">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">

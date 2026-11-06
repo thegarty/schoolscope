@@ -137,7 +137,7 @@ export default function SchoolAutocomplete({
             <li
               key={school.id}
               className={`px-3 py-2 cursor-pointer ${
-                results[highlightedIndex]?.id === school.id ? 'bg-blue-100' : 'hover:bg-blue-50'
+                results[highlightedIndex]?.id === school.id ? 'bg-violet-100' : 'hover:bg-violet-50'
               }`}
               onMouseDown={() => selectSchool(school)}
             >
@@ -155,7 +155,7 @@ export default function SchoolAutocomplete({
       {selected && (
         <button
           type="button"
-          className="text-xs text-blue-600 mt-1 underline"
+          className="text-xs text-violet-600 mt-1 underline"
           onClick={() => {
             setSelected(null)
             setIsOpen(false)

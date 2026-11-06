@@ -1,3 +1,4 @@
+import AppFooter from '@/components/AppFooter'
 import { db } from '@/lib/db'
 import { validateRequest } from '@/lib/auth'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -265,87 +266,7 @@ export default async function BrowseSchoolsPage({
       </main>
 
       {/* Footer */}
-      <footer className="bg-white text-foreground border-t border-border py-10">
-        <div className="container px-4 md:px-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {/* Brand */}
-            <div className="md:col-span-1">
-              <div className="flex items-center mb-4">
-                <School className="h-6 w-6 mr-2" />
-                <span className="font-bold text-xl">SchoolScope</span>
-              </div>
-              <p className="text-muted-foreground text-sm">
-                Connecting Australian school communities through events, calendars, and information sharing.
-              </p>
-            </div>
-
-            {/* Schools by State */}
-            <div>
-              <h3 className="font-semibold mb-4">Schools by State</h3>
-              <div className="space-y-2">
-                <Link href="/schools/state/nsw" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">
-                  New South Wales Schools
-                </Link>
-                <Link href="/schools/state/vic" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">
-                  Victoria Schools
-                </Link>
-                <Link href="/schools/state/qld" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">
-                  Queensland Schools
-                </Link>
-                <Link href="/schools/state/wa" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">
-                  Western Australia Schools
-                </Link>
-              </div>
-            </div>
-
-            <div>
-              <h3 className="font-semibold mb-4">More States</h3>
-              <div className="space-y-2">
-                <Link href="/schools/state/sa" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">
-                  South Australia Schools
-                </Link>
-                <Link href="/schools/state/tas" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">
-                  Tasmania Schools
-                </Link>
-                <Link href="/schools/state/nt" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">
-                  Northern Territory Schools
-                </Link>
-                <Link href="/schools/state/act" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">
-                  ACT Schools
-                </Link>
-              </div>
-            </div>
-
-            {/* Quick Links */}
-            <div>
-              <h3 className="font-semibold mb-4">Quick Links</h3>
-              <div className="space-y-2">
-                <Link href="/schools" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">
-                  Browse All Schools
-                </Link>
-                <Link href="/register" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">
-                  Join SchoolScope
-                </Link>
-                <Link href="/privacy" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">
-                  Privacy Policy
-                </Link>
-                <Link href="/terms" className="flex items-center min-h-11 text-sm text-muted-foreground hover:text-primary transition-colors">
-                  Terms of Service
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          <div className="border-t border-border mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center">
-            <p className="text-xs text-muted-foreground">
-              © 2026 SchoolScope. All rights reserved.
-            </p>
-            <p className="text-xs text-muted-foreground mt-2 sm:mt-0">
-              Connecting 10,000+ Australian schools nationwide
-            </p>
-          </div>
-        </div>
-      </footer>
+      <AppFooter />
     </div>
   )
 } 

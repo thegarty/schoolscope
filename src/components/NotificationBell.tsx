@@ -119,7 +119,7 @@ export default function NotificationBell() {
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case 'EVENT_CONFIRMATION':
-        return <Calendar className="h-4 w-4 text-blue-600" />
+        return <Calendar className="h-4 w-4 text-violet-600" />
       case 'SCHOOL_EDIT_VOTE':
         return <Vote className="h-4 w-4 text-purple-600" />
       case 'UPCOMING_EVENT':
@@ -136,9 +136,9 @@ export default function NotificationBell() {
       case 'medium':
         return 'border-l-yellow-500 bg-yellow-50'
       case 'low':
-        return 'border-l-blue-500 bg-blue-50'
+        return 'border-l-violet-500 bg-violet-50'
       default:
-        return 'border-l-gray-500 bg-gray-50'
+        return 'border-l-gray-500 bg-background'
     }
   }
 
@@ -277,7 +277,7 @@ export default function NotificationBell() {
           </div>
 
           {notifications.length > 0 && (
-            <div className="p-3 border-t border-gray-200 bg-gray-50">
+            <div className="p-3 border-t border-gray-200 bg-background">
               <div className="flex justify-between">
                 <Link href="/dashboard">
                   <Button size="sm" variant="outline" className="text-xs">

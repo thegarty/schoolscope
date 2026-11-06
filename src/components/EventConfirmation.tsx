@@ -71,7 +71,7 @@ export default function EventConfirmation({
   // Private events don't need confirmation UI since they're automatically confirmed
   if (isPrivate) {
     return (
-      <div className="flex items-center text-sm text-blue-600">
+      <div className="flex items-center text-sm text-violet-600">
         <CheckCircle className="h-4 w-4 mr-1" />
         <span>Personal Event</span>
       </div>

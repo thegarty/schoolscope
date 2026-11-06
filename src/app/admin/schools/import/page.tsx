@@ -105,7 +105,7 @@ export default function SchoolImportPage() {
           </div>
           <button
             onClick={downloadTemplate}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center gap-2"
+            className="px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700 flex items-center gap-2"
           >
             <Download className="h-4 w-4" />
             Download Template
@@ -113,15 +113,15 @@ export default function SchoolImportPage() {
         </div>
 
         {/* Instructions */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <div className="bg-violet-50 border border-violet-200 rounded-lg p-6">
           <div className="flex items-start gap-3">
-            <FileText className="h-6 w-6 text-blue-600 mt-0.5" />
+            <FileText className="h-6 w-6 text-violet-600 mt-0.5" />
             <div>
-              <h3 className="text-lg font-medium text-blue-900 mb-2">CSV Import Instructions</h3>
-              <div className="text-sm text-blue-800 space-y-2">
+              <h3 className="text-lg font-medium text-violet-900 mb-2">CSV Import Instructions</h3>
+              <div className="text-sm text-violet-800 space-y-2">
                 <p>• Download the template CSV file to see the required format</p>
-                <p>• Required columns: <code className="bg-blue-100 px-1 rounded">name</code></p>
-                <p>• Optional columns: <code className="bg-blue-100 px-1 rounded">address, suburb, state, postcode, phone, email, website</code></p>
+                <p>• Required columns: <code className="bg-violet-100 px-1 rounded">name</code></p>
+                <p>• Optional columns: <code className="bg-violet-100 px-1 rounded">address, suburb, state, postcode, phone, email, website</code></p>
                 <p>• Each school name must be unique</p>
                 <p>• State should be one of: NSW, VIC, QLD, WA, SA, TAS, ACT, NT</p>
               </div>
@@ -155,7 +155,7 @@ export default function SchoolImportPage() {
                 />
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  className="px-6 py-3 bg-violet-600 text-white rounded-md hover:bg-violet-700"
                 >
                   {file ? 'Choose Different File' : 'Select CSV File'}
                 </button>
@@ -168,7 +168,7 @@ export default function SchoolImportPage() {
                 <h4 className="text-md font-medium text-gray-900 mb-3">File Preview</h4>
                 <div className="overflow-x-auto">
                   <table className="min-w-full border border-gray-200 rounded-lg">
-                    <thead className="bg-gray-50">
+                    <thead className="bg-background">
                       <tr>
                                                  {preview[0]?.map((header: string, index: number) => (
                            <th key={index} className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
@@ -179,7 +179,7 @@ export default function SchoolImportPage() {
                     </thead>
                     <tbody className="divide-y divide-gray-200">
                       {preview.slice(1).map((row, rowIndex) => (
-                        <tr key={rowIndex} className="hover:bg-gray-50">
+                        <tr key={rowIndex} className="hover:bg-background">
                                                      {row.map((cell: string, cellIndex: number) => (
                              <td key={cellIndex} className="px-4 py-2 text-sm text-gray-900">
                                {cell}

@@ -1,3 +1,5 @@
+import AppHeader from '@/components/AppHeader'
+import AppFooter from '@/components/AppFooter'
 import { redirect } from 'next/navigation'
 import { validateRequest } from '@/lib/auth'
 import { db } from '@/lib/db'
@@ -54,7 +56,8 @@ export default async function AddChildPage({
   const preselected = schoolId ? await getSchoolById(schoolId) : null
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
+    <><AppHeader user={user} />
+    <div className="min-h-screen flex items-center justify-center bg-background py-12 px-4">
       <div className="max-w-md w-full">
         <Card>
           <CardHeader>
@@ -103,5 +106,6 @@ export default async function AddChildPage({
         </Card>
       </div>
     </div>
+    <AppFooter /></>
   )
 } 

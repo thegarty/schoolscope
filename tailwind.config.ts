@@ -19,6 +19,7 @@ const config = {
     },
     extend: {
       colors: {
+        violet: { 50: "#f5efff", 100: "#e9ddff", 200: "#d4bfff", 300: "#b79aef", 400: "#9670e3", 500: "#8057dc", 600: "#7046d4", 700: "#5e36bc", 800: "#4e2d98", 900: "#3e2576", 950: "#2b1754" },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

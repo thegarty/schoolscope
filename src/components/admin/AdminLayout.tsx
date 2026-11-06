@@ -1,16 +1,17 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
+import Link from 'next/link'
+import { SchoolScopeBrand } from '@/components/SchoolScopeBrand';
 import { usePathname } from 'next/navigation';
-import { 
-  BarChart3, 
-  Users, 
-  School, 
-  Calendar, 
-  Mail, 
-  Settings, 
-  ChevronDown, 
+import {
+  BarChart3,
+  Users,
+  School,
+  Calendar,
+  Mail,
+  Settings,
+  ChevronDown,
   ChevronRight,
   Home,
   UserCheck,
@@ -101,14 +102,14 @@ function MenuItem({ item, level = 0 }: { item: MenuItem; level?: number }) {
   const pathname = usePathname();
   const isActive = item.href === pathname;
   const hasChildren = item.children && item.children.length > 0;
-  
+
   // Check if any child is active to keep parent menu open
-  const hasActiveChild = hasChildren && item.children!.some(child => 
+  const hasActiveChild = hasChildren && item.children!.some(child =>
     child.href === pathname
   );
-  
+
   const [isOpen, setIsOpen] = useState(hasActiveChild);
-  
+
   // Update isOpen when pathname changes and this item has an active child
   React.useEffect(() => {
     if (hasActiveChild) {
@@ -131,7 +132,7 @@ function MenuItem({ item, level = 0 }: { item: MenuItem; level?: number }) {
           href={item.href}
           className={`flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-colors ${
             isActive
-              ? 'bg-blue-100 text-blue-700 border-r-2 border-blue-600'
+              ? 'bg-violet-100 text-violet-700 border-r-2 border-violet-600'
               : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
           } ${level > 0 ? 'ml-6 pl-8' : ''}`}
         >
@@ -142,8 +143,8 @@ function MenuItem({ item, level = 0 }: { item: MenuItem; level?: number }) {
         <button
           onClick={handleClick}
           className={`flex items-center w-full px-3 py-2.5 text-sm font-medium rounded-lg transition-colors ${
-            hasActiveChild 
-              ? 'text-blue-700 bg-blue-50' 
+            hasActiveChild
+              ? 'text-violet-700 bg-violet-50'
               : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
           } ${level > 0 ? 'ml-6 pl-8' : ''}`}
         >
@@ -176,16 +177,11 @@ export default function AdminLayout({ children, user }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Sidebar */}
       <div className="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-center h-16 px-4 bg-blue-600 flex-shrink-0">
-          <Link href="/admin" className="flex items-center">
-            <School className="h-8 w-8 text-white mr-2" />
-            <span className="text-xl font-bold text-white">Admin Panel</span>
-          </Link>
-        </div>
+        <div className="scope-admin-brand flex items-center justify-center px-4 flex-shrink-0"><SchoolScopeBrand href="/admin" subtitle="Administration" /></div>
 
         {/* Navigation - Scrollable */}
         <nav className="flex-1 overflow-y-auto px-3 py-4">
@@ -198,7 +194,7 @@ export default function AdminLayout({ children, user }: AdminLayoutProps) {
         <div className="flex-shrink-0 p-4 border-t border-gray-200 bg-white">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center">
+              <div className="h-8 w-8 rounded-full bg-violet-500 flex items-center justify-center">
                 <span className="text-sm font-medium text-white">
                   {user?.name?.[0] || user?.email?.[0] || 'A'}
                 </span>
@@ -231,4 +227,4 @@ export default function AdminLayout({ children, user }: AdminLayoutProps) {
       </div>
     </div>
   );
-} 
+}

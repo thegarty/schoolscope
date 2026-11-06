@@ -138,7 +138,7 @@ export default function SubscriptionsPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Mail className="h-6 w-6 text-blue-600" />
+            <Mail className="h-6 w-6 text-violet-600" />
             <h1 className="text-2xl font-bold text-gray-900">Email Subscriptions</h1>
           </div>
         </div>
@@ -196,14 +196,14 @@ export default function SubscriptionsPage() {
                   placeholder="Search users by name or email..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-violet-500 focus:border-violet-500"
                 />
               </div>
             </div>
             <select
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              className="px-4 py-2 border border-gray-300 rounded-md focus:ring-violet-500 focus:border-violet-500"
             >
               <option value="all">All Users</option>
               <option value="subscribed">Subscribed</option>
@@ -213,9 +213,9 @@ export default function SubscriptionsPage() {
 
           {/* Bulk Actions */}
           {selectedUsers.length > 0 && (
-            <div className="mt-4 p-4 bg-blue-50 rounded-md">
+            <div className="mt-4 p-4 bg-violet-50 rounded-md">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-blue-700">
+                <span className="text-sm text-violet-700">
                   {selectedUsers.length} users selected
                 </span>
                 <div className="flex gap-2">
@@ -240,7 +240,7 @@ export default function SubscriptionsPage() {
         {/* Users Table */}
         <div className="bg-white shadow rounded-lg overflow-hidden">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="bg-background">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   <input
@@ -274,7 +274,7 @@ export default function SubscriptionsPage() {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {users.map((user) => (
-                <tr key={user.id} className="hover:bg-gray-50">
+                <tr key={user.id} className="hover:bg-background">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <input
                       type="checkbox"
@@ -285,7 +285,7 @@ export default function SubscriptionsPage() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">
-                        <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center">
+                        <div className="h-10 w-10 rounded-full bg-violet-500 flex items-center justify-center">
                           <span className="text-sm font-medium text-white">
                             {user.name?.[0] || user.email[0].toUpperCase()}
                           </span>
@@ -314,7 +314,7 @@ export default function SubscriptionsPage() {
                         {user.emailSubscribed ? 'Subscribed' : 'Unsubscribed'}
                       </span>
                       {user.emailVerified && (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-violet-100 text-violet-800">
                           Verified
                         </span>
                       )}

@@ -146,7 +146,7 @@ export default function SchoolInfoEditor({ school, pendingEdits, currentUserId }
       <Card className="border-slate-200 shadow-sm">
         <CardContent className="space-y-4 p-6">
           {!isAuthenticated && (
-            <div className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-800">
+            <div className="rounded-lg border border-violet-200 bg-violet-50 px-3 py-2 text-sm text-violet-800">
               Viewing is public. <a href="/login" className="underline hover:no-underline">Log in</a> to suggest edits or vote on changes.
             </div>
           )}

@@ -1,3 +1,5 @@
+import AppHeader from '@/components/AppHeader'
+import AppFooter from '@/components/AppFooter'
 import { redirect, notFound } from 'next/navigation'
 import { validateRequest } from '@/lib/auth'
 import { db } from '@/lib/db'
@@ -111,7 +113,8 @@ export default async function EditChildPage({ params }: EditChildPageProps) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
+    <><AppHeader user={user} />
+    <div className="min-h-screen flex items-center justify-center bg-background py-12 px-4">
       <div className="max-w-md w-full">
         <Card>
           <CardHeader>
@@ -127,5 +130,6 @@ export default async function EditChildPage({ params }: EditChildPageProps) {
         </Card>
       </div>
     </div>
+    <AppFooter /></>
   )
 } 

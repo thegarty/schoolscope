@@ -1,18 +1,16 @@
+import AppFooter from '@/components/AppFooter'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Nunito } from 'next/font/google'
 import { CalendarDays, ChevronRight, School, Users } from 'lucide-react'
 import AppHeader from '@/components/AppHeader'
 import { validateRequest } from '@/lib/auth'
 import './home.css'
 
-const nunito = Nunito({ subsets: ['latin'], display: 'swap', variable: '--font-discovery' })
-const states = [['nsw', 'New South Wales'], ['vic', 'Victoria'], ['qld', 'Queensland'], ['wa', 'Western Australia'], ['sa', 'South Australia'], ['tas', 'Tasmania'], ['nt', 'Northern Territory'], ['act', 'ACT']]
 
 export default async function HomePage() {
   const { user } = await validateRequest()
   return (
-    <div className={`${nunito.variable} scope-discovery`}>
+    <div className="scope-discovery">
       <AppHeader user={user} />
       <main id="main-content">
         <section className="discovery-hero" aria-labelledby="discovery-title">
@@ -46,10 +44,7 @@ export default async function HomePage() {
           <p className="discovery-community"><Users size={25} aria-hidden="true" />Made for Australian school communities.</p>
         </section>
       </main>
-      <footer className="discovery-footer">
-        <details><summary>Find schools by state</summary><nav aria-label="Schools by state">{states.map(([slug, name]) => <Link key={slug} href={`/schools/state/${slug}`}>{name}</Link>)}</nav></details>
-        <div className="discovery-legal"><span>© 2026 SchoolScope</span><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link></div>
-      </footer>
+      <AppFooter />
     </div>
   )
 }

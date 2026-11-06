@@ -322,7 +322,7 @@ export default function SchoolEnrichmentPage() {
           </div>
         </div>
         {discoveryMessage && (
-          <div className="bg-blue-50 border border-blue-200 text-blue-900 rounded-md px-4 py-3 text-sm">
+          <div className="bg-violet-50 border border-violet-200 text-violet-900 rounded-md px-4 py-3 text-sm">
             {discoveryMessage}
           </div>
         )}
@@ -424,7 +424,7 @@ export default function SchoolEnrichmentPage() {
                       href={source.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-700 hover:text-blue-900 hover:underline break-all"
+                      className="text-violet-700 hover:text-violet-900 hover:underline break-all"
                     >
                       {source.url}
                     </a>
@@ -481,7 +481,7 @@ export default function SchoolEnrichmentPage() {
                     {proposal.existingValue && (
                       <p className="text-xs text-red-600 mt-2">Current: {proposal.existingValue}</p>
                     )}
-                    <pre className="text-xs text-gray-700 whitespace-pre-wrap mt-2 bg-gray-50 p-2 rounded">
+                    <pre className="text-xs text-gray-700 whitespace-pre-wrap mt-2 bg-background p-2 rounded">
                       {typeof proposal.proposedValue === 'string'
                         ? proposal.proposedValue
                         : JSON.stringify(proposal.proposedValue, null, 2)}

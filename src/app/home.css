@@ -132,3 +132,7 @@
   .discovery-action-copy h3 { font-size: 20px; }
   .discovery-action-copy p { font-size: 13px; }
 }
+
+/* Use the same approved Ripple logo as the rest of SchoolScope. */
+.scope-discovery .scope-brand-mark { background: transparent; border-radius: 0; height: 62px; }
+@media(max-width:767px) { .scope-discovery .scope-brand-mark { height: 46px; } }

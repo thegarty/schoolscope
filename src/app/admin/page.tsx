@@ -206,7 +206,7 @@ export default function AdminDashboard() {
           <div className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <Users className="h-8 w-8 text-blue-600" />
+                <Users className="h-8 w-8 text-violet-600" />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-500">Total Users</p>
@@ -241,7 +241,7 @@ export default function AdminDashboard() {
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-500">Email Events</p>
                 <p className="text-2xl font-semibold text-gray-900">{stats?.email.totalEvents || 0}</p>
-                <p className="text-xs text-blue-600">
+                <p className="text-xs text-violet-600">
                   {stats?.email.deliveries || 0} delivered
                 </p>
               </div>
@@ -273,9 +273,9 @@ export default function AdminDashboard() {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               <Link
                 href="/admin/users"
-                className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-background transition-colors"
               >
-                <Users className="h-8 w-8 text-blue-600 mr-3" />
+                <Users className="h-8 w-8 text-violet-600 mr-3" />
                 <div>
                   <h3 className="font-medium text-gray-900">Manage Users</h3>
                   <p className="text-sm text-gray-500">View and edit user accounts</p>
@@ -284,7 +284,7 @@ export default function AdminDashboard() {
 
               <Link
                 href="/admin/schools/add"
-                className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-background transition-colors"
               >
                 <Plus className="h-8 w-8 text-green-600 mr-3" />
                 <div>
@@ -295,7 +295,7 @@ export default function AdminDashboard() {
 
               <Link
                 href="/admin/email/test"
-                className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-background transition-colors"
               >
                 <Send className="h-8 w-8 text-purple-600 mr-3" />
                 <div>
@@ -306,7 +306,7 @@ export default function AdminDashboard() {
 
               <Link
                 href="/admin/system/settings"
-                className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-background transition-colors"
               >
                 <Settings className="h-8 w-8 text-gray-600 mr-3" />
                 <div>
@@ -325,7 +325,7 @@ export default function AdminDashboard() {
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-gray-900">User Statistics</h2>
-                <Link href="/admin/users" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                <Link href="/admin/users" className="text-violet-600 hover:text-violet-700 text-sm font-medium">
                   View All →
                 </Link>
               </div>
@@ -365,7 +365,7 @@ export default function AdminDashboard() {
                   </div>
                   <div className="text-right">
                     <span className="text-lg font-semibold">{stats?.users.admins || 0}</span>
-                    <Link href="/admin/users/admins" className="text-blue-600 hover:text-blue-700 text-sm ml-2">
+                    <Link href="/admin/users/admins" className="text-violet-600 hover:text-violet-700 text-sm ml-2">
                       Manage
                     </Link>
                   </div>
@@ -379,7 +379,7 @@ export default function AdminDashboard() {
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-gray-900">Email System Health</h2>
-                <Link href="/admin/email" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                <Link href="/admin/email" className="text-violet-600 hover:text-violet-700 text-sm font-medium">
                   View Details →
                 </Link>
               </div>
@@ -434,7 +434,7 @@ export default function AdminDashboard() {
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-gray-900">Schools by State</h2>
-                <Link href="/admin/schools" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                <Link href="/admin/schools" className="text-violet-600 hover:text-violet-700 text-sm font-medium">
                   Manage Schools →
                 </Link>
               </div>
@@ -461,7 +461,7 @@ export default function AdminDashboard() {
                   <p>No schools registered yet</p>
                   <Link 
                     href="/admin/schools/add"
-                    className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                    className="text-violet-600 hover:text-violet-700 text-sm font-medium"
                   >
                     Add the first school
                   </Link>
@@ -475,7 +475,7 @@ export default function AdminDashboard() {
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-gray-900">Recent Email Activity</h2>
-                <Link href="/admin/email" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                <Link href="/admin/email" className="text-violet-600 hover:text-violet-700 text-sm font-medium">
                   View All →
                 </Link>
               </div>
@@ -490,7 +490,7 @@ export default function AdminDashboard() {
                           event.eventType === 'DELIVERY' ? 'bg-green-500' :
                           event.eventType === 'BOUNCE' ? 'bg-orange-500' :
                           event.eventType === 'COMPLAINT' ? 'bg-red-500' :
-                          'bg-gray-500'
+                          'bg-background0'
                         }`} />
                         <div className="min-w-0 flex-1">
                           <p className="text-sm font-medium text-gray-900 truncate">{event.email}</p>

@@ -21,7 +21,7 @@ export default function TestEmailPage() {
     <AdminLayout user={currentUser}>
       <div className="space-y-6">
         <div className="flex items-center gap-3">
-          <Send className="h-6 w-6 text-blue-600" />
+          <Send className="h-6 w-6 text-violet-600" />
           <h1 className="text-2xl font-bold text-gray-900">Test Email</h1>
         </div>
 

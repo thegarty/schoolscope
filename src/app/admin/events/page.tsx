@@ -309,7 +309,7 @@ export default function EventsPage() {
                         {event.title}
                       </h3>
                       {getStatusBadge(event)}
-                      <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded">
+                      <span className="px-2 py-1 text-xs font-medium bg-violet-100 text-violet-800 rounded">
                         {event.category}
                       </span>
                     </div>
@@ -385,7 +385,7 @@ export default function EventsPage() {
                     )}
                     <button
                       onClick={() => router.push(`/events/${event.id}`)}
-                      className="p-2 text-gray-400 hover:text-blue-600"
+                      className="p-2 text-gray-400 hover:text-violet-600"
                       title="View event"
                     >
                       <Eye className="h-4 w-4" />
@@ -466,7 +466,7 @@ export default function EventsPage() {
           </div>
           <div className="bg-white p-6 rounded-lg shadow">
             <div className="flex items-center">
-              <Users className="h-8 w-8 text-blue-600" />
+              <Users className="h-8 w-8 text-violet-600" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-500">Total Confirmations</p>
                 <p className="text-2xl font-semibold text-gray-900">

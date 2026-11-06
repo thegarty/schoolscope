@@ -183,7 +183,7 @@ export default function EditSchoolPage() {
               <ArrowLeft className="h-5 w-5" />
             </button>
             <div className="flex items-center gap-3">
-              <School className="h-6 w-6 text-blue-600" />
+              <School className="h-6 w-6 text-violet-600" />
               <h1 className="text-2xl font-bold text-gray-900">Edit School</h1>
             </div>
           </div>
@@ -207,7 +207,7 @@ export default function EditSchoolPage() {
 
         {/* School Info */}
         {school && (
-          <div className="bg-gray-50 rounded-lg p-4">
+          <div className="bg-background rounded-lg p-4">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-lg font-medium text-gray-900">{school.name}</h2>
@@ -238,7 +238,7 @@ export default function EditSchoolPage() {
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-violet-500 focus:border-violet-500"
                     placeholder="Enter school name"
                   />
                 </div>
@@ -251,7 +251,7 @@ export default function EditSchoolPage() {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-violet-500 focus:border-violet-500"
                     placeholder="school@example.com"
                   />
                 </div>
@@ -271,7 +271,7 @@ export default function EditSchoolPage() {
                     name="address"
                     value={formData.address}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-violet-500 focus:border-violet-500"
                     placeholder="123 School Street"
                   />
                 </div>
@@ -285,7 +285,7 @@ export default function EditSchoolPage() {
                       name="city"
                       value={formData.city}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-violet-500 focus:border-violet-500"
                       placeholder="Sydney"
                     />
                   </div>
@@ -297,7 +297,7 @@ export default function EditSchoolPage() {
                       name="state"
                       value={formData.state}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-violet-500 focus:border-violet-500"
                     >
                       <option value="">Select State</option>
                       {australianStates.map(state => (
@@ -314,7 +314,7 @@ export default function EditSchoolPage() {
                       name="postcode"
                       value={formData.postcode}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-violet-500 focus:border-violet-500"
                       placeholder="2000"
                     />
                   </div>
@@ -335,7 +335,7 @@ export default function EditSchoolPage() {
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-violet-500 focus:border-violet-500"
                     placeholder="(02) 1234 5678"
                   />
                 </div>
@@ -348,7 +348,7 @@ export default function EditSchoolPage() {
                     name="website"
                     value={formData.website}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-violet-500 focus:border-violet-500"
                     placeholder="https://school.edu.au"
                   />
                 </div>
@@ -369,7 +369,7 @@ export default function EditSchoolPage() {
                     value={formData.aboutSummary}
                     onChange={handleChange}
                     maxLength={180}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-violet-500 focus:border-violet-500"
                     placeholder="Short summary used for SEO and snippets"
                   />
                 </div>
@@ -382,7 +382,7 @@ export default function EditSchoolPage() {
                     value={formData.aboutContent}
                     onChange={handleChange}
                     rows={5}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-violet-500 focus:border-violet-500"
                     placeholder="Long-form school description"
                   />
                 </div>
@@ -401,7 +401,7 @@ export default function EditSchoolPage() {
               <button
                 type="submit"
                 disabled={saving || !formData.name}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 flex items-center gap-2"
+                className="px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700 disabled:bg-gray-400 flex items-center gap-2"
               >
                 <Save className="h-4 w-4" />
                 {saving ? 'Saving...' : 'Save Changes'}

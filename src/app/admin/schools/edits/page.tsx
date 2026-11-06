@@ -143,7 +143,7 @@ export default function SchoolEditsPage() {
                 onClick={() => setFilter(status)}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                   filter === status
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-violet-600 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -199,7 +199,7 @@ export default function SchoolEditsPage() {
                       </div>
 
                       {/* Changes Preview */}
-                      <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                      <div className="bg-background rounded-lg p-4 mb-4">
                         <h4 className="text-sm font-medium text-gray-900 mb-2">Proposed Changes:</h4>
                         <div className="space-y-2 text-sm">
                           <div className="flex">
@@ -215,9 +215,9 @@ export default function SchoolEditsPage() {
                       </div>
 
                       {edit.reason && (
-                        <div className="bg-blue-50 rounded-lg p-3 mb-4">
-                          <h4 className="text-sm font-medium text-blue-900 mb-1">Reason for Edit:</h4>
-                          <p className="text-sm text-blue-800">{edit.reason}</p>
+                        <div className="bg-violet-50 rounded-lg p-3 mb-4">
+                          <h4 className="text-sm font-medium text-violet-900 mb-1">Reason for Edit:</h4>
+                          <p className="text-sm text-violet-800">{edit.reason}</p>
                         </div>
                       )}
                     </div>
@@ -293,7 +293,7 @@ export default function SchoolEditsPage() {
           </div>
           <div className="bg-white p-6 rounded-lg shadow">
             <div className="flex items-center">
-              <Edit className="h-8 w-8 text-blue-600" />
+              <Edit className="h-8 w-8 text-violet-600" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-500">Total Requests</p>
                 <p className="text-2xl font-semibold text-gray-900">{edits.length}</p>

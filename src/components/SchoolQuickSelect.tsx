@@ -36,7 +36,7 @@ export default function SchoolQuickSelect({ schools }: SchoolQuickSelectProps) {
           <button
             key={school.id}
             type="button"
-            className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded hover:bg-blue-200 transition-colors"
+            className="text-xs bg-violet-100 text-violet-800 px-2 py-1 rounded hover:bg-violet-200 transition-colors"
             onClick={() => handleSchoolSelect(school)}
           >
             {school.name}
