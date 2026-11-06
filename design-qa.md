@@ -49,3 +49,7 @@ Evidence root: `/Users/tomhegarty/Documents/ChatGPT/School Scope/output/releases
 None required for this branding release. Authenticated screen walkthrough remains an explicit coverage gap.
 
 final result: passed
+
+## Logo lockup alignment — 7 November 2026
+
+Owner clarified that the requested symmetry concerns the bulb and wordmark together. Original image assets are unchanged. Reduced the mark size and spacing, contained the image inside its layout box, and aligned the complete mark with the wordmark. Local browser measurements confirmed a shared vertical centre at 46px on desktop and 37.5px on phone; the image no longer extends below its container. Evidence: `logo-alignment-local-desktop.png` and `logo-alignment-local-mobile.png` in the release evidence root. Branding-only production build passed. No application logic changed.

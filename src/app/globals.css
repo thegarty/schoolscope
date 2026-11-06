@@ -210,7 +210,7 @@
 }
 
 /* Little Ripple: shared visual foundations for every route. */
-.scope-brand-mark { width: 48px; height: 56px; border-radius: 0; flex-shrink: 0; }
+.scope-brand-mark { width: 40px; height: 48px; border-radius: 0; flex-shrink: 0; }
 .scope-brand-mark img { width: 100%; height: 100%; object-fit: contain; }
 .scope-brand-name { font-weight: 900; font-size: 26px; letter-spacing: -1px; }
 .scope-header-inner { min-height: 92px; }
@@ -248,8 +248,8 @@ h1,h2,h3 { font-weight: 800; }
 .allauth-auth-card { width: min(100%, 32rem); }
 /* Match the homepage navigation on every shared header. */
 .scope-header-inner { max-width:1487px; padding:16px 68px; gap:24px; }
-.scope-header .scope-brand { gap:12px; }
-.scope-header .scope-brand-mark { width:54px; height:62px; }
+.scope-header .scope-brand { gap:9px; }
+.scope-header .scope-brand-mark { width:48px; height:54px; }
 .scope-header .scope-brand-name { font-size:32px; }
 .scope-desktop-nav { gap:14px; }
 .scope-desktop-nav a { font-size:20px; padding:12px 16px; gap:10px; min-height:58px; border-radius:20px; }
@@ -265,7 +265,7 @@ h1,h2,h3 { font-weight: 800; }
 @media(min-width:768px) and (max-width:1000px) {
  .scope-header-inner { padding-inline:24px; gap:16px; }
  .scope-header .scope-brand-name { font-size:23px; }
- .scope-header .scope-brand-mark { width:44px; height:52px; }
+ .scope-header .scope-brand-mark { width:40px; height:46px; }
  .scope-desktop-nav a { font-size:14px; padding-inline:8px; gap:6px; }
  .scope-desktop-nav svg { width:19px; height:19px; }
  .scope-header-actions { gap:8px; }
@@ -274,7 +274,7 @@ h1,h2,h3 { font-weight: 800; }
  .scope-header-inner { min-height:78px; padding:14px 18px; gap:10px; }
  .scope-header .scope-brand { gap:8px; }
  .scope-header .scope-brand-name { font-size:20px; letter-spacing:-.8px; }
- .scope-header .scope-brand-mark { width:39px; height:46px; }
+ .scope-header .scope-brand-mark { width:34px; height:40px; }
  .scope-header-actions { gap:8px; }
 }
 @media(max-width:360px) { .scope-header .scope-brand-name { font-size:16px; } .scope-header-actions { gap:5px; } }

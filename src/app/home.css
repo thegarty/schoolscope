@@ -9,8 +9,8 @@
 }
 .scope-discovery .scope-header { border-bottom: 0; }
 .scope-discovery .scope-header-inner { max-width: 1487px; min-height: 92px; padding: 16px 68px; gap: 24px; }
-.scope-discovery .scope-brand { gap: 12px; }
-.scope-discovery .scope-brand-mark { width: 54px; height: 54px; border-radius: 17px; }
+.scope-discovery .scope-brand { gap: 9px; }
+.scope-discovery .scope-brand-mark { width: 48px; height: 54px; border-radius: 0; }
 .scope-discovery .scope-brand-mark svg { width: 31px; height: 31px; }
 .scope-discovery .scope-brand-name { font-size: 32px; font-weight: 900; letter-spacing: -1px; }
 .scope-discovery .scope-desktop-nav { gap: 14px; }
@@ -71,7 +71,7 @@
 @media (min-width: 768px) and (max-width: 1000px) {
   .scope-discovery .scope-header-inner { padding-inline: 24px; gap: 16px; }
   .scope-discovery .scope-brand-name { font-size: 23px; }
-  .scope-discovery .scope-brand-mark { width: 44px; height: 44px; }
+  .scope-discovery .scope-brand-mark { width: 40px; height: 46px; }
   .scope-discovery .scope-desktop-nav a { font-size: 14px; padding-inline: 8px; gap: 6px; }
   .scope-discovery .scope-desktop-nav svg { width: 19px; height: 19px; }
   .scope-discovery .scope-header-actions { gap: 8px; }
@@ -92,7 +92,7 @@
 @media (max-width: 767px) {
   .scope-discovery .scope-header-inner { min-height: 75px; padding: 14px 18px; gap: 10px; }
   .scope-discovery .scope-brand { gap: 8px; }
-  .scope-discovery .scope-brand-mark { width: 39px; height: 39px; border-radius: 13px; }
+  .scope-discovery .scope-brand-mark { width: 34px; height: 40px; border-radius: 13px; }
   .scope-discovery .scope-brand-mark svg { width: 24px; height: 24px; }
   .scope-discovery .scope-brand-name { font-size: 20px; letter-spacing: -.8px; }
   .scope-discovery .scope-header-actions { gap: 8px; }
@@ -134,5 +134,5 @@
 }
 
 /* Use the same approved Ripple logo as the rest of SchoolScope. */
-.scope-discovery .scope-brand-mark { background: transparent; border-radius: 0; height: 62px; }
-@media(max-width:767px) { .scope-discovery .scope-brand-mark { height: 46px; } }
+.scope-discovery .scope-brand-mark { background: transparent; border-radius: 0; height: 54px; }
+@media(max-width:767px) { .scope-discovery .scope-brand-mark { height: 40px; } }
