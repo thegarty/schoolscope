@@ -52,7 +52,7 @@ model School {
 
 model User {
   id        String    @id @default(cuid())
-  clerkId   String?   @unique
+  allauthId String?   @unique
   email     String    @unique
   name      String?
   password  String?
@@ -343,4 +343,82 @@ enum SchoolSourceDiscoveryStatus {
   RUNNING
   COMPLETED
   FAILED
+}
+
+model TutoringSession {
+  id String @id @default(cuid())
+  parentId String?
+  childId String?
+  visitorHash String?
+  ipHash String?
+  mode String
+  status String @default("active")
+  context Json
+  workspace Json @default("[]")
+  revision Int @default(0)
+  sequence Int @default(0)
+  backendCalls Int @default(0)
+  escalations Int @default(0)
+  backendCostMicros Int @default(0)
+  voiceSeconds Float @default(0)
+  liveId String?
+  finalUsageKnown Boolean @default(false)
+  summary Json?
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  retainedUntil DateTime
+  lastHeartbeat DateTime @default(now())
+  closedAt DateTime?
+  events TutoringEvent[]
+  attachments TutoringAttachment[]
+  reservation TutoringReservation?
+  @@index([parentId, createdAt])
+  @@index([visitorHash, createdAt])
+  @@index([status, expiresAt])
+  @@map("tutoring_sessions")
+}
+
+model TutoringEvent {
+  id String @id @default(cuid())
+  sessionId String
+  seq Int
+  operationId String
+  type String
+  payload Json
+  createdAt DateTime @default(now())
+  session TutoringSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  @@unique([sessionId, seq])
+  @@unique([sessionId, operationId])
+  @@map("tutoring_events")
+}
+
+model TutoringAttachment {
+  id String @id @default(cuid())
+  sessionId String
+  name String
+  key String @unique
+  mime String
+  size Int
+  pages Int @default(0)
+  createdAt DateTime @default(now())
+  session TutoringSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  @@map("tutoring_attachments")
+}
+
+model TutoringReservation {
+  id String @id @default(cuid())
+  sessionId String? @unique
+  day String
+  reservedMicros Int @default(1000000)
+  settledMicros Int?
+  session TutoringSession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  @@index([day])
+  @@map("tutoring_reservations")
+}
+
+model TutoringControl {
+  id String @id
+  disabled Boolean @default(false)
+  updatedAt DateTime @updatedAt
+  @@map("tutoring_controls")
 }

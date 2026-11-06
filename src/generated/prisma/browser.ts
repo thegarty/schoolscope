@@ -82,3 +82,28 @@ export type SchoolEditVote = Prisma.SchoolEditVoteModel
  * 
  */
 export type EmailEvent = Prisma.EmailEventModel
+/**
+ * Model TutoringSession
+ * 
+ */
+export type TutoringSession = Prisma.TutoringSessionModel
+/**
+ * Model TutoringEvent
+ * 
+ */
+export type TutoringEvent = Prisma.TutoringEventModel
+/**
+ * Model TutoringAttachment
+ * 
+ */
+export type TutoringAttachment = Prisma.TutoringAttachmentModel
+/**
+ * Model TutoringReservation
+ * 
+ */
+export type TutoringReservation = Prisma.TutoringReservationModel
+/**
+ * Model TutoringControl
+ * 
+ */
+export type TutoringControl = Prisma.TutoringControlModel

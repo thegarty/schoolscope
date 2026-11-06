@@ -1,0 +1,12 @@
+FROM node:24.13.0-bookworm-slim
+RUN apt-get update && apt-get install -y --no-install-recommends openssl ca-certificates && rm -rf /var/lib/apt/lists/* && npm install -g pnpm@10.24.0
+WORKDIR /app
+COPY package.json pnpm-lock.yaml .npmrc ./
+COPY vendor ./vendor
+RUN pnpm install --frozen-lockfile
+COPY . .
+ENV TUTOR_PUBLIC_ENABLED=true
+RUN DATABASE_URL=postgresql://build:build@127.0.0.1:5432/build NEXT_PUBLIC_APP_URL=https://tutor-web-preview.up.railway.app pnpm build
+ENV NODE_ENV=production
+EXPOSE 3000
+CMD ["pnpm","exec","next","start","--hostname","0.0.0.0","--port","3000"]

@@ -396,7 +396,12 @@ export const ModelName = {
   SchoolSourceDiscoveryRun: 'SchoolSourceDiscoveryRun',
   SchoolEdit: 'SchoolEdit',
   SchoolEditVote: 'SchoolEditVote',
-  EmailEvent: 'EmailEvent'
+  EmailEvent: 'EmailEvent',
+  TutoringSession: 'TutoringSession',
+  TutoringEvent: 'TutoringEvent',
+  TutoringAttachment: 'TutoringAttachment',
+  TutoringReservation: 'TutoringReservation',
+  TutoringControl: 'TutoringControl'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -412,7 +417,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "school" | "user" | "child" | "event" | "eventConfirmation" | "schoolSource" | "schoolEnrichmentRun" | "schoolEnrichmentProposal" | "schoolAboutVersion" | "schoolSourceDiscoveryRun" | "schoolEdit" | "schoolEditVote" | "emailEvent"
+    modelProps: "school" | "user" | "child" | "event" | "eventConfirmation" | "schoolSource" | "schoolEnrichmentRun" | "schoolEnrichmentProposal" | "schoolAboutVersion" | "schoolSourceDiscoveryRun" | "schoolEdit" | "schoolEditVote" | "emailEvent" | "tutoringSession" | "tutoringEvent" | "tutoringAttachment" | "tutoringReservation" | "tutoringControl"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1378,6 +1383,376 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    TutoringSession: {
+      payload: Prisma.$TutoringSessionPayload<ExtArgs>
+      fields: Prisma.TutoringSessionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TutoringSessionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringSessionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TutoringSessionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringSessionPayload>
+        }
+        findFirst: {
+          args: Prisma.TutoringSessionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringSessionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TutoringSessionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringSessionPayload>
+        }
+        findMany: {
+          args: Prisma.TutoringSessionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringSessionPayload>[]
+        }
+        create: {
+          args: Prisma.TutoringSessionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringSessionPayload>
+        }
+        createMany: {
+          args: Prisma.TutoringSessionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TutoringSessionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringSessionPayload>[]
+        }
+        delete: {
+          args: Prisma.TutoringSessionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringSessionPayload>
+        }
+        update: {
+          args: Prisma.TutoringSessionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringSessionPayload>
+        }
+        deleteMany: {
+          args: Prisma.TutoringSessionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TutoringSessionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TutoringSessionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringSessionPayload>[]
+        }
+        upsert: {
+          args: Prisma.TutoringSessionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringSessionPayload>
+        }
+        aggregate: {
+          args: Prisma.TutoringSessionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTutoringSession>
+        }
+        groupBy: {
+          args: Prisma.TutoringSessionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TutoringSessionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TutoringSessionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TutoringSessionCountAggregateOutputType> | number
+        }
+      }
+    }
+    TutoringEvent: {
+      payload: Prisma.$TutoringEventPayload<ExtArgs>
+      fields: Prisma.TutoringEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TutoringEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TutoringEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringEventPayload>
+        }
+        findFirst: {
+          args: Prisma.TutoringEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TutoringEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringEventPayload>
+        }
+        findMany: {
+          args: Prisma.TutoringEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringEventPayload>[]
+        }
+        create: {
+          args: Prisma.TutoringEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringEventPayload>
+        }
+        createMany: {
+          args: Prisma.TutoringEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TutoringEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringEventPayload>[]
+        }
+        delete: {
+          args: Prisma.TutoringEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringEventPayload>
+        }
+        update: {
+          args: Prisma.TutoringEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.TutoringEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TutoringEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TutoringEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.TutoringEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringEventPayload>
+        }
+        aggregate: {
+          args: Prisma.TutoringEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTutoringEvent>
+        }
+        groupBy: {
+          args: Prisma.TutoringEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TutoringEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TutoringEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TutoringEventCountAggregateOutputType> | number
+        }
+      }
+    }
+    TutoringAttachment: {
+      payload: Prisma.$TutoringAttachmentPayload<ExtArgs>
+      fields: Prisma.TutoringAttachmentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TutoringAttachmentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringAttachmentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TutoringAttachmentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringAttachmentPayload>
+        }
+        findFirst: {
+          args: Prisma.TutoringAttachmentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringAttachmentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TutoringAttachmentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringAttachmentPayload>
+        }
+        findMany: {
+          args: Prisma.TutoringAttachmentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringAttachmentPayload>[]
+        }
+        create: {
+          args: Prisma.TutoringAttachmentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringAttachmentPayload>
+        }
+        createMany: {
+          args: Prisma.TutoringAttachmentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TutoringAttachmentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringAttachmentPayload>[]
+        }
+        delete: {
+          args: Prisma.TutoringAttachmentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringAttachmentPayload>
+        }
+        update: {
+          args: Prisma.TutoringAttachmentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringAttachmentPayload>
+        }
+        deleteMany: {
+          args: Prisma.TutoringAttachmentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TutoringAttachmentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TutoringAttachmentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringAttachmentPayload>[]
+        }
+        upsert: {
+          args: Prisma.TutoringAttachmentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringAttachmentPayload>
+        }
+        aggregate: {
+          args: Prisma.TutoringAttachmentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTutoringAttachment>
+        }
+        groupBy: {
+          args: Prisma.TutoringAttachmentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TutoringAttachmentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TutoringAttachmentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TutoringAttachmentCountAggregateOutputType> | number
+        }
+      }
+    }
+    TutoringReservation: {
+      payload: Prisma.$TutoringReservationPayload<ExtArgs>
+      fields: Prisma.TutoringReservationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TutoringReservationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringReservationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TutoringReservationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringReservationPayload>
+        }
+        findFirst: {
+          args: Prisma.TutoringReservationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringReservationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TutoringReservationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringReservationPayload>
+        }
+        findMany: {
+          args: Prisma.TutoringReservationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringReservationPayload>[]
+        }
+        create: {
+          args: Prisma.TutoringReservationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringReservationPayload>
+        }
+        createMany: {
+          args: Prisma.TutoringReservationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TutoringReservationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringReservationPayload>[]
+        }
+        delete: {
+          args: Prisma.TutoringReservationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringReservationPayload>
+        }
+        update: {
+          args: Prisma.TutoringReservationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringReservationPayload>
+        }
+        deleteMany: {
+          args: Prisma.TutoringReservationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TutoringReservationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TutoringReservationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringReservationPayload>[]
+        }
+        upsert: {
+          args: Prisma.TutoringReservationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringReservationPayload>
+        }
+        aggregate: {
+          args: Prisma.TutoringReservationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTutoringReservation>
+        }
+        groupBy: {
+          args: Prisma.TutoringReservationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TutoringReservationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TutoringReservationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TutoringReservationCountAggregateOutputType> | number
+        }
+      }
+    }
+    TutoringControl: {
+      payload: Prisma.$TutoringControlPayload<ExtArgs>
+      fields: Prisma.TutoringControlFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TutoringControlFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringControlPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TutoringControlFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringControlPayload>
+        }
+        findFirst: {
+          args: Prisma.TutoringControlFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringControlPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TutoringControlFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringControlPayload>
+        }
+        findMany: {
+          args: Prisma.TutoringControlFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringControlPayload>[]
+        }
+        create: {
+          args: Prisma.TutoringControlCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringControlPayload>
+        }
+        createMany: {
+          args: Prisma.TutoringControlCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TutoringControlCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringControlPayload>[]
+        }
+        delete: {
+          args: Prisma.TutoringControlDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringControlPayload>
+        }
+        update: {
+          args: Prisma.TutoringControlUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringControlPayload>
+        }
+        deleteMany: {
+          args: Prisma.TutoringControlDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TutoringControlUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TutoringControlUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringControlPayload>[]
+        }
+        upsert: {
+          args: Prisma.TutoringControlUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutoringControlPayload>
+        }
+        aggregate: {
+          args: Prisma.TutoringControlAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTutoringControl>
+        }
+        groupBy: {
+          args: Prisma.TutoringControlGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TutoringControlGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TutoringControlCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TutoringControlCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1455,7 +1830,7 @@ export type SchoolScalarFieldEnum = (typeof SchoolScalarFieldEnum)[keyof typeof 
 
 export const UserScalarFieldEnum = {
   id: 'id',
-  clerkId: 'clerkId',
+  allauthId: 'allauthId',
   email: 'email',
   name: 'name',
   password: 'password',
@@ -1655,6 +2030,82 @@ export const EmailEventScalarFieldEnum = {
 } as const
 
 export type EmailEventScalarFieldEnum = (typeof EmailEventScalarFieldEnum)[keyof typeof EmailEventScalarFieldEnum]
+
+
+export const TutoringSessionScalarFieldEnum = {
+  id: 'id',
+  parentId: 'parentId',
+  childId: 'childId',
+  visitorHash: 'visitorHash',
+  ipHash: 'ipHash',
+  mode: 'mode',
+  status: 'status',
+  context: 'context',
+  workspace: 'workspace',
+  revision: 'revision',
+  sequence: 'sequence',
+  backendCalls: 'backendCalls',
+  escalations: 'escalations',
+  backendCostMicros: 'backendCostMicros',
+  voiceSeconds: 'voiceSeconds',
+  liveId: 'liveId',
+  finalUsageKnown: 'finalUsageKnown',
+  summary: 'summary',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt',
+  retainedUntil: 'retainedUntil',
+  lastHeartbeat: 'lastHeartbeat',
+  closedAt: 'closedAt'
+} as const
+
+export type TutoringSessionScalarFieldEnum = (typeof TutoringSessionScalarFieldEnum)[keyof typeof TutoringSessionScalarFieldEnum]
+
+
+export const TutoringEventScalarFieldEnum = {
+  id: 'id',
+  sessionId: 'sessionId',
+  seq: 'seq',
+  operationId: 'operationId',
+  type: 'type',
+  payload: 'payload',
+  createdAt: 'createdAt'
+} as const
+
+export type TutoringEventScalarFieldEnum = (typeof TutoringEventScalarFieldEnum)[keyof typeof TutoringEventScalarFieldEnum]
+
+
+export const TutoringAttachmentScalarFieldEnum = {
+  id: 'id',
+  sessionId: 'sessionId',
+  name: 'name',
+  key: 'key',
+  mime: 'mime',
+  size: 'size',
+  pages: 'pages',
+  createdAt: 'createdAt'
+} as const
+
+export type TutoringAttachmentScalarFieldEnum = (typeof TutoringAttachmentScalarFieldEnum)[keyof typeof TutoringAttachmentScalarFieldEnum]
+
+
+export const TutoringReservationScalarFieldEnum = {
+  id: 'id',
+  sessionId: 'sessionId',
+  day: 'day',
+  reservedMicros: 'reservedMicros',
+  settledMicros: 'settledMicros'
+} as const
+
+export type TutoringReservationScalarFieldEnum = (typeof TutoringReservationScalarFieldEnum)[keyof typeof TutoringReservationScalarFieldEnum]
+
+
+export const TutoringControlScalarFieldEnum = {
+  id: 'id',
+  disabled: 'disabled',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TutoringControlScalarFieldEnum = (typeof TutoringControlScalarFieldEnum)[keyof typeof TutoringControlScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -2035,6 +2486,11 @@ export type GlobalOmitConfig = {
   schoolEdit?: Prisma.SchoolEditOmit
   schoolEditVote?: Prisma.SchoolEditVoteOmit
   emailEvent?: Prisma.EmailEventOmit
+  tutoringSession?: Prisma.TutoringSessionOmit
+  tutoringEvent?: Prisma.TutoringEventOmit
+  tutoringAttachment?: Prisma.TutoringAttachmentOmit
+  tutoringReservation?: Prisma.TutoringReservationOmit
+  tutoringControl?: Prisma.TutoringControlOmit
 }
 
 /* Types for Logging */

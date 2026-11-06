@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { School, Calendar, Users, Plus, Home, Menu, X, Settings } from 'lucide-react'
-import { SignInButton, SignUpButton, UserButton } from '@clerk/nextjs'
+import { UserButton } from '@allauth/react'
 import NotificationBell from './NotificationBell'
 import { useState } from 'react'
 import { useAdmin } from '@/lib/hooks/useAdmin'
@@ -181,27 +181,23 @@ export default function AppHeader({ user, showNotifications = true }: AppHeaderP
 
                 {/* User Menu */}
                 <div className="hidden sm:flex items-center space-x-3">
-                  <UserButton />
+                  <UserButton variant="avatar" managementMode="modal" />
                 </div>
 
                 {/* Mobile User Menu */}
                 <div className="sm:hidden">
-                  <UserButton />
+                  <UserButton variant="avatar" managementMode="modal" />
                 </div>
               </>
             ) : (
               /* Guest Navigation */
               <div className="flex items-center space-x-4">
-                <SignInButton mode="modal">
-                  <Button variant="outline" size="sm" type="button">
+                <Button variant="outline" size="sm" type="button" asChild><Link href="/sign-in">
                     Login
-                  </Button>
-                </SignInButton>
-                <SignUpButton mode="modal">
-                  <Button size="sm" type="button">
+                  </Link></Button>
+                <Button size="sm" type="button" asChild><Link href="/sign-up">
                     Sign Up
-                  </Button>
-                </SignUpButton>
+                  </Link></Button>
               </div>
             )}
           </div>

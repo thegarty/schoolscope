@@ -1,9 +1,27 @@
-# Database - Docker PostgreSQL on port 55442
-DATABASE_URL="postgresql://schoolscope_user:schoolscope_password@localhost:55442/schoolscope?schema=public"
+# Copy to .env (both Prisma CLI and Next.js load this file).
+# Change POSTGRES_PORT and DATABASE_URL together if the port is occupied.
+POSTGRES_PORT=55443
+DATABASE_URL="postgresql://schoolscope_user:schoolscope_password@localhost:55443/schoolscope?schema=public"
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
 
-# Auth - Generate a secure random secret for production
-NEXTAUTH_SECRET="schoolscope-dev-secret-change-in-production-2024"
-NEXTAUTH_URL="http://localhost:3000"
+# AllAuth: select the exact environment; keep the proxy secret server-only.
+ALLAUTH_URL="https://allauth.co"
+ALLAUTH_PROJECT="schoolscope-development"
+ALLAUTH_PROXY_SECRET=""
 
-# App
-NEXT_PUBLIC_APP_URL="http://localhost:3000" 
+# Optional application email delivery (AllAuth manages authentication emails).
+# RESEND_API_KEY=
+# RESEND_FROM_EMAIL=noreply@schoolscope.com.au
+# RESEND_FROM_NAME=SchoolScope
+
+# Tutoring proof of concept. Generate a unique random secret shared by web/controller.
+# OPENAI_API_KEY is server-only; configure through secure key setup.
+# OPENAI_API_KEY=
+TUTOR_CONTROLLER_URL="http://127.0.0.1:3001"
+TUTOR_INTERNAL_SECRET=""
+TUTOR_PUBLIC_ENABLED="false"
+TUTOR_CHILD_ENABLED="false"
+TUTOR_RETENTION_VERIFIED="false"
+# Local worksheet files default to .tutor-uploads (gitignored).
+# Cloud controller only: TUTOR_S3_ENDPOINT, TUTOR_S3_REGION, TUTOR_S3_BUCKET,
+# TUTOR_S3_ACCESS_KEY, TUTOR_S3_SECRET_KEY.

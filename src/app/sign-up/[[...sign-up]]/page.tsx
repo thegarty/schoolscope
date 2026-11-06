@@ -1,26 +1,8 @@
-import { SignUp } from '@clerk/nextjs'
-import { auth } from '@clerk/nextjs/server'
+import { SignUp } from '@allauth/react'
+import { getAuthUser } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 
-export default async function SignUpPage() {
-  if (!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
-    return <div className="min-h-screen flex items-center justify-center bg-gray-50">Auth is not configured.</div>
-  }
-
-  const { userId } = await auth()
-  if (userId) {
-    redirect('/dashboard')
-  }
-
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
-      <SignUp
-        path="/sign-up"
-        routing="path"
-        signInUrl="/sign-in"
-        forceRedirectUrl="/dashboard"
-        fallbackRedirectUrl="/dashboard"
-      />
-    </div>
-  )
+export default async function AuthPage() {
+  if (await getAuthUser()) redirect('/dashboard')
+  return <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4"><SignUp signInUrl="/sign-in" /></div>
 }

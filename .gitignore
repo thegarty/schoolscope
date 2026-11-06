@@ -37,4 +37,11 @@ yarn-error.log*
 next-env.d.ts
 
 # prisma
-/prisma/migrations/dev.db* 
+/prisma/migrations/dev.db*
+# Local browser verification artifacts
+.playwright-cli/
+output/playwright/
+
+.tutor-uploads/
+
+output/tutoring/

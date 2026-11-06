@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  transpilePackages: ["@allauth/react"],
   serverExternalPackages: ["@prisma/client"],
   async rewrites() {
     return [

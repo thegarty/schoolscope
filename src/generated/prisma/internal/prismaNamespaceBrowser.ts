@@ -63,7 +63,12 @@ export const ModelName = {
   SchoolSourceDiscoveryRun: 'SchoolSourceDiscoveryRun',
   SchoolEdit: 'SchoolEdit',
   SchoolEditVote: 'SchoolEditVote',
-  EmailEvent: 'EmailEvent'
+  EmailEvent: 'EmailEvent',
+  TutoringSession: 'TutoringSession',
+  TutoringEvent: 'TutoringEvent',
+  TutoringAttachment: 'TutoringAttachment',
+  TutoringReservation: 'TutoringReservation',
+  TutoringControl: 'TutoringControl'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -120,7 +125,7 @@ export type SchoolScalarFieldEnum = (typeof SchoolScalarFieldEnum)[keyof typeof 
 
 export const UserScalarFieldEnum = {
   id: 'id',
-  clerkId: 'clerkId',
+  allauthId: 'allauthId',
   email: 'email',
   name: 'name',
   password: 'password',
@@ -320,6 +325,82 @@ export const EmailEventScalarFieldEnum = {
 } as const
 
 export type EmailEventScalarFieldEnum = (typeof EmailEventScalarFieldEnum)[keyof typeof EmailEventScalarFieldEnum]
+
+
+export const TutoringSessionScalarFieldEnum = {
+  id: 'id',
+  parentId: 'parentId',
+  childId: 'childId',
+  visitorHash: 'visitorHash',
+  ipHash: 'ipHash',
+  mode: 'mode',
+  status: 'status',
+  context: 'context',
+  workspace: 'workspace',
+  revision: 'revision',
+  sequence: 'sequence',
+  backendCalls: 'backendCalls',
+  escalations: 'escalations',
+  backendCostMicros: 'backendCostMicros',
+  voiceSeconds: 'voiceSeconds',
+  liveId: 'liveId',
+  finalUsageKnown: 'finalUsageKnown',
+  summary: 'summary',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt',
+  retainedUntil: 'retainedUntil',
+  lastHeartbeat: 'lastHeartbeat',
+  closedAt: 'closedAt'
+} as const
+
+export type TutoringSessionScalarFieldEnum = (typeof TutoringSessionScalarFieldEnum)[keyof typeof TutoringSessionScalarFieldEnum]
+
+
+export const TutoringEventScalarFieldEnum = {
+  id: 'id',
+  sessionId: 'sessionId',
+  seq: 'seq',
+  operationId: 'operationId',
+  type: 'type',
+  payload: 'payload',
+  createdAt: 'createdAt'
+} as const
+
+export type TutoringEventScalarFieldEnum = (typeof TutoringEventScalarFieldEnum)[keyof typeof TutoringEventScalarFieldEnum]
+
+
+export const TutoringAttachmentScalarFieldEnum = {
+  id: 'id',
+  sessionId: 'sessionId',
+  name: 'name',
+  key: 'key',
+  mime: 'mime',
+  size: 'size',
+  pages: 'pages',
+  createdAt: 'createdAt'
+} as const
+
+export type TutoringAttachmentScalarFieldEnum = (typeof TutoringAttachmentScalarFieldEnum)[keyof typeof TutoringAttachmentScalarFieldEnum]
+
+
+export const TutoringReservationScalarFieldEnum = {
+  id: 'id',
+  sessionId: 'sessionId',
+  day: 'day',
+  reservedMicros: 'reservedMicros',
+  settledMicros: 'settledMicros'
+} as const
+
+export type TutoringReservationScalarFieldEnum = (typeof TutoringReservationScalarFieldEnum)[keyof typeof TutoringReservationScalarFieldEnum]
+
+
+export const TutoringControlScalarFieldEnum = {
+  id: 'id',
+  disabled: 'disabled',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TutoringControlScalarFieldEnum = (typeof TutoringControlScalarFieldEnum)[keyof typeof TutoringControlScalarFieldEnum]
 
 
 export const SortOrder = {

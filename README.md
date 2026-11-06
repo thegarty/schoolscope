@@ -1,229 +1,64 @@
-# 🏫 SchoolScope
+# SchoolScope
 
-**Community-driven school calendar and profile management system for Australian schools**
+Australian school profiles, community events and family calendars. Built with Next.js 16, React 19, PostgreSQL, Prisma 7 and AllAuth.
 
-[![Next.js](https://img.shields.io/badge/Next.js-14.0.4-black?logo=next.js)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?logo=typescript)](https://www.typescriptlang.org/)
-[![Prisma](https://img.shields.io/badge/Prisma-5.7.1-2D3748?logo=prisma)](https://www.prisma.io/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-336791?logo=postgresql)](https://www.postgresql.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.3-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
+## Run locally
 
-## ✨ Features
+Requirements: pnpm 10.24 and Docker. The project pins Node 24.13.0 through `.npmrc`, so pnpm downloads and uses the matching runtime.
 
-### 🏫 **Comprehensive School Database**
-- **10,868+ Australian schools** pre-loaded with official data
-- Complete school profiles with location, type, and sector information
-- Community-driven school information updates with democratic voting system
-
-### 👥 **User & Family Management**
-- Secure authentication with Lucia Auth
-- Multi-child family support
-- Easy child profile management (add, edit, delete)
-- Year level tracking and school associations
-
-### 📅 **Dual Event System**
-- **Public Events**: Community-wide school events visible to all parents
-- **Private Events**: Personal family reminders and appointments
-- Event categories: Academic, Sports, Arts, Health, and more
-- Location support with address details
-
-### ✅ **Community Validation**
-- **Event Confirmations**: Community members can verify public events
-- Real-time confirmation counts and status updates
-- Prevents misinformation through crowd-sourced validation
-- Event owners cannot confirm their own events (prevents bias)
-
-### 🗳️ **Democratic School Editing**
-- Any community member can suggest school information updates
-- Voting system with 3-vote threshold for approval/rejection
-- Change history tracking and transparency
-- Prevents vandalism through community oversight
-
-### 📱 **Calendar Integration**
-- Export events to Google Calendar, Outlook, Apple Calendar
-- .ics file generation for universal calendar support
-- Location data included in calendar exports
-- Automatic timezone handling
-
-### 🎨 **Modern User Experience**
-- Responsive design for desktop and mobile
-- Clean, intuitive interface with Tailwind CSS
-- Real-time updates and interactions
-- Accessible components with Radix UI
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Node.js 18+ 
-- Docker (for PostgreSQL)
-- Git
-
-### 1. Clone & Install
-```bash
-git clone https://github.com/thegarty/schoolscope.git
-cd schoolscope
-npm install
+```sh
+pnpm install --frozen-lockfile
+cp env-template.txt .env # only on first setup; preserve an existing .env
 ```
 
-### 2. Environment Setup
-```bash
-# Copy environment template
-cp env-template.txt .env.local
+Set the server-only `ALLAUTH_PROXY_SECRET` in `.env` using the selected AllAuth Development environment. The current local setup already has this private file configured. Do not commit credentials.
 
-# Edit .env.local with your settings
-# DATABASE_URL is pre-configured for Docker PostgreSQL
+```sh
+pnpm docker:up
+pnpm db:generate
+pnpm db:migrate:deploy
+pnpm db:seed
+pnpm dev --hostname 127.0.0.1
 ```
 
-### 3. Database Setup
-```bash
-# Start PostgreSQL with Docker
-npm run docker:up
+Open [localhost:3000](http://localhost:3000). The database uses port 55443 locally and persists in the Docker `postgres_data` volume. Change `POSTGRES_PORT` and the port in `DATABASE_URL` together if necessary. The compose default remains 55442 for existing setups. Stop PostgreSQL with `pnpm docker:down`; this preserves its volume.
 
-# Apply database schema
-npm run db:migrate
+The idempotent seed imports 10,868 schools from `data/SchoolData.xlsx`. It creates no login accounts. Sign up or continue with Google through AllAuth at `/sign-in` or `/sign-up`. Legacy password test accounts in earlier documentation no longer provide access.
 
-# Seed with Australian schools + test data
-npm run db:seed
+## Authentication
+
+SchoolScope uses the pinned AllAuth React SDK 1.4.4, vendored from the official versioned archive. Its SHA-256 is `bf3896199f789253fbaf0acb6a8c7f8975912bf8bec1118c54668c67ac9896ee`.
+
+The SDK components share one provider, use same-origin `/api/allauth/*` endpoints, and keep native credentials in HttpOnly cookies. The official server proxy signs upstream requests and enforces its endpoint and origin allowlists. The browser receives no integration secret. Enabled sign-in providers and verification/password policies come from the selected environment. Recovery routes are `/forgot-password` and `/reset-password`; `/login` and `/register` remain aliases.
+
+Server authorization validates the native session against AllAuth, requires a verified email, and links its immutable subject to `users.allauthId`. An existing SchoolScope record may be linked by its matching verified email only when it has no different AllAuth identity. Application user IDs, admin permissions, children, events and other related data remain local. AllAuth platform roles never grant SchoolScope administrator rights.
+
+The new migration removes the previous provider mapping and creates the AllAuth mapping. Historical applied migrations remain unchanged so deployed databases retain a valid migration history. Existing provider sessions do not transfer; users must sign in with AllAuth using the same verified email to regain their existing records. This is identity linking, not a password or credential import.
+
+The configured local target is the dedicated **SchoolScope** workspace, **SchoolScope Development**, slug `schoolscope-development`. Development and Production identities and secrets are separate.
+
+## Validation
+
+```sh
+pnpm typecheck
+pnpm build
+pnpm test:auth-smoke # requires the local dev server and configured AllAuth environment
 ```
 
-### 4. Start Development
-```bash
-npm run dev
-```
+## Railway production configuration
 
-Visit [http://localhost:3000](http://localhost:3000) to see your application!
+Before deploying this authentication migration, provision/select SchoolScope's Production environment in AllAuth, register the exact public application origin, and set these Railway variables:
 
-## 🧪 Test Accounts
+- `DATABASE_URL`: the existing production database.
+- `NEXT_PUBLIC_APP_URL`: the exact HTTPS application origin.
+- `ALLAUTH_URL`: `https://allauth.co`.
+- `ALLAUTH_PROJECT`: the returned Production slug.
+- `ALLAUTH_PROXY_SECRET`: that environment's server-only integration secret.
 
-The seed script creates 4 test parent accounts for testing confirmations:
+Verify each desired social provider for that environment. Google, Apple and Microsoft controls appear only when AllAuth advertises them. Optional application email requires `RESEND_API_KEY`; authentication email is handled by AllAuth. The build works without an application email credential, and attempting delivery without it fails explicitly.
 
-| Email | Password | Parent Name | Children |
-|-------|----------|-------------|----------|
-| `parent1@schoolscope.com` | `password123` | Sarah Johnson | Emma (Year 5), Jack (Year 8) |
-| `parent2@schoolscope.com` | `password123` | Michael Chen | Lily (Year 6) |
-| `parent3@schoolscope.com` | `password123` | Emma Williams | Oliver (Year 4), Sophie (Year 7) |
-| `parent4@schoolscope.com` | `password123` | David Martinez | Carlos (Year 9) |
+Run `pnpm db:migrate:deploy` before serving the new application. The custom production server also runs migrations at startup, but its legacy error handler continues booting on migration failure; verify migrations explicitly during deployment. Remove obsolete provider variables from Railway after the cutover, and verify login, logout, recovery and existing-user data on the public origin. The local setup does not deploy or change Railway/Cloudflare.
 
-## 📊 Database Schema
+## Live tutoring preview
 
-### Core Models
-- **Schools**: 10,868+ Australian schools with comprehensive data
-- **Users**: Parent accounts with secure authentication
-- **Children**: Student profiles linked to users and schools
-- **Events**: Public and private events with confirmation system
-- **EventConfirmations**: Community validation tracking
-- **SchoolEdits**: Democratic school information updates
-- **SchoolEditVotes**: Voting system for school changes
-
-## 🛠️ Tech Stack
-
-### Frontend
-- **Next.js 14** - React framework with App Router
-- **TypeScript** - Type-safe development
-- **Tailwind CSS** - Utility-first styling
-- **Radix UI** - Accessible component primitives
-- **Lucide React** - Beautiful icons
-
-### Backend
-- **Next.js API Routes** - Serverless API endpoints
-- **Prisma** - Type-safe database ORM
-- **PostgreSQL** - Robust relational database
-- **Lucia Auth** - Secure session-based authentication
-
-### Development
-- **Docker** - Containerized PostgreSQL
-- **ESLint** - Code linting
-- **Prettier** - Code formatting
-
-## 📝 Available Scripts
-
-```bash
-# Development
-npm run dev              # Start development server
-npm run build           # Build for production
-npm run start           # Start production server
-npm run lint            # Run ESLint
-
-# Database
-npm run db:migrate      # Apply database migrations
-npm run db:seed         # Seed database with test data
-npm run db:studio       # Open Prisma Studio (database GUI)
-npm run db:reset        # Reset database (development only)
-npm run db:generate     # Generate Prisma client
-
-# Docker
-npm run docker:up       # Start PostgreSQL container
-npm run docker:down     # Stop PostgreSQL container
-npm run docker:logs     # View PostgreSQL logs
-```
-
-## 🏗️ Project Structure
-
-```
-schoolscope/
-├── src/
-│   ├── app/                 # Next.js App Router pages
-│   │   ├── api/            # API endpoints
-│   │   ├── auth/           # Authentication pages
-│   │   ├── children/       # Child management
-│   │   ├── events/         # Event management
-│   │   ├── schools/        # School pages
-│   │   └── dashboard/      # Main dashboard
-│   ├── components/         # Reusable React components
-│   │   └── ui/            # UI component library
-│   ├── lib/               # Utility functions
-│   └── auth/              # Authentication logic
-├── prisma/
-│   ├── schema.prisma      # Database schema
-│   ├── seed.js           # Database seeding
-│   └── migrations/       # Database migrations
-├── data/
-│   ├── SchoolData.xlsx    # Australian schools dataset
-│   └── README.md         # Data documentation
-└── public/               # Static assets
-```
-
-## 🔒 Security Features
-
-- **Session-based authentication** with secure cookies
-- **CSRF protection** built into Next.js
-- **SQL injection prevention** with Prisma ORM
-- **Input validation** and sanitization
-- **User isolation** - users can only access their own data
-- **Democratic oversight** prevents malicious school edits
-
-## 🌟 Key Innovations
-
-### Community-Driven Validation
-Unlike traditional school apps, SchoolScope uses community validation to ensure event accuracy. Parents can confirm events they didn't create, building trust through crowd-sourcing.
-
-### Democratic School Management
-School information updates require community approval, preventing vandalism while allowing necessary corrections and updates.
-
-### Dual Event System
-Separates public school events from private family reminders, with appropriate privacy controls and auto-confirmation for personal events.
-
-### Comprehensive Australian Coverage
-Pre-loaded with official data for 10,868+ Australian schools, eliminating setup friction for parents.
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- Australian school data sourced from official education departments
-- Built with modern web technologies and best practices
-- Inspired by the need for better school community communication
-
----
-
-**Made with ❤️ for Australian school communities**
+A separate adult-only proof of concept is available at [SchoolScope Tutor](https://tutor-web-preview.up.railway.app/tutor/demo). Run both local processes with `pnpm dev:all`. See [tutoring setup and operations](docs/TUTORING.md) for limits, privacy, testing, and the real-child activation gate.

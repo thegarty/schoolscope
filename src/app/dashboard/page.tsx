@@ -183,6 +183,8 @@ export default async function DashboardPage({
               <Button asChild variant="outline" size="sm">
                 <Link href="/children/add">Add Child</Link>
               </Button>
+              <Button asChild variant="outline" size="sm"><Link href="/tutor/demo">Try the AI tutor</Link>
+              </Button>
               <Button asChild variant="outline" size="sm">
                 <Link href="/events/create">Create Event</Link>
               </Button>
@@ -325,6 +327,7 @@ export default async function DashboardPage({
                           <p className="font-medium text-gray-900">{child.name}</p>
                           <p className="text-xs text-gray-500">{child.yearLevel} • {child.school.name}</p>
                         </div>
+                        <Button asChild variant="outline" size="sm"><Link href={`/tutor/children/${child.id}`}>Start tutoring</Link></Button>
                         <Button asChild variant="outline" size="sm">
                           <Link href={`/children/${child.id}/edit`}>
                             <Edit className="h-4 w-4" />
@@ -424,7 +427,8 @@ export default async function DashboardPage({
                             {child.school.suburb}, {child.school.state}
                           </p>
                         </div>
-                        <div className="ml-4">
+                        <div className="ml-4 flex gap-2">
+                          <Button asChild size="sm"><Link href={`/tutor/children/${child.id}`}>Start tutoring</Link></Button>
                           <Button asChild variant="outline" size="sm">
                             <Link href={`/children/${child.id}/edit`}>
                               <Edit className="h-4 w-4" />

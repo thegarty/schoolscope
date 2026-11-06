@@ -2,7 +2,8 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import Script from 'next/script'
 import { Suspense } from 'react'
-import { ClerkProvider } from '@clerk/nextjs'
+import { AuthProvider } from '@/components/AuthProvider'
+import '@allauth/react/styles.css'
 import { GoogleAnalytics } from '@/components/GoogleAnalytics'
 import './globals.css'
 
@@ -36,9 +37,9 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
   const content = (
     <>
+      {process.env.TUTOR_PUBLIC_ENABLED !== 'true' && <>
       {/* Google Analytics */}
       <Script
         strategy="afterInteractive"
@@ -68,6 +69,7 @@ export default function RootLayout({
       <Suspense fallback={null}>
         <GoogleAnalytics />
       </Suspense>
+      </>}
       <div className="min-h-screen bg-background">
         {children}
       </div>
@@ -77,11 +79,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        {publishableKey ? (
-          <ClerkProvider publishableKey={publishableKey}>{content}</ClerkProvider>
-        ) : (
-          content
-        )}
+        <AuthProvider>{content}</AuthProvider>
       </body>
     </html>
   )

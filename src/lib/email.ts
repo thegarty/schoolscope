@@ -1,4 +1,4 @@
-import { resend, EMAIL_CONFIG } from './resend'
+import { getResend, EMAIL_CONFIG } from './resend'
 import { db } from './db'
 import crypto from 'crypto'
 
@@ -48,7 +48,7 @@ export async function sendEmail(options: EmailOptions): Promise<string | null> {
       text: options.text,
     }
 
-    const { data, error } = await resend.emails.send(payload)
+    const { data, error } = await getResend().emails.send(payload)
 
     if (error || !data?.id) {
       console.error('Resend error:', error)
