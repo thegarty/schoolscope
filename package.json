@@ -29,7 +29,7 @@
     "dev:all": "node scripts/tutoring/dev.mjs",
     "tutor:prepare": "pnpm db:migrate:deploy && pnpm db:seed:safe",
     "tutor:web": "pnpm tutor:prepare && next start --hostname 0.0.0.0 --port 3000",
-    "test:tutor": "tsx --test scripts/tutoring/contracts.test.ts",
+    "test:tutor": "tsx --test scripts/tutoring/contracts.test.ts scripts/tutoring/cards.test.ts",
     "test:tutor:db": "tsx --test scripts/tutoring/database.test.ts",
     "test:tutor:public": "node scripts/tutoring/public-smoke.mjs",
     "tutor:admin": "tsx scripts/tutoring/admin.ts"

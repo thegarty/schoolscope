@@ -27,3 +27,19 @@ test('service authorization binds method and exact path, with tamper rejection',
  assert.deepEqual(readPrincipal(auth,'GET','/sessions/a'),p)
  assert.throws(()=>readPrincipal(auth,'DELETE','/sessions/a'));assert.throws(()=>readPrincipal(auth,'GET','/sessions/b'))
 })
+
+test('multiple-choice questions reject duplicate choices and preserve old free-response questions',()=>{
+ const base={id:'q',kind:'question',title:'Try it',question:'Which amount is half?',hint:'Think about equal parts.'}
+ assert.equal(Block.safeParse({...base,options:['One half','One half']}).success,false)
+ assert.equal(Block.safeParse({...base,options:['One half','One quarter','One whole']}).success,true)
+ assert.equal(Block.safeParse(base).success,true)
+})
+
+test('spoken and typed option labels bind deterministically to the visible choices',async()=>{
+ const {resolveChoice}=await import('../../src/lib/tutoring/contracts')
+ const options=['Exactly half is shaded','The whole bar is shaded','Nothing is shaded']
+ for(const value of ['B','b.','I choose B','Option 2','the second one','bee'])assert.equal(resolveChoice(value,options),1)
+ assert.equal(resolveChoice('Exactly half is shaded',options),0)
+ assert.equal(resolveChoice('Can you explain this?',options),null)
+ assert.equal(resolveChoice('D',options),null)
+})

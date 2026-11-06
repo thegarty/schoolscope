@@ -4,6 +4,7 @@ import { PDFDocument } from 'pdf-lib'
 import { z } from 'zod'
 import { tutorDb as db } from './database'
 import { Context, LIMITS, TutorError, sydneyDay, type Principal, type TeachingBlock, type LessonContext } from './contracts'
+import {lessonCards} from './cards'
 import { curriculum, starterBlocks } from './curriculum'
 import { digest, sign, verify } from './security'
 import { putObject, getObject, deleteObject } from './storage'
@@ -49,31 +50,31 @@ export async function createSession(p:Principal,input:unknown) {
   // Parent-approved corrections in data.context take precedence over the displayed school defaults.
   c={...data.context,label:'Learner'}
  }
- const day=sydneyDay();const now=new Date()
+ const day=sydneyDay();const now=new Date();const limited=process.env.TUTOR_ENFORCE_LIMITS==='true'
  const s=await db.$transaction(async tx=>{
   await tx.$executeRaw`SELECT pg_advisory_xact_lock(71403892)`
   if((await tx.tutoringControl.findUnique({where:{id:`challenge:${challengeId}`}})))throw new TutorError(409,'This browser check has already been used')
   const reservations=await tx.tutoringReservation.findMany({where:{day},select:{reservedMicros:true,settledMicros:true}})
-  if(reservations.reduce((sum,r)=>sum+(r.settledMicros??r.reservedMicros),0)+LIMITS.reservationMicros>LIMITS.dailyMicros)throw new TutorError(429,'Today’s demo budget has been reached. Come back tomorrow.')
-  if(!data.childId) {
+  if(limited&&reservations.reduce((sum,r)=>sum+(r.settledMicros??r.reservedMicros),0)+LIMITS.reservationMicros>LIMITS.dailyMicros)throw new TutorError(429,'Today’s demo budget has been reached. Come back tomorrow.')
+  if(limited&&!data.childId) {
    const visitorTrials=await tx.tutoringControl.count({where:{id:{startsWith:`trial:${day}:v:${p.visitorHash}:`}}})
    const ipTrials=await tx.tutoringControl.count({where:{id:{startsWith:`trial:${day}:ip:${p.ipHash}:`}}})
    if(visitorTrials>=2 || ipTrials>=6)throw new TutorError(429,'You’ve used today’s demo sessions. Come back tomorrow.')
    if(await tx.tutoringSession.count({where:{mode:'demo',status:'active',expiresAt:{gt:now},lastHeartbeat:{gt:new Date(Date.now()-60000)}}})>=3)throw new TutorError(429,'Three lessons are running right now. Try again shortly.')
   }
-  if(!data.childId) {
+  if(limited&&!data.childId) {
    await tx.tutoringControl.create({data:{id:`trial:${day}:v:${p.visitorHash}:${challengeId}`}})
    await tx.tutoringControl.create({data:{id:`trial:${day}:ip:${p.ipHash}:${challengeId}`}})
   }
   await tx.tutoringControl.create({data:{id:`challenge:${challengeId}`}})
-  return tx.tutoringSession.create({data:{parentId:data.childId?p.parentId:null,childId:data.childId??null,visitorHash:p.visitorHash,ipHash:p.ipHash,mode:data.childId?'private':'demo',context:json(c),workspace:json(starterBlocks(c)),expiresAt:new Date(Date.now()+600000),retainedUntil:new Date(Date.now()+(data.childId?30:1)*86400000),reservation:{create:{day,reservedMicros:1000000}}}})
+  return tx.tutoringSession.create({data:{parentId:data.childId?p.parentId:null,childId:data.childId??null,visitorHash:p.visitorHash,ipHash:p.ipHash,mode:data.childId?'private':'demo',context:json(c),workspace:json(starterBlocks(c)),expiresAt:new Date(Date.now()+(limited?600000:(data.childId?30:1)*86400000)),retainedUntil:new Date(Date.now()+(data.childId?30:1)*86400000),reservation:{create:{day,reservedMicros:1000000}}}})
  })
  await event(s.id,'notice',{text:'AI tutor demonstration. Adult participant confirmed. Parents can review private lessons; no audio is recorded.'})
  return publicSession(s)
 }
 export function publicSession(s:{[key:string]:any}) {
  const {id,status,context,workspace,revision,createdAt,expiresAt,summary,sequence,attachments,mode,voiceSeconds}=s
- return {id,status,context,workspace,revision,createdAt,expiresAt,summary,sequence,mode,voiceSeconds,curriculum:curriculum(Context.parse(context)),attachments:attachments?.map(({id,name,mime,pages}:any)=>({id,name,mime,pages}))??[]}
+ return {id,status,context,workspace,revision,createdAt,expiresAt,summary,sequence,mode,voiceSeconds,limitsEnabled:process.env.TUTOR_ENFORCE_LIMITS==='true',curriculum:curriculum(Context.parse(context)),attachments:attachments?.map(({id,name,mime,pages}:any)=>({id,name,mime,pages}))??[]}
 }
 export async function events(id:string,p:Principal,after:number) {await owned(id,p);return db.tutoringEvent.findMany({where:{sessionId:id,seq:{gt:after}},orderBy:{seq:'asc'},take:200})}
 export async function history(p:Principal) {return (await db.tutoringSession.findMany({where:{retainedUntil:{gt:new Date()},OR:[{mode:'demo',visitorHash:p.visitorHash},...(p.parentId?[{mode:'private',parentId:p.parentId}]:[])]},orderBy:{createdAt:'desc'},take:50})).map(publicSession)}
@@ -110,3 +111,6 @@ export async function deleteSession(id:string,p:Principal) {
  // Keep only a spend ledger, with no link to the deleted session or identity.
  await db.$transaction(async tx=>{await tx.tutoringSession.delete({where:{id}})})
 }
+
+export async function allCards(id:string) {const s=await db.tutoringSession.findUniqueOrThrow({where:{id}});const es=await db.tutoringEvent.findMany({where:{sessionId:id,type:'lesson'},orderBy:{seq:'asc'}});return lessonCards(Context.parse(s.context),es)}
+export async function focusedCard(id:string) {const cards=await allCards(id);const focus=await db.tutoringEvent.findFirst({where:{sessionId:id,type:'focus'},orderBy:{seq:'desc'}});return cards.find(c=>c.id===(focus?.payload as any)?.cardId)||cards[cards.length-1]}

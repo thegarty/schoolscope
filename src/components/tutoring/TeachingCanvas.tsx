@@ -1,6 +1,8 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import katex from 'katex'
+import {lessonCards} from '@/lib/tutoring/cards'
+import type {LessonContext} from '@/lib/tutoring/contracts'
 import type { TeachingBlock } from '@/lib/tutoring/contracts'
 
 export function MathText({value}:{value:string}) {
@@ -18,16 +20,41 @@ function Visual({block:b}:{block:TeachingBlock}) {
  case 'feedback':return <p className={`tutor-feedback ${b.correct?'positive':''}`}>{b.correct?'✓ ':''}{b.message}<small>Practice feedback · not a formal assessment</small></p>
  }
 }
-export function TeachingCanvas({blocks,events,readOnly,onDraw,onNote}:{blocks:TeachingBlock[];events:any[];readOnly:boolean;onDraw:(points:[number,number][],colour:string)=>void;onNote:(blockId:string,text:string)=>void}) {
- const [pen,setPen]=useState(false),[colour,setColour]=useState('ink'),[draft,setDraft]=useState<[number,number][]>([])
- const area=useRef<HTMLDivElement>(null), drawing=useRef(false),points=useRef<[number,number][]>([])
- const strokes=events.filter(e=>e.type==='draw').slice(-150)
+export function TeachingCanvas({blocks,context,events,readOnly,busy,onDraw,onNote,onAnswer,onFocus}:{blocks:TeachingBlock[];context:LessonContext;events:any[];readOnly:boolean;busy:boolean;onDraw:(points:[number,number][],colour:string,cardId:string)=>void;onNote:(blockId:string,text:string)=>void;onAnswer:(cardId:string,questionId:string,choice:string)=>void;onFocus:(cardId:string)=>void}) {
+ const cards=useMemo(()=>lessonCards(context,events),[context,events])
+ const [index,setIndex]=useState(0),[direction,setDirection]=useState('next'),[pen,setPen]=useState(false),[colour,setColour]=useState('ink'),[draft,setDraft]=useState<[number,number][]>([]),[noteOpen,setNoteOpen]=useState(false)
+ const area=useRef<HTMLDivElement>(null),drawing=useRef(false),points=useRef<[number,number][]>([]),swipe=useRef<{x:number;y:number}|null>(null)
+ const card=cards[Math.min(index,cards.length-1)]
+ const lastId=cards[cards.length-1].id
+ const focusCallback=useRef(onFocus);focusCallback.current=onFocus
+ useEffect(()=>{setDirection('next');setIndex(cards.length-1)},[lastId])
+ useEffect(()=>{if(!readOnly)focusCallback.current(card.id)},[card.id,readOnly])
+ const latestFocus=events.filter(e=>e.type==='focus').slice(-1)[0]
+ useEffect(()=>{if(readOnly&&latestFocus){const i=cards.findIndex(c=>c.id===latestFocus.payload.cardId);if(i>=0)setIndex(i)}},[latestFocus?.id,readOnly])
+ const strokes=events.filter(e=>e.type==='draw'&&(e.payload.blockId===card.id||(!e.payload.blockId&&card.id==='welcome'))).slice(-100)
+ const selected=events.filter(e=>e.type==='choice'&&e.payload.cardId===card.id).slice(-1)[0]?.payload.choice
+ function move(next:number){if(next<0||next>=cards.length)return;setDirection(next>index?'next':'previous');setPen(false);setDraft([]);setIndex(next)}
  const position=(e:React.PointerEvent):[number,number]=>{const r=area.current!.getBoundingClientRect();return [Math.max(0,Math.min(1,(e.clientX-r.left)/r.width)),Math.max(0,Math.min(1,(e.clientY-r.top)/r.height))]}
- const finish=()=>{if(drawing.current){drawing.current=false;if(points.current.length>1)onDraw(points.current,colour);setDraft([])}}
- return <div className="tutor-canvas-shell"><div className="tutor-canvas-tools"><span className="tutor-eyebrow">OUR WORKSPACE</span><div>{!readOnly&&<><button aria-pressed={pen} onClick={()=>setPen(!pen)}>{pen?'✓ Drawing on':'✎ Draw'}</button><label className="sr-only" htmlFor="pen-colour">Pen colour</label><select id="pen-colour" value={colour} onChange={e=>setColour(e.target.value)}><option value="ink">Ink</option><option value="blue">Blue</option><option value="orange">Orange</option></select></>}<span className="tutor-saved"><i/> Saved as we go</span></div></div>
- <div className={`tutor-canvas ${pen?'pen-active':''}`} ref={area}>
- <div className="tutor-block-grid">{blocks.map((b,i)=><article className={`tutor-block kind-${b.kind}`} key={b.id}><div className="tutor-block-heading"><span className="tutor-block-number">{String(i+1).padStart(2,'0')}</span><h3>{b.title}</h3><span>{b.kind==='question'?'YOUR TURN':b.kind==='feedback'?'FEEDBACK':'LET’S EXPLORE'}</span></div><Visual block={b}/>{events.filter(e=>e.type==='annotation'&&e.payload.blockId===b.id).map(e=><p className="tutor-note" key={e.id}>✎ {e.payload.text}</p>)}{!readOnly&&<form className="tutor-note-form" onSubmit={e=>{e.preventDefault();const form=e.currentTarget;const text=(new FormData(form).get('note') as string).trim();if(text)onNote(b.id,text);form.reset()}}><input name="note" aria-label={`Add a note to ${b.title}`} placeholder="Add your thinking…" maxLength={400}/><button title="Save note" aria-label="Save note">+</button></form>}</article>)}</div>
+ const finish=()=>{if(drawing.current){drawing.current=false;if(points.current.length>1)onDraw(points.current,colour,card.id);setDraft([])}}
+ const visuals=card.blocks.filter(b=>b.kind!=='question'&&b.kind!=='feedback')
+ const feedback=card.blocks.filter(b=>b.kind==='feedback')
+ const question=card.question
+ return <div className="tutor-canvas-shell tutor-card-deck" aria-label="Lesson cards" tabIndex={0} onKeyDown={e=>{if((e.target as HTMLElement).closest('input,textarea,select,button,summary'))return;if(e.key==='ArrowLeft'){e.preventDefault();move(index-1)}if(e.key==='ArrowRight'){e.preventDefault();move(index+1)}}}>
+ <div className="tutor-canvas-tools"><span className="tutor-eyebrow">{index===cards.length-1?'CURRENT QUESTION':'LOOKING BACK'}</span><div>{!readOnly&&<><button onClick={()=>setNoteOpen(!noteOpen)} aria-expanded={noteOpen}>＋ Note</button><button aria-pressed={pen} onClick={()=>setPen(!pen)}>{pen?'✓ Done drawing':'✎ Draw'}</button><label className="sr-only" htmlFor="pen-colour">Pen colour</label><select id="pen-colour" value={colour} onChange={e=>setColour(e.target.value)}><option value="ink">Ink</option><option value="blue">Blue</option><option value="orange">Orange</option></select></>}<span className="tutor-saved"><i/> Saved</span></div></div>
+ {noteOpen&&!readOnly&&<form className="tutor-card-note-editor" onSubmit={e=>{e.preventDefault();const text=String(new FormData(e.currentTarget).get('thought')||'').trim();if(text)onNote(question?.id||card.blocks[0].id,text);setNoteOpen(false)}}><input autoFocus name="thought" aria-label="Your thinking" placeholder="Add your thinking…" maxLength={400}/><button>Save</button><button type="button" aria-label="Cancel note" onClick={()=>setNoteOpen(false)}>×</button></form>}
+ <div className={`tutor-canvas ${pen?'pen-active':''}`} ref={area} onTouchStart={e=>{if(pen||(e.target as Element).closest('button,input,textarea,select,summary'))return;swipe.current={x:e.touches[0].clientX,y:e.touches[0].clientY}}} onTouchEnd={e=>{if(!swipe.current)return;const dx=e.changedTouches[0].clientX-swipe.current.x,dy=e.changedTouches[0].clientY-swipe.current.y;swipe.current=null;if(Math.abs(dx)>55&&Math.abs(dx)>Math.abs(dy)*1.4)move(index+(dx<0?1:-1))}}>
+ <div className={`tutor-active-slide slide-${direction}`} key={card.id}>
+ <div className="tutor-slide-visual">{visuals.map(b=><article className={`tutor-block kind-${b.kind}`} key={b.id}><div className="tutor-block-heading"><h3>{b.title}</h3><span>LET’S EXPLORE</span></div><Visual block={b}/></article>)}</div>
+ {feedback.map(b=><article className="tutor-card-feedback" key={b.id}><Visual block={b}/></article>)}
+ {question?<article className="tutor-block tutor-question-card" key={question.id}><div className="tutor-block-heading"><span className="tutor-eyebrow">YOUR TURN</span><h3>{question.title}</h3></div><p className="tutor-question-text">{question.question}</p>
+ {question.options?.length?<div className={`tutor-choice-grid choices-${question.options.length}`} role="group" aria-label="Answer choices">{question.options.map((option,i)=><button key={option} disabled={readOnly||busy} aria-pressed={selected===option} className={selected===option?'chosen':''} onClick={()=>onAnswer(card.id,question.id,option)}><span className="tutor-choice-letter">{String.fromCharCode(65+i)}</span><span>{option}</span></button>)}</div>:<p className="tutor-answer-help">Say your answer or type it below.</p>}
+ <div className="tutor-question-footer"><details className="tutor-hint"><summary>A little hint</summary><p>{question.hint}</p></details><span>{busy?'Checking your answer…':'Tap, type, or say your answer'}</span></div>
+ </article>:<p className="tutor-muted">Ask Ripple a question to keep exploring.</p>}
+ {events.filter(e=>e.type==='annotation'&&card.blocks.some(b=>b.id===e.payload.blockId)).slice(-1).map(e=><p className="tutor-note" key={e.id}>✎ {e.payload.text}</p>)}
+ </div>
  <svg className="tutor-drawing" viewBox="0 0 1000 1000" preserveAspectRatio="none" style={{pointerEvents:pen&&!readOnly?'auto':'none',touchAction:pen?'none':'auto'}} onPointerDown={e=>{if(readOnly||!pen)return;e.currentTarget.setPointerCapture(e.pointerId);drawing.current=true;points.current=[position(e)];setDraft(points.current)}} onPointerMove={e=>{if(!drawing.current)return;if(points.current.length<400){points.current=[...points.current,position(e)];setDraft(points.current)}}} onPointerUp={finish} onPointerCancel={finish}>
  {strokes.map(e=><polyline key={e.id} points={e.payload.points.map((p:number[])=>`${p[0]*1000},${p[1]*1000}`).join(' ')} fill="none" stroke={{ink:'#334155',blue:'#6973d4',orange:'#d47c4f'}[e.payload.colour as 'ink']} strokeWidth="2" vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round"/>)}<polyline points={draft.map(p=>`${p[0]*1000},${p[1]*1000}`).join(' ')} fill="none" stroke={{ink:'#334155',blue:'#6973d4',orange:'#d47c4f'}[colour as 'ink']} strokeWidth="2" vectorEffect="non-scaling-stroke"/>
- </svg></div><p className="tutor-canvas-footer">A place to try things. Mistakes are part of learning.</p></div>
+ </svg></div>
+ <nav className="tutor-card-navigation" aria-label="Lesson card navigation"><button disabled={index===0} onClick={()=>move(index-1)} aria-label="Previous lesson card">‹ <span>Previous</span></button><div><span className="tutor-card-counter">{index+1} / {cards.length}</span><span className="tutor-card-dots">{cards.map((c,i)=><button key={c.id} className={i===index?'active':''} aria-label={`Go to lesson card ${i+1}`} aria-current={i===index?'step':undefined} onClick={()=>move(i)}/>)}</span></div><button disabled={index===cards.length-1} onClick={()=>move(index+1)} aria-label="Next lesson card"><span>Next</span> ›</button></nav>
+ </div>
 }

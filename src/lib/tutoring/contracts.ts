@@ -9,7 +9,7 @@ export const Block = z.discriminatedUnion('kind', [
   z.object({ ...base, kind: z.literal('fraction'), numerator: z.number().int().min(0).max(24), denominator: z.number().int().min(1).max(24) }).refine(b=>b.numerator<=b.denominator,'Use a proper fraction'),
   z.object({ ...base, kind: z.literal('numberline'), min: z.number().min(-1000), max: z.number().max(1000), points: z.array(z.number()).max(15) }).refine(b=>b.max>b.min && b.points.every(p=>p>=b.min && p<=b.max),'Invalid number line'),
   z.object({ ...base, kind: z.literal('geometry'), shape: z.enum(['rectangle','triangle','circle']), width: z.number().min(1).max(20), height: z.number().min(1).max(20), unit: z.enum(['cm','m','units']) }),
-  z.object({ ...base, kind: z.literal('question'), question: z.string().max(600), hint: z.string().max(400) }),
+  z.object({ ...base, kind: z.literal('question'), question: z.string().max(600), hint: z.string().max(400), options: z.array(z.string().min(1).max(120)).min(2).max(4).refine(values=>new Set(values).size===values.length,'Answer choices must be distinct').optional() }),
   z.object({ ...base, kind: z.literal('feedback'), message: z.string().max(500), correct: z.boolean() }),
 ])
 export type TeachingBlock = z.infer<typeof Block>
@@ -36,4 +36,15 @@ export function applyOperations(workspace: TeachingBlock[], operations: z.infer<
   }
   if(next.length>40) throw new TutorError(422,'The canvas is full. Start a new lesson.')
   return next
+}
+
+/** Bind short spoken/typed option answers to the on-screen choices before model reasoning. */
+export function resolveChoice(utterance:string,options:string[]|undefined):number|null {
+ if(!options?.length)return null
+ const clean=(s:string)=>s.toLowerCase().trim().replace(/[.!?,]+$/g,'').replace(/\s+/g,' ')
+ let value=clean(utterance)
+ const exact=options.findIndex(option=>clean(option)===value);if(exact>=0)return exact
+ value=value.replace(/^(?:i (?:choose|pick|think|say)|my answer is|the answer is|it is|it's)\s+/,'').replace(/^(?:option|answer|choice)\s+/,'').replace(/^the\s+/,'').replace(/\s+(?:one|option|answer|choice)$/,'')
+ const choices:Record<string,number>={a:0,ay:0,'1':0,one:0,first:0,b:1,bee:1,be:1,'2':1,two:1,second:1,c:2,see:2,sea:2,'3':2,three:2,third:2,d:3,dee:3,'4':3,four:3,fourth:3}
+ const index=choices[value];return index!==undefined&&index<options.length?index:null
 }

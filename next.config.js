@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: { serverComponentsHmrCache: false },
   transpilePackages: ["@allauth/react"],
   serverExternalPackages: ["@prisma/client"],
   async rewrites() {

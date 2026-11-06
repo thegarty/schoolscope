@@ -25,3 +25,6 @@ TUTOR_RETENTION_VERIFIED="false"
 # Local worksheet files default to .tutor-uploads (gitignored).
 # Cloud controller only: TUTOR_S3_ENDPOINT, TUTOR_S3_REGION, TUTOR_S3_BUCKET,
 # TUTOR_S3_ACCESS_KEY, TUTOR_S3_SECRET_KEY.
+
+# Usage quotas are disabled for testing at the owner’s request.
+TUTOR_ENFORCE_LIMITS="false"

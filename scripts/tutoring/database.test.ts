@@ -8,7 +8,7 @@ import {tutorDb as db} from '../../src/lib/tutoring/database'
 import {challenge,createSession,owned,deleteSession,attach,event} from '../../src/lib/tutoring/service'
 import {sydneyDay,type Principal} from '../../src/lib/tutoring/contracts'
 if(!process.env.DATABASE_URL?.includes('/schoolscope_tutor_tests'))throw new Error('Use the isolated schoolscope_tutor_tests database')
-process.env.TUTOR_PUBLIC_ENABLED='true';process.env.TUTOR_CHILD_ENABLED='false';process.env.TUTOR_INTERNAL_SECRET='integration-tests-secret-at-least-32-chars'
+process.env.TUTOR_ENFORCE_LIMITS='true';process.env.TUTOR_PUBLIC_ENABLED='true';process.env.TUTOR_CHILD_ENABLED='false';process.env.TUTOR_INTERNAL_SECRET='integration-tests-secret-at-least-32-chars'
 const principal=():Principal=>({visitorHash:randomUUID(),ipHash:randomUUID(),isAdmin:false})
 const p=principal();let id:string
 function input(p:Principal){const token=challenge(p);let n=0;while(!createHash('sha256').update(`${token}:${n}`).digest('hex').startsWith('0000'))n++;return {context:{country:'AU',state:'NSW',year:4,lesson:'fractions',label:'Fictional learner'},adultConfirmed:true,consent:true,challenge:token,nonce:String(n)}}
@@ -52,4 +52,16 @@ test('expired sessions cannot accept actions',async()=>{
 })
 test('atomic reservations enforce the daily budget; kill switch rejects admission',async()=>{
  await clear();await db.tutoringReservation.create({data:{day:sydneyDay(),reservedMicros:25_000_000}});const q=principal();await assert.rejects(createSession(q,input(q)));await clear();await db.tutoringControl.create({data:{id:'global',disabled:true}});await assert.rejects(createSession(q,input(q)))
+})
+
+test('unrestricted preview ignores exhausted trial, concurrency and daily-spend quotas',async()=>{
+ await clear();process.env.TUTOR_ENFORCE_LIMITS='false'
+ try {
+  await db.tutoringReservation.create({data:{day:sydneyDay(),reservedMicros:25_000_000}})
+  const q=principal();const sessions=[]
+  for(let i=0;i<5;i++)sessions.push(await createSession(q,input(q)))
+  assert.equal(sessions.length,5);assert.equal(await db.tutoringSession.count({where:{status:'active'}}),5)
+  assert.ok(new Date(sessions[0].expiresAt).getTime()-Date.now()>23*3600000)
+  assert.equal(sessions[0].limitsEnabled,false)
+ } finally {process.env.TUTOR_ENFORCE_LIMITS='true'}
 })
